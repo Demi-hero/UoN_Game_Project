@@ -7,10 +7,11 @@ HEIGHT = 540
 BORDER = 10
 
 
-class background:
+class Background:
     background = pyg.image.load(os.path.join("images", "background.png"))
 
-class player:
+
+class Player:
     # image is 100 by 37 px
     ship = pyg.image.load(os.path.join("images", "vipership.png"))
     ht = 37
@@ -35,13 +36,13 @@ class player:
     # event handler
 
 
-class bullet:
+class Bullet:
     # image is 33 by 8 px
     bull = pyg.image.load(os.path.join("images", "bullet.png"))
     ht = 8
     ln = 33
     vx = 15
-    gunposadj = [player.ln*0.4, player.ht*0.5]
+    gunposadj = [Player.ln*0.4, Player.ht*0.5]
 
     def __init__(self):
         self.x = 0
@@ -56,7 +57,7 @@ class bullet:
 
     # needs to be in the event handler some how
 
-class alien:
+class Alien:
     # image is 88 by 36 px
     ship = pyg.image.load(os.path.join("images", "alien.png"))
     ht = 36
@@ -76,21 +77,21 @@ class alien:
         self.alive = True
 
 
-background = background()
-player1 = player(BORDER, HEIGHT//2)
-aa = bullet()
-ab = bullet()
-ac = bullet()
-ad = bullet()
-ae = bullet()
+background = Background()
+player1 = Player(BORDER, HEIGHT//2)
+aa = Bullet()
+ab = Bullet()
+ac = Bullet()
+ad = Bullet()
+ae = Bullet()
 clip = [aa, ab, ac, ad, ae]
-ba = alien()
-bb = alien()
-bc = alien()
-bd = alien()
-be = alien()
-bf = alien()
-bg = alien()
-bh = alien()
-bi = alien()
+ba = Alien()
+bb = Alien()
+bc = Alien()
+bd = Alien()
+be = Alien()
+bf = Alien()
+bg = Alien()
+bh = Alien()
+bi = Alien()
 swarm = [ba, bb, bc, bd, be, bf, bg, bh, bi]

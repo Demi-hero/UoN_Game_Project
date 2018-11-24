@@ -27,14 +27,14 @@ class App(EH.HandleEvent):
         self._display_surf = None
         self._image_surf = None
         self._backgroud_image = None
-        self.size =self.width, self.height = Sprites.WIDTH, Sprites.HEIGHT
+        self.size = self.width, self.height = Sprites.WIDTH, Sprites.HEIGHT
         self.black = (0,0,0)
         self.white = (255,255,255)
         self.xpos_change = 0
         self.ypos_change = 0
         self.move = False
         self.score = 0
-        # self.clip = [aa, ab, ac, ad, ae]
+        self.lives = 3
 
     # do on initialisation
     def on_init(self):
@@ -51,12 +51,12 @@ class App(EH.HandleEvent):
         # loads the images in to the related image_surf variable
         self._backgroud_image = Sprites.background.background
         self._image_surf = Sprites.player1.ship
+        self._player_hitbox = Sprites.player1.hitbox
         self.player_xpos = Sprites.BORDER
         self.player_ypos = Sprites.HEIGHT//2
         return True
 
-
-    # what to do after this event loop    
+    # what to do after this event loop
     def on_loop(self):
         # player changes
         if self.player_xpos > self.width - Sprites.player1.ln or self.player_xpos < 0:
@@ -67,6 +67,10 @@ class App(EH.HandleEvent):
             self.player_ypos -= (2*self.ypos_change)
         else:
             self.player_ypos += self.ypos_change
+        # update hitbox with final pos
+        Sprites.player1.hitbox = pyg.Rect(self.player_xpos, self.player_ypos,
+                                          Sprites.player1.ln, Sprites.player1.ht)
+
         # bullet changes
         for bullet in Sprites.clip:
             if bullet.alive:
@@ -81,13 +85,16 @@ class App(EH.HandleEvent):
         # swarm updates
         for alien in Sprites.swarm:
             spawn_rate = 1
-            if randint(1,100) <= spawn_rate:
+            if randint(1, 100) <= spawn_rate:
                 alien.spawn()
             for bullet in Sprites.clip:
                 if alien.hitbox.colliderect(bullet.hitbox):
                     alien.alive = False
                     bullet.alive = False
                     self.score += 100
+            if alien.hitbox.colliderect(self._player_hitbox):
+                self.lives -= 1
+                self.on_crash()
             if alien.alive:
                 alien.x += alien.vx
                 alien.hitbox = pyg.Rect(alien.x, alien.y, alien.ln, alien.ht)
@@ -98,13 +105,15 @@ class App(EH.HandleEvent):
                 alien.y = 0
                 alien.hitbox = pyg.Rect(alien.x, alien.y, alien.ln, alien.ht)
 
+
+
     # what to do when images render
     def on_render(self):
 
         self._display_surf.fill(self.white)
         self._display_surf.blit(self._backgroud_image, (0, 0))
         self._display_surf.blit(self._image_surf, (self.player_xpos,
-                                                  self.player_ypos))
+                                                   self.player_ypos))
         for bullet in Sprites.clip:
             if bullet.alive:
                 self._display_surf.blit(bullet.bull, (bullet.x, bullet.y))
@@ -120,6 +129,7 @@ class App(EH.HandleEvent):
 
     # what to do when exicuting the file.
     def on_execute(self):
+        self.lives = 3
         if not self.on_init():
             self._running = False
 

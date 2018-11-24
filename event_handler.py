@@ -39,16 +39,6 @@ class HandleEvent():
         elif event.key == pyg.K_UP or event.key == pyg.K_DOWN:
             self.ypos_change = 0
 
-    def text_objects(self, text, font):
-        textsurface = font.render(text, True, self.black)
-        return textsurface, textsurface.get_rect()
-
-    def message_display(self, text, yloc = .45, xloc = .5):
-        largetext = pyg.font.Font('freesansbold.ttf', 50)
-        textsurf, textrect = self.text_objects(text, largetext)
-        textrect.center = (self.width*xloc), (self.height*yloc)
-        self._display_surf.blit(textsurf, textrect)
-         
     def on_mouse_focus(self):
         pass
     def on_mouse_blur(self):
@@ -79,18 +69,29 @@ class HandleEvent():
         pass
 
     def on_crash(self):
-        self.message_display("Game Over")
-        self.message_display("Press any key to try again", .65)
-        pyg.display.update()
-        time.sleep(1)
-        while True:
-            for event in pyg.event.get():
-                if event.type == pyg.KEYDOWN:
-                    self.xpos_change = 0
-                    self.ypos_change = 0
-                    self.on_execute()
-                    break
+        if self.lives == 0:
+            self.message_display("Game Over")
+            self.message_display("Press any key to try again", .65)
+            pyg.display.update()
+            time.sleep(1)
+            while True:
+                for event in pyg.event.get():
+                    if event.type == pyg.KEYDOWN:
+                        self.xpos_change = 0
+                        self.ypos_change = 0
+                        self.on_execute()
+                        break
+        else:
+            pass
+    def text_objects(self, text, font):
+        textsurface = font.render(text, True, self.white)
+        return textsurface, textsurface.get_rect()
 
+    def message_display(self, text, yloc=.45, xloc=.5):
+        largetext = pyg.font.Font('freesansbold.ttf', 50)
+        textsurf, textrect = self.text_objects(text, largetext)
+        textrect.center = (self.width * xloc), (self.height * yloc)
+        self._display_surf.blit(textsurf, textrect)
 
     def on_exit(self):
         self._running = False
