@@ -3,10 +3,10 @@
 Created on Wed Nov 21 15:03:01 2018
 
 """
-import pygame
+import pygame as pyg
+import time
 
-
-class HandleEvent:
+class HandleEvent():
     def __init__(self):
         pass
         
@@ -17,22 +17,33 @@ class HandleEvent:
         pass
     
     def on_key_down(self, event):
-        if event.key == pygame.K_LEFT:
+        if event.key == pyg.K_LEFT:
             self.xpos_change = -5    
-        elif event.key == pygame.K_RIGHT:
+        elif event.key == pyg.K_RIGHT:
             self.xpos_change = 5    
-        elif event.key == pygame.K_DOWN:
+        elif event.key == pyg.K_DOWN:
             self. ypos_change = 5    
-        elif event.key == pygame.K_UP:
+        elif event.key == pyg.K_UP:
             self.ypos_change = -5
+        #elif pressedkeys[pyg.K_SPACE] and (cooldown == 0):
+         #   for  in clip:
+          #      pass
        
     def on_key_up(self, event):
-        if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+        if event.key == pyg.K_LEFT or event.key == pyg.K_RIGHT:
            self.xpos_change = 0
-        elif event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+        elif event.key == pyg.K_UP or event.key == pyg.K_DOWN:
             self.ypos_change = 0
-         
-        
+
+    def text_objects(self, text, font):
+        textsurface = font.render(text, True, self.black)
+        return textsurface, textsurface.get_rect()
+
+    def message_display(self, text, yloc = .45, xloc = .5):
+        largetext = pyg.font.Font('freesansbold.ttf', 50)
+        textsurf, textrect = self.text_objects(text, largetext)
+        textrect.center = (self.width*xloc), (self.height*yloc)
+        self._display_surf.blit(textsurf, textrect)
          
     def on_mouse_focus(self):
         pass
@@ -63,6 +74,20 @@ class HandleEvent:
     def on_expose(self):
         pass
 
+    def on_crash(self):
+        self.message_display("Game Over")
+        self.message_display("Press any key to try again", .65)
+        pyg.display.update()
+        time.sleep(1)
+        while True:
+            for event in pyg.event.get():
+                if event.type == pyg.KEYDOWN:
+                    self.xpos_change = 0
+                    self.ypos_change = 0
+                    self.on_execute()
+                    break
+
+
     def on_exit(self):
         self._running = False
 
@@ -71,28 +96,28 @@ class HandleEvent:
     def on_event(self, event):
         # means I only ever need to use the on_event function. 
         # runs all the event types as a master event
-        if event.type == pygame.QUIT:
+        if event.type == pyg.QUIT:
             self.on_exit()
  
-        elif event.type >= pygame.USEREVENT:
+        elif event.type >= pyg.USEREVENT:
             self.on_user(event)
  
-        elif event.type == pygame.VIDEOEXPOSE:
+        elif event.type == pyg.VIDEOEXPOSE:
             self.on_expose()
  
-        elif event.type == pygame.VIDEORESIZE:
+        elif event.type == pyg.VIDEORESIZE:
             self.on_resize(event)
  
-        elif event.type == pygame.KEYUP:
+        elif event.type == pyg.KEYUP:
             self.on_key_up(event)
                 
-        elif event.type == pygame.KEYDOWN:
+        elif event.type == pyg.KEYDOWN:
             self.on_key_down(event)
  
-        elif event.type == pygame.MOUSEMOTION:
+        elif event.type == pyg.MOUSEMOTION:
             self.on_mouse_move(event)
  
-        elif event.type == pygame.MOUSEBUTTONUP:
+        elif event.type == pyg.MOUSEBUTTONUP:
             if event.button == 0:
                 self.on_lbutton_up(event)
             elif event.button == 1:
@@ -100,7 +125,7 @@ class HandleEvent:
             elif event.button == 2:
                 self.on_rbutton_up(event)
  
-        elif event.type == pygame.MOUSEBUTTONDOWN:
+        elif event.type == pyg.MOUSEBUTTONDOWN:
             if event.button == 0:
                 self.on_lbutton_down(event)
             elif event.button == 1:
@@ -108,7 +133,7 @@ class HandleEvent:
             elif event.button == 2:
                 self.on_rbutton_down(event)
  
-        elif event.type == pygame.ACTIVEEVENT:
+        elif event.type == pyg.ACTIVEEVENT:
             if event.state == 1:
                 if event.gain:
                     self.on_mouse_focus()

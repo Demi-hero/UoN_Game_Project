@@ -4,15 +4,12 @@ Created on Thu Nov  8 13:20:18 2018
 
 ToDo: 
     Make it stop on the edges / game over on the edge
-
-
     Make a Start screen
-        Press x to play
+        Press KEY to play : Can be implimented from current code
         Credits?
         Different Music?
-
     Make a Game Over Screen
-        Display Text to screen
+        Display Text to screen : Done
         Credits?
         Music
         High Score File
@@ -20,8 +17,7 @@ ToDo:
 
 import pygame as pyg
 import event_handler as EH
-# import images
-import time
+import Sprites
 
 
 
@@ -32,14 +28,16 @@ class App(EH.HandleEvent):
         self._running = True
         self._display_surf = None
         self._image_surf = None
-        self.size =self.width, self.height = 640, 400
+        self._backgroud_image = None
+        self.size =self.width, self.height = Sprites.WIDTH, Sprites.HEIGHT
         self.black = (0,0,0)
         self.white = (255,255,255)
         self.xpos_change = 0
         self.ypos_change = 0
         self.move = False
-        self.player_width = 15
-        self.player_height = 12
+        self.player_width = Sprites.player1.ln
+        self.player_height = Sprites.player1.ht
+        # self.clip = [aa, ab, ac, ad, ae]
 
     # do on initialisation
     def on_init(self):
@@ -52,58 +50,50 @@ class App(EH.HandleEvent):
         
         # this is how I manage the frames per second
         self.clock = pyg.time.Clock()
-        
-        # loads the single image in to the image_surf variable
-        self._image_surf = pyg.image.load("Single_Old_Hero.png")
+
+        # loads the images in to the related image_surf variable
+        self._backgroud_image = Sprites.background.background
+        self._image_surf = Sprites.player1.ship
         self.player_xpos = self.width * .5
         self.player_ypos = self.height * .75
         return True
 
-    def text_objects(self, text, font):
-        textsurface = font.render(text, True, self.black)
-        return textsurface, textsurface.get_rect()
-
-    def message_display(self, text, yloc = .45, xloc = .5):
-        largetext = pyg.font.Font('freesansbold.ttf', 50)
-        textsurf, textrect = self.text_objects(text, largetext)
-        textrect.center = (self.width*xloc), (self.height*yloc)
-        self._display_surf.blit(textsurf, textrect)
-
-    def on_crash(self):
-        self.message_display("Game Over")
-        self.message_display("Try Again!", .65)
-        pyg.display.update()
-        time.sleep(2)
-        self.on_execute()
 
     # what to do after this event loop    
     def on_loop(self):
-        self.clock.tick(60)
-        if self.player_xpos > self.width - self.player_width or self.player_xpos < 0:
-            self.on_crash()
-        if self.player_ypos > self.height - self.player_height or self.player_ypos < 0:
-            self.on_crash()
+        pass
+
 
 
     # what to do when images render
     def on_render(self):
-        self.player_xpos += self.xpos_change
-        self.player_ypos += self.ypos_change
+
+        if self.player_xpos > self.width - self.player_width or self.player_xpos < 0:
+            self.player_xpos -= (2*self.xpos_change)
+        else:
+            self.player_xpos += self.xpos_change
+
+        if self.player_ypos > self.height - self.player_height or self.player_ypos < 0:
+            self.player_ypos -= (2*self.ypos_change)
+        else:
+            self.player_ypos += self.ypos_change
+
         self._display_surf.fill(self.white)
+        self._display_surf.blit(self._backgroud_image, (0, 0))
         self._display_surf.blit(self._image_surf, (self.player_xpos,
                                                   self.player_ypos))
         self.clock.tick(60)
         pyg.display.flip()
-        
+
     # what to do when clearing images
     def on_cleanup(self):
         pyg.quit()
-    
-    # what to do when exicuting the file.    
+
+    # what to do when exicuting the file.
     def on_execute(self):
         if not self.on_init():
             self._running = False
-            
+
         while self._running:
             for event in pyg.event.get():
                 self.on_event(event)

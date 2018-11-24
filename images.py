@@ -1,7 +1,10 @@
 import pygame as pyg
 import os
 
-image_dir = "PNGs"
+background = os.path.join("images", "background.png")
+pcship = os.path.join("images", "vipership.png")
+npcship = os.path.join("images", "alien.png")
+
 
 class Character:
     def __init__(self):
@@ -11,3 +14,4 @@ class Character:
 player = Character()
 
 print(type(player.charsprite))
+"""

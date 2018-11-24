@@ -26,17 +26,17 @@ class player:
         self.y = y-self.ht
         self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
         self.lives = 3
-
+    # event handler?
     def on_hit(self):
         self.lives -= 1
         self.x = BORDER
         self.y = HEIGHT//2
         self.draw()
-
+    # event handler
     def draw(self):
         self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
         screen.blit(self.ship, (self.x, self.y))
-
+    # event handler
     def update(self, pressedkeys):
         if pressedkeys[pyg.K_UP] and pressedkeys[pyg.K_LEFT]:
             self.vy = self.vx = -self.speed*self.vdiagmod
@@ -150,6 +150,9 @@ bh = alien()
 bi = alien()
 swarm = [ba, bb, bc, bd, be, bf, bg, bh, bi]
 running = True
+
+
+
 
 def main():
     cooldown = 0
