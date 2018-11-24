@@ -100,6 +100,7 @@ class App(EH.HandleEvent):
                 alien.hitbox = pyg.Rect(alien.x, alien.y, alien.ln, alien.ht)
             if alien.x < (0 - alien.ln):
                 alien.alive = False
+                self.score -= 100
             if not alien.alive:
                 alien.x = Sprites.WIDTH + 10
                 alien.y = 0
@@ -120,6 +121,7 @@ class App(EH.HandleEvent):
         for alien in Sprites.swarm:
             if alien.alive:
                 self._display_surf.blit(alien.ship, (alien.x, alien.y))
+        self.message_display("{}".format(self.score), 0.05, 0.1)
         self.clock.tick(60)
         pyg.display.flip()
 
