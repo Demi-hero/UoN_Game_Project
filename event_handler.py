@@ -5,6 +5,8 @@ Created on Wed Nov 21 15:03:01 2018
 """
 import pygame as pyg
 import time
+import Sprites
+
 
 class HandleEvent():
     def __init__(self):
@@ -18,17 +20,19 @@ class HandleEvent():
     
     def on_key_down(self, event):
         if event.key == pyg.K_LEFT:
-            self.xpos_change = -5    
+            self.xpos_change = -5
+
         elif event.key == pyg.K_RIGHT:
             self.xpos_change = 5    
         elif event.key == pyg.K_DOWN:
             self. ypos_change = 5    
         elif event.key == pyg.K_UP:
             self.ypos_change = -5
-        #elif pressedkeys[pyg.K_SPACE] and (cooldown == 0):
-         #   for  in clip:
-          #      pass
-       
+        elif event.key == pyg.K_SPACE:
+            for bullet in Sprites.clip:
+                if not bullet.alive:
+                    bullet.fire(Sprites.player1.x, Sprites.player1.y)
+
     def on_key_up(self, event):
         if event.key == pyg.K_LEFT or event.key == pyg.K_RIGHT:
            self.xpos_change = 0

@@ -90,13 +90,13 @@ class bullet:
         self.alive = True
 
     def update(self):
-        if self.alive == True:
+        if self.alive:
             self.x += self.vx
             self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
             screen.blit(self.bull, (self.x, self.y))
         if self.x > WIDTH:
             self.alive = False
-        if self.alive == False:
+        if not self.alive:
             self.x = 0
             self.y = 0
             self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)

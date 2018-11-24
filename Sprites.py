@@ -1,5 +1,6 @@
 import pygame as pyg
 import os
+from random import randint
 
 WIDTH = 960
 HEIGHT = 540
@@ -24,6 +25,7 @@ class player:
         self.y = y-self.ht
         self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
         self.lives = 3
+
     # event handler?
     def on_hit(self):
         self.lives -= 1
@@ -40,6 +42,7 @@ class bullet:
     ln = 33
     vx = 15
     gunposadj = [player.ln*0.4, player.ht*0.5]
+
     def __init__(self):
         self.x = 0
         self.y = 0
@@ -50,6 +53,20 @@ class bullet:
         self.x = x + self.gunposadj[0]
         self.y = y + self.gunposadj[1]
         self.alive = True
+
+    # needs to be in the event handler some how
+
+    def update(self):
+        if self.alive:
+            self.x += self.vx
+            self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
+            self._display_surf.blit(self.bull, (self.x, self.y))
+        if self.x > WIDTH:
+            self.alive = False
+        if not self.alive:
+            self.x = 0
+            self.y = 0
+            self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
 
 class alien:
     # image is 88 by 36 px
@@ -74,7 +91,7 @@ class alien:
         if self.alive == True:
             self.x += self.vx
             self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
-            screen.blit(self.ship, (self.x, self.y))
+            self._display_surf.blit(self.ship, (self.x, self.y))
         if self.x < (0-self.ln):
             self.alive = False
         if self.alive == False:

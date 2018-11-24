@@ -20,8 +20,6 @@ import event_handler as EH
 import Sprites
 
 
-
-
 class App(EH.HandleEvent):
     # initialisation
     def __init__(self, *arg, **karg):
@@ -72,16 +70,23 @@ class App(EH.HandleEvent):
             self.player_xpos -= (2*self.xpos_change)
         else:
             self.player_xpos += self.xpos_change
-
         if self.player_ypos > self.height - self.player_height or self.player_ypos < 0:
             self.player_ypos -= (2*self.ypos_change)
         else:
             self.player_ypos += self.ypos_change
-
         self._display_surf.fill(self.white)
         self._display_surf.blit(self._backgroud_image, (0, 0))
         self._display_surf.blit(self._image_surf, (self.player_xpos,
                                                   self.player_ypos))
+        for bullet in Sprites.clip:
+            if bullet.alive:
+                bullet.x += bullet.vx
+                self._display_surf.blit(bullet.bull, (bullet.x, bullet.y))
+            if bullet.x > Sprites.WIDTH:
+                bullet.alive = False
+            if not bullet.alive:
+                bullet.x = 0
+                bullet.y = 0
         self.clock.tick(60)
         pyg.display.flip()
 
