@@ -56,18 +56,6 @@ class bullet:
 
     # needs to be in the event handler some how
 
-    def update(self):
-        if self.alive:
-            self.x += self.vx
-            self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
-            self._display_surf.blit(self.bull, (self.x, self.y))
-        if self.x > WIDTH:
-            self.alive = False
-        if not self.alive:
-            self.x = 0
-            self.y = 0
-            self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
-
 class alien:
     # image is 88 by 36 px
     ship = pyg.image.load(os.path.join("images", "alien.png"))
@@ -86,18 +74,6 @@ class alien:
             spawny = int(BORDER + (randint(0,4) * (HEIGHT*0.2)))
             self.y = spawny
         self.alive = True
-
-    def update(self):
-        if self.alive == True:
-            self.x += self.vx
-            self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
-            self._display_surf.blit(self.ship, (self.x, self.y))
-        if self.x < (0-self.ln):
-            self.alive = False
-        if self.alive == False:
-            self.x = WIDTH
-            self.y = 0
-            self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
 
 
 background = background()

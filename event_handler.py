@@ -31,7 +31,7 @@ class HandleEvent():
         elif event.key == pyg.K_SPACE:
             for bullet in Sprites.clip:
                 if not bullet.alive:
-                    bullet.fire(Sprites.player1.x, Sprites.player1.y)
+                    bullet.fire(self.player_xpos, self.player_ypos)
 
     def on_key_up(self, event):
         if event.key == pyg.K_LEFT or event.key == pyg.K_RIGHT:

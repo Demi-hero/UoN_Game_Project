@@ -78,6 +78,7 @@ class bullet:
     ln = 33
     vx = 15
     gunposadj = [player.ln*0.4, player.ht*0.5]
+
     def __init__(self):
         self.x = 0
         self.y = 0
