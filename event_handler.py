@@ -21,7 +21,6 @@ class HandleEvent():
     def on_key_down(self, event):
         if event.key == pyg.K_LEFT:
             self.xpos_change = -5
-
         elif event.key == pyg.K_RIGHT:
             self.xpos_change = 5    
         elif event.key == pyg.K_DOWN:
@@ -69,7 +68,9 @@ class HandleEvent():
         pass
 
     def on_crash(self):
+        self.lives -= 1
         if self.lives == 0:
+            # play sad game over music
             self.message_display("Game Over")
             self.message_display("Press any key to try again", .65)
             pyg.display.update()
@@ -79,10 +80,21 @@ class HandleEvent():
                     if event.type == pyg.KEYDOWN:
                         self.xpos_change = 0
                         self.ypos_change = 0
+                        for aliens in Sprites.swarm:
+                            aliens.alive = False
+                        for bullet in Sprites.clip:
+                            bullet.alive = False
                         self.on_execute()
                         break
         else:
-            pass
+            # bad explosion noise / Oh god no
+            self.player_xpos = Sprites.BORDER
+            self.player_ypos = Sprites.HEIGHT // 2
+            for aliens in Sprites.swarm:
+                aliens.alive = False
+            self._player_hitbox = pyg.Rect(self.player_xpos, self.player_ypos,
+                                           Sprites.player1.ln, Sprites.player1.ht)
+
     def text_objects(self, text, font):
         textsurface = font.render(text, True, self.white)
         return textsurface, textsurface.get_rect()
@@ -99,7 +111,7 @@ class HandleEvent():
     def on_user(self,event):
         pass
     def on_event(self, event):
-        # means I only ever need to use the on_event function. 
+        # means you only ever need to use the on_event function.
         # runs all the event types as a master event
         if event.type == pyg.QUIT:
             self.on_exit()

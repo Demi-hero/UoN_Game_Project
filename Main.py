@@ -34,7 +34,7 @@ class App(EH.HandleEvent):
         self.ypos_change = 0
         self.move = False
         self.score = 0
-        self.lives = 3
+        self.lives = 0
 
     # do on initialisation
     def on_init(self):
@@ -51,9 +51,10 @@ class App(EH.HandleEvent):
         # loads the images in to the related image_surf variable
         self._backgroud_image = Sprites.background.background
         self._image_surf = Sprites.player1.ship
-        self._player_hitbox = Sprites.player1.hitbox
         self.player_xpos = Sprites.BORDER
-        self.player_ypos = Sprites.HEIGHT//2
+        self.player_ypos = Sprites.HEIGHT // 2
+        self._player_hitbox = pyg.Rect(self.player_xpos, self.player_ypos,
+                                       Sprites.player1.ln, Sprites.player1.ht)
         return True
 
     # what to do after this event loop
@@ -68,7 +69,8 @@ class App(EH.HandleEvent):
         else:
             self.player_ypos += self.ypos_change
         # update hitbox with final pos
-        Sprites.player1.hitbox = pyg.Rect(self.player_xpos, self.player_ypos,
+
+        self._player_hitbox = pyg.Rect(self.player_xpos, self.player_ypos,
                                           Sprites.player1.ln, Sprites.player1.ht)
 
         # bullet changes
@@ -81,6 +83,7 @@ class App(EH.HandleEvent):
             if not bullet.alive:
                 bullet.x = 0
                 bullet.y = 0
+                bullet.hitbox = pyg.Rect(bullet.x, bullet.y, bullet.ln, bullet.ht)
 
         # swarm updates
         for alien in Sprites.swarm:
@@ -91,16 +94,15 @@ class App(EH.HandleEvent):
                 if alien.hitbox.colliderect(bullet.hitbox):
                     alien.alive = False
                     bullet.alive = False
-                    self.score += 100
+                    self.score += 10
             if alien.hitbox.colliderect(self._player_hitbox):
-                self.lives -= 1
                 self.on_crash()
             if alien.alive:
                 alien.x += alien.vx
                 alien.hitbox = pyg.Rect(alien.x, alien.y, alien.ln, alien.ht)
             if alien.x < (0 - alien.ln):
                 alien.alive = False
-                self.score -= 100
+                self.score -= 50
             if not alien.alive:
                 alien.x = Sprites.WIDTH + 10
                 alien.y = 0
@@ -121,7 +123,8 @@ class App(EH.HandleEvent):
         for alien in Sprites.swarm:
             if alien.alive:
                 self._display_surf.blit(alien.ship, (alien.x, alien.y))
-        self.message_display("{}".format(self.score), 0.05, 0.1)
+        self.message_display("Score:{}".format(self.score), 0.05, 0.1)
+        self.message_display("Lives: {}".format(self.lives), 0.05, .85)
         self.clock.tick(60)
         pyg.display.flip()
 
@@ -132,6 +135,7 @@ class App(EH.HandleEvent):
     # what to do when exicuting the file.
     def on_execute(self):
         self.lives = 3
+        self.score = 0
         if not self.on_init():
             self._running = False
 
