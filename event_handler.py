@@ -31,6 +31,17 @@ class HandleEvent():
             for bullet in Sprites.clip:
                 if not bullet.alive:
                     bullet.fire(self.player_xpos, self.player_ypos)
+        elif event.key == pyg.K_p:
+            self.message_display("GAME PAUSED", .30)
+            self.message_display("Press Space to restart")
+            self.message_display("Press Q to quit", .65)
+            pyg.display.update()
+            while True:
+                for event in pyg.event.get():
+                    if event.type == pyg.K_p:
+                        break
+                    if event.type == pyg.K_q:
+                        pyg.quit()
 
     def on_key_up(self, event):
         if event.key == pyg.K_LEFT or event.key == pyg.K_RIGHT:
@@ -59,9 +70,16 @@ class HandleEvent():
     def on_mbutton_down(self, event):
         pass
     def on_minimize(self):
+        # freeze all updates
         pass
     def on_restore(self):
-        pass
+        self.message_display("GAME PAUSED")
+        self.message_display("Press Space to restart")
+        pyg.display.update()
+        while True:
+            for event in pyg.event.get():
+                if event.type == pyg.K_SPACE:
+                    break
     def on_resize(self,event):
         pass
     def on_expose(self):
