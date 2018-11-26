@@ -49,7 +49,7 @@ class App(EH.HandleEvent):
         self.clock = pyg.time.Clock()
 
         # loads the images in to the related image_surf variable
-        self._backgroud_image = Sprites.background.background
+#        self._backgroud_image = Sprites.background.background
         self._image_surf = Sprites.player1.ship
         self.player_xpos = Sprites.BORDER
         self.player_ypos = Sprites.HEIGHT // 2
@@ -72,7 +72,15 @@ class App(EH.HandleEvent):
 
         self._player_hitbox = pyg.Rect(self.player_xpos, self.player_ypos,
                                           Sprites.player1.ln, Sprites.player1.ht)
-
+        
+        # y-axis loop animation counter control      
+        if Sprites.player1.flight_y + 1 >= 9:
+            Sprites.player1.flight_y = 0
+            
+        # x-axis loop animation counter control      
+        if Sprites.player1.flight_x + 1 >= 9:
+            Sprites.player1.flight_x = 0
+        
         # bullet changes
         for bullet in Sprites.clip:
             if bullet.alive:
@@ -113,10 +121,34 @@ class App(EH.HandleEvent):
     # what to do when images render
     def on_render(self):
 
+        
+        
         self._display_surf.fill(self.white)
-        self._display_surf.blit(self._backgroud_image, (0, 0))
-        self._display_surf.blit(self._image_surf, (self.player_xpos,
+        self._display_surf.blit(Sprites.background.bg1, (Sprites.background.bg1_x, 0))
+        self._display_surf.blit(Sprites.background.bg2, (Sprites.background.bg2_x, 0))
+#        self._display_surf.blit(self._backgroud_image, (0, 0))
+#        self._display_surf.blit(self._image_surf, (self.player_xpos,
+#                                                   self.player_ypos))
+        
+        # animate thurst on up or down
+        if Sprites.player1.updown:
+            self._display_surf.blit(Sprites.player1.shiptop[Sprites.player1.flight_y//3],
+                                    (self.player_xpos, self.player_ypos))
+            Sprites.player1.flight_y += 1
+#        else:
+#            self._display_surf.blit(self._image_surf, (self.player_xpos,
+#                                                   self.player_ypos))
+        
+        # animate thrust on left or right
+        elif Sprites.player1.leftright:
+            self._display_surf.blit(Sprites.player1.shipside[Sprites.player1.flight_x//3],
+                                    (self.player_xpos, self.player_ypos))
+            Sprites.player1.flight_x += 1
+        else:
+            self._display_surf.blit(self._image_surf, (self.player_xpos,
                                                    self.player_ypos))
+            
+            
         for bullet in Sprites.clip:
             if bullet.alive:
                 self._display_surf.blit(bullet.bull, (bullet.x, bullet.y))
@@ -127,7 +159,14 @@ class App(EH.HandleEvent):
         self.message_display("Lives: {}".format(self.lives), 0.05, .85)
         self.clock.tick(60)
         pyg.display.flip()
+        
+        Sprites.background.bg1_x -= 1
+        Sprites.background.bg2_x -= 1
 
+        if Sprites.background.bg1_x <= -1 * Sprites.background.bg1.get_width():
+            Sprites.background.bg1_x = Sprites.background.bg2_x + Sprites.background.bg2.get_width()
+        if Sprites.background.bg2_x <= -1 * Sprites.background.bg2.get_width():
+            Sprites.background.bg2_x = Sprites.background.bg1_x + Sprites.background.bg1.get_width()
     # what to do when clearing images
     def on_cleanup(self):
         pyg.quit()

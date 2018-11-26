@@ -8,14 +8,25 @@ BORDER = 10
 
 
 class Background:
-    background = pyg.image.load(os.path.join("images", "background.png"))
-
+#    background = pyg.image.load(os.path.join("images", "background.jpg"))
+    bg1 = pyg.image.load(os.path.join("images", "background.jpg"))
+    bg2 = pyg.image.load(os.path.join("images", "background.jpg"))
+    
+    bg1_x = 0
+    bg2_x = bg1.get_width()
 
 class Player:
-    # image is 100 by 37 px
-    ship = pyg.image.load(os.path.join("images", "vipership.png"))
-    ht = 37
-    ln = 100
+    # image is 205 by 43 px from side, 205 by 95 from top view
+    ship = pyg.image.load(os.path.join("images", "hero_side.png"))
+    shiptop = [pyg.image.load(os.path.join("images", "hero_top1.png")), 
+               pyg.image.load(os.path.join("images", "hero_top2.png")), 
+               pyg.image.load(os.path.join("images", "hero_top3.png"))]
+    shipside = [pyg.image.load(os.path.join("images", "hero_side1.png")), 
+               pyg.image.load(os.path.join("images", "hero_side2.png")), 
+               pyg.image.load(os.path.join("images", "hero_side3.png"))]
+    
+    ht = 43
+    ln = 205
     vx = 0
     vy = 0
     speed = 4
@@ -26,6 +37,10 @@ class Player:
         self.y = y-self.ht
         self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
         self.lives = 3
+        self.updown = False
+        self.leftright = False
+        self.flight_y = 0
+        self.flight_x = 0
 
     # event handler?
     def on_hit(self):
@@ -58,10 +73,10 @@ class Bullet:
     # needs to be in the event handler some how
 
 class Alien:
-    # image is 88 by 36 px
-    ship = pyg.image.load(os.path.join("images", "alien.png"))
-    ht = 36
-    ln = 88
+    # image is 100 by 133 px
+    ship = pyg.image.load(os.path.join("images", "enemy_purple.png"))
+    ht = 100
+    ln = 133
     vx = -3
 
     def __init__(self):

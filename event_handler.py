@@ -21,12 +21,17 @@ class HandleEvent():
     def on_key_down(self, event):
         if event.key == pyg.K_LEFT:
             self.xpos_change = -5
+            Sprites.player1.leftright = True
         elif event.key == pyg.K_RIGHT:
-            self.xpos_change = 5    
+            self.xpos_change = 5   
+            Sprites.player1.leftright = True
         elif event.key == pyg.K_DOWN:
             self. ypos_change = 5    
+            Sprites.player1.updown = True
         elif event.key == pyg.K_UP:
             self.ypos_change = -5
+            Sprites.player1.updown = True
+            
         elif event.key == pyg.K_SPACE:
             for bullet in Sprites.clip:
                 if not bullet.alive:
@@ -35,8 +40,10 @@ class HandleEvent():
     def on_key_up(self, event):
         if event.key == pyg.K_LEFT or event.key == pyg.K_RIGHT:
            self.xpos_change = 0
+           Sprites.player1.leftright = False
         elif event.key == pyg.K_UP or event.key == pyg.K_DOWN:
             self.ypos_change = 0
+            Sprites.player1.updown = False 
 
     def on_mouse_focus(self):
         pass
