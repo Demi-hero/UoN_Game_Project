@@ -27,15 +27,6 @@ class Player:
         self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
         self.lives = 3
 
-    # event handler?
-    def on_hit(self):
-        self.lives -= 1
-        self.x = BORDER
-        self.y = HEIGHT//2
-        self.draw()
-    # event handler
-
-
 class Bullet:
     # image is 33 by 8 px
     bull = pyg.image.load(os.path.join("images", "bullet.png"))

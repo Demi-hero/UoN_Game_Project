@@ -48,9 +48,14 @@ class HandleEvent():
         elif event.key == pyg.K_UP:
             self.ypos_change = -5
         elif event.key == pyg.K_SPACE:
+            reload = 0
             for bullet in Sprites.clip:
                 if not bullet.alive:
                     bullet.fire(self.player_xpos, self.player_ypos)
+                    reload = 5
+                    break
+                if reload > 0:
+                    reoload -= 1
         elif event.key == pyg.K_p:
             self.on_pause()
         elif event.key == pyg.K_q:
@@ -104,7 +109,7 @@ class HandleEvent():
             self.message_display("Game Over")
             self.message_display("Press any key to try again", .65)
             pyg.display.update()
-            time.sleep(2)
+            time.sleep(1.5)
             while True:
                 for event in pyg.event.get():
                     if event.type == pyg.KEYDOWN:

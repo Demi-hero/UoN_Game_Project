@@ -69,8 +69,6 @@ class App(EH.HandleEvent):
             self.player_ypos -= (2*self.ypos_change)
         else:
             self.player_ypos += self.ypos_change
-        # update hitbox with final pos
-
         self._player_hitbox = pyg.Rect(self.player_xpos, self.player_ypos,
                                        Sprites.player1.ln, Sprites.player1.ht)
 
@@ -108,7 +106,6 @@ class App(EH.HandleEvent):
                 alien.x = Sprites.WIDTH + 10
                 alien.y = 0
                 alien.hitbox = pyg.Rect(alien.x, alien.y, alien.ln, alien.ht)
-
 
     # what to do when images render
     def on_render(self):
