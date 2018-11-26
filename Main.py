@@ -144,7 +144,6 @@ class App(EH.HandleEvent):
             self.on_render()
         self.on_cleanup()
 
-
 if __name__ == '__main__':
     theApp = App()
     theApp.on_execute()

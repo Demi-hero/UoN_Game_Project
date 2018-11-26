@@ -62,8 +62,6 @@ class HandleEvent():
             if self.paused:
                 self.on_exit()
 
-
-
     def on_key_up(self, event):
         if event.key == pyg.K_LEFT or event.key == pyg.K_RIGHT:
            self.xpos_change = 0
