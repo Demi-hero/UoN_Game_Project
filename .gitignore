@@ -1,10 +1,6 @@
 
-.idea/encodings.xml
-.idea/libraries/R_User_Library.xml
-.idea/misc.xml
-.idea/modules.xml
-.idea/UoN_Game_Project.iml
-.idea/vcs.xml
-.idea/workspace.xml
-__pycache__/Sprites.cpython-37.pyc
+*.xml
+*.pyc
+*.iml
+*.pyc
 __pycache__/event_handler.cpython-37.pyc

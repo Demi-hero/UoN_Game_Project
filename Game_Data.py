@@ -5,7 +5,7 @@ from random import randint
 WIDTH = 960
 HEIGHT = 540
 BORDER = 10
-
+HS_FILE = "highscore.txt"
 
 class Background:
     bg1 = pyg.image.load(os.path.join("images", "background.jpg"))

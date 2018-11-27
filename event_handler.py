@@ -5,7 +5,8 @@ Created on Wed Nov 21 15:03:01 2018
 """
 import pygame as pyg
 import time
-import Sprites
+import Game_Data
+from os import path
 
 
 class HandleEvent():
@@ -21,7 +22,18 @@ class HandleEvent():
         textsurf, textrect = self.text_objects(text, largetext)
         textrect.center = (self.width * xloc), (self.height * yloc)
         self._display_surf.blit(textsurf, textrect)
-        
+
+    def load_data(self):
+        try:
+            with open("highscore.txt", "r") as f:
+                self.high_score = int(f.read())
+        except FileNotFoundError:
+            self.high_score = 0
+            print("FnF error")
+        except ValueError:
+            print("Value Error")
+            self.high_score = 0
+
     def on_pause(self, minimised=0):
         if not self.paused:
             self.paused = True
@@ -41,26 +53,26 @@ class HandleEvent():
     def on_key_down(self, event):
         if event.key == pyg.K_LEFT:
             self.xpos_change = -5
-            Sprites.player1.leftright = True
+            Game_Data.player1.leftright = True
         elif event.key == pyg.K_RIGHT:
             self.xpos_change = 5   
-            Sprites.player1.leftright = True
+            Game_Data.player1.leftright = True
         elif event.key == pyg.K_DOWN:
             self. ypos_change = 5    
-            Sprites.player1.updown = True
+            Game_Data.player1.updown = True
         elif event.key == pyg.K_UP:
             self.ypos_change = -5
-            Sprites.player1.updown = True
+            Game_Data.player1.updown = True
             
         elif event.key == pyg.K_SPACE:
             reload = 0
-            for bullet in Sprites.clip:
+            for bullet in Game_Data.clip:
                 if not bullet.alive:
                     bullet.fire(self.player_xpos, self.player_ypos)
                     reload = 5
                     break
                 if reload > 0:
-                    reoload -= 1
+                    reload -= 1
         elif event.key == pyg.K_p:
             self.on_pause()
         elif event.key == pyg.K_q:
@@ -70,10 +82,10 @@ class HandleEvent():
     def on_key_up(self, event):
         if event.key == pyg.K_LEFT or event.key == pyg.K_RIGHT:
            self.xpos_change = 0
-           Sprites.player1.leftright = False
+           Game_Data.player1.leftright = False
         elif event.key == pyg.K_UP or event.key == pyg.K_DOWN:
             self.ypos_change = 0
-            Sprites.player1.updown = False 
+            Game_Data.player1.updown = False
 
     def on_mouse_focus(self):
         pass
@@ -111,29 +123,43 @@ class HandleEvent():
         self.lives -= 1
         if self.lives == 0:
             # play sad game over music
-            self.message_display("Game Over")
+            self._display_surf.blit(Game_Data.background.bg1, (Game_Data.background.bg1_x, 0))
+            self._display_surf.blit(Game_Data.background.bg2, (Game_Data.background.bg2_x, 0))
+            self.message_display("Game Over", 0.35)
+
+            if self.score > self.high_score:
+                self.high_score = self.score
+                self.message_display("NEW HIGH SCORE: {}!".format(self.score), .55)
+                with open("highscore.txt", "w") as f:
+                    f.write(str(self.score))
+
+            else:
+                self.message_display("Highscore: {}".format(self.high_score))
+                self.message_display("Your Score: {}".format(self.score), .55)
             self.message_display("Press any key to try again", .65)
             pyg.display.update()
             time.sleep(1.5)
             while True:
                 for event in pyg.event.get():
-                    if event.type == pyg.KEYDOWN:
+                    if event.type == pyg.QUIT:
+                        self.on_execute()
+                    elif event.type == pyg.KEYDOWN:
                         self.xpos_change = 0
                         self.ypos_change = 0
-                        for aliens in Sprites.swarm:
+                        for aliens in Game_Data.swarm:
                             aliens.alive = False
-                        for bullet in Sprites.clip:
+                        for bullet in Game_Data.clip:
                             bullet.alive = False
                         self.on_execute()
                         break
         else:
             # bad explosion noise / Oh god no
-            self.player_xpos = Sprites.BORDER
-            self.player_ypos = Sprites.HEIGHT // 2
-            for aliens in Sprites.swarm:
+            self.player_xpos = Game_Data.BORDER
+            self.player_ypos = Game_Data.HEIGHT // 2
+            for aliens in Game_Data.swarm:
                 aliens.alive = False
             self._player_hitbox = pyg.Rect(self.player_xpos, self.player_ypos,
-                                           Sprites.player1.ln, Sprites.player1.ht)
+                                           Game_Data.player1.ln, Game_Data.player1.ht)
 
     def on_exit(self):
         self._running = False
