@@ -40,6 +40,13 @@ class Player:
         self.leftright = False
         self.flight_y = 0
         self.flight_x = 0
+        self.player_name = ""
+
+    def update_name(self,new_letter="", delete=0):
+        if not delete:
+            self.player_name += new_letter
+        else:
+            self.player_name = self.player_name[:-1]
 
 class Bullet:
     # image is 33 by 8 px

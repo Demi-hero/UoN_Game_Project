@@ -7,6 +7,7 @@ import pygame as pyg
 import time
 import Game_Data
 from os import path
+import csv
 
 
 class HandleEvent():
@@ -22,17 +23,41 @@ class HandleEvent():
         textsurf, textrect = self.text_objects(text, largetext)
         textrect.center = (self.width * xloc), (self.height * yloc)
         self._display_surf.blit(textsurf, textrect)
+    def create_false_hs(self):
+        with open("highscore.csv", "w", newline='') as csvfile:
+            filewriter = csv.writer(csvfile, delimiter=",")
+            filewriter.writerow(["Jes", "3200"])
+            filewriter.writerow(["Peter", "2200"])
+            filewriter.writerow(["Nate", "1200"])
+            self.scores = [["Jes", "3200"], ["Peter", "2200"], ["Nate", "1200"], ["backstop","0"]]
+            self.high_score = int(self.scores[0][1])
 
     def load_data(self):
+        self.scores = []
         try:
-            with open("highscore.txt", "r") as f:
-                self.high_score = int(f.read())
+            # have used with to double make sure I closed the file
+            with open("highScore.csv", "r", newline='') as f:
+                reader = csv.reader(f, delimiter=',')
+                for row in reader:
+                    self.scores.append(row)
+                print(self.scores)
+                self.high_score = int(self.scores[0][1])
         except FileNotFoundError:
-            self.high_score = 0
+            self.create_false_hs()
             print("FnF error")
         except ValueError:
             print("Value Error")
-            self.high_score = 0
+            self.create_false_hs()
+        except IndexError:
+            print("I am confused")
+            self.create_false_hs()
+
+    def game_over_display(self):
+        self._display_surf.blit(Game_Data.background.bg1, (Game_Data.background.bg1_x, 0))
+        self._display_surf.blit(Game_Data.background.bg2, (Game_Data.background.bg2_x, 0))
+        self.message_display("Game Over", 0.35)
+        self.message_display("Player Name: {}".format(Game_Data.player1.player_name), .05, .05)
+        pyg.display.flip()
 
     def on_pause(self, minimised=0):
         if not self.paused:
@@ -123,19 +148,41 @@ class HandleEvent():
         self.lives -= 1
         if self.lives == 0:
             # play sad game over music
-            self._display_surf.blit(Game_Data.background.bg1, (Game_Data.background.bg1_x, 0))
-            self._display_surf.blit(Game_Data.background.bg2, (Game_Data.background.bg2_x, 0))
-            self.message_display("Game Over", 0.35)
-
             if self.score > self.high_score:
+                self.altering_name = True
                 self.high_score = self.score
                 self.message_display("NEW HIGH SCORE: {}!".format(self.score), .55)
-                with open("highscore.txt", "w") as f:
-                    f.write(str(self.score))
-
+                while self.altering_name:
+                    for event in pyg.event.get():
+                        if event.type == pyg.KEYDOWN:
+                            if event.unicode.isalpha():
+                                Game_Data.player1.update_name(event.unicode)
+                            elif event.key == pyg.K_BACKSPACE:
+                                Game_Data.player1.update_name("", 1)
+                            elif event.key == pyg.K_RETURN:
+                                if len(Game_Data.player1.player_name) < 3:
+                                    Game_Data.player1.update_name()
+                                else:
+                                    self.scoreboard = [Game_Data.player1.player_name, self.score]
+                                    self.altering_name = False
+                        elif event.type == pyg.QUIT:
+                            return
+                        self.game_over_display()
+                with open("highscore.csv", "w", newline='') as f:
+                    scorewriter = csv.writer(f, delimiter=',')
+                    for value, lists in enumerate(self.scores):
+                        if self.scoreboard[1] > int(lists[1]):
+                            self.scores.insert(value, self.scoreboard)
+                            break
+                    if len(self.scores) > 10:
+                        self.scores[:] = self.scores[:-1]
+                    for lists in self.scores:
+                        print(lists)
+                        scorewriter.writerow((lists[0], lists[1]))
             else:
                 self.message_display("Highscore: {}".format(self.high_score))
                 self.message_display("Your Score: {}".format(self.score), .55)
+
             self.message_display("Press any key to try again", .65)
             pyg.display.update()
             time.sleep(1.5)
