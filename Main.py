@@ -35,6 +35,7 @@ class App(EH.HandleEvent):
         self.move = False
         self.score = 0
         self.lives = 0
+        self.paused = False
 
     # do on initialisation
     def on_init(self):
@@ -68,10 +69,8 @@ class App(EH.HandleEvent):
             self.player_ypos -= (2*self.ypos_change)
         else:
             self.player_ypos += self.ypos_change
-        # update hitbox with final pos
-
-        self._player_hitbox = pyg.Rect(self.player_xpos, self.player_ypos,
-                                          Sprites.player1.ln, Sprites.player1.ht)
+        self._player_hitbox = pyg.Rect(self.player_xpos, self.player_ypos, 
+                                       Sprites.player1.ln, Sprites.player1.ht)
         
         # y-axis loop animation counter control      
         if Sprites.player1.flight_y + 1 >= 9:
@@ -83,7 +82,7 @@ class App(EH.HandleEvent):
         
         # bullet changes
         for bullet in Sprites.clip:
-            if bullet.alive:
+            if bullet.alive and not self.paused:
                 bullet.x += bullet.vx
                 bullet.hitbox = pyg.Rect(bullet.x, bullet.y, bullet.ln, bullet.ht)
             if bullet.x > Sprites.WIDTH:
@@ -102,10 +101,10 @@ class App(EH.HandleEvent):
                 if alien.hitbox.colliderect(bullet.hitbox):
                     alien.alive = False
                     bullet.alive = False
-                    self.score += 10
+                    self.score += 50
             if alien.hitbox.colliderect(self._player_hitbox):
                 self.on_crash()
-            if alien.alive:
+            if alien.alive and not self.paused:
                 alien.x += alien.vx
                 alien.hitbox = pyg.Rect(alien.x, alien.y, alien.ln, alien.ht)
             if alien.x < (0 - alien.ln):
@@ -116,61 +115,56 @@ class App(EH.HandleEvent):
                 alien.y = 0
                 alien.hitbox = pyg.Rect(alien.x, alien.y, alien.ln, alien.ht)
 
-
-
     # what to do when images render
     def on_render(self):
-
-        
-        
-        self._display_surf.fill(self.white)
-        self._display_surf.blit(Sprites.background.bg1, (Sprites.background.bg1_x, 0))
-        self._display_surf.blit(Sprites.background.bg2, (Sprites.background.bg2_x, 0))
-#        self._display_surf.blit(self._backgroud_image, (0, 0))
-#        self._display_surf.blit(self._image_surf, (self.player_xpos,
-#                                                   self.player_ypos))
-        
-        # animate thurst on up or down
-        if Sprites.player1.updown:
-            self._display_surf.blit(Sprites.player1.shiptop[Sprites.player1.flight_y//3],
-                                    (self.player_xpos, self.player_ypos))
-            Sprites.player1.flight_y += 1
-#        else:
-#            self._display_surf.blit(self._image_surf, (self.player_xpos,
-#                                                   self.player_ypos))
-        
-        # animate thrust on left or right
-        elif Sprites.player1.leftright:
-            self._display_surf.blit(Sprites.player1.shipside[Sprites.player1.flight_x//3],
-                                    (self.player_xpos, self.player_ypos))
-            Sprites.player1.flight_x += 1
-        else:
-            self._display_surf.blit(self._image_surf, (self.player_xpos,
-                                                   self.player_ypos))
+        if not self.paused:
+            self._display_surf.fill(self.white)
+            self._display_surf.blit(Sprites.background.bg1, (Sprites.background.bg1_x, 0))
+            self._display_surf.blit(Sprites.background.bg2, (Sprites.background.bg2_x, 0))
+    #        self._display_surf.blit(self._backgroud_image, (0, 0))
+    #        self._display_surf.blit(self._image_surf, (self.player_xpos,
+    #                                                   self.player_ypos))
             
+            # animate thurst on up or down
+            if Sprites.player1.updown:
+                self._display_surf.blit(Sprites.player1.shiptop[Sprites.player1.flight_y//3],
+                                        (self.player_xpos, self.player_ypos))
+                Sprites.player1.flight_y += 1
+    #        else:
+    #            self._display_surf.blit(self._image_surf, (self.player_xpos,
+    #                                                   self.player_ypos))
             
-        for bullet in Sprites.clip:
-            if bullet.alive:
-                self._display_surf.blit(bullet.bull, (bullet.x, bullet.y))
-        for alien in Sprites.swarm:
-            if alien.alive:
-                self._display_surf.blit(alien.ship, (alien.x, alien.y))
-        self.message_display("Score:{}".format(self.score), 0.05, 0.1)
-        self.message_display("Lives: {}".format(self.lives), 0.05, .85)
-        self.clock.tick(60)
-        pyg.display.flip()
-        
-        Sprites.background.bg1_x -= 1
-        Sprites.background.bg2_x -= 1
+            # animate thrust on left or right
+            elif Sprites.player1.leftright:
+                self._display_surf.blit(Sprites.player1.shipside[Sprites.player1.flight_x//3],
+                                        (self.player_xpos, self.player_ypos))
+                Sprites.player1.flight_x += 1
+            else:
+                self._display_surf.blit(self._image_surf, (self.player_xpos,
+                                                       self.player_ypos))
+                
+                
+            for bullet in Sprites.clip:
+                if bullet.alive:
+                    self._display_surf.blit(bullet.bull, (bullet.x, bullet.y))
+            for alien in Sprites.swarm:
+                if alien.alive:
+                    self._display_surf.blit(alien.ship, (alien.x, alien.y))
+            self.message_display("Score:{}".format(self.score), 0.05, 0.1)
+            self.message_display("Lives: {}".format(self.lives), 0.05, .85)
+            self.clock.tick(60)
+            pyg.display.flip()
+            
+            Sprites.background.bg1_x -= 1
+            Sprites.background.bg2_x -= 1
 
-        if Sprites.background.bg1_x <= -1 * Sprites.background.bg1.get_width():
-            Sprites.background.bg1_x = Sprites.background.bg2_x + Sprites.background.bg2.get_width()
-        if Sprites.background.bg2_x <= -1 * Sprites.background.bg2.get_width():
-            Sprites.background.bg2_x = Sprites.background.bg1_x + Sprites.background.bg1.get_width()
+            if Sprites.background.bg1_x <= -1 * Sprites.background.bg1.get_width():
+                Sprites.background.bg1_x = Sprites.background.bg2_x + Sprites.background.bg2.get_width()
+            if Sprites.background.bg2_x <= -1 * Sprites.background.bg2.get_width():
+                Sprites.background.bg2_x = Sprites.background.bg1_x + Sprites.background.bg1.get_width()
     # what to do when clearing images
     def on_cleanup(self):
         pyg.quit()
-        quit()
 
     # what to do when exicuting the file.
     def on_execute(self):
@@ -185,7 +179,6 @@ class App(EH.HandleEvent):
             self.on_loop()
             self.on_render()
         self.on_cleanup()
-
 
 if __name__ == '__main__':
     theApp = App()

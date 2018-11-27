@@ -11,7 +11,27 @@ import Sprites
 class HandleEvent():
     def __init__(self):
         pass
+
+    def text_objects(self, text, font):
+        textsurface = font.render(text, True, self.white)
+        return textsurface, textsurface.get_rect()
+
+    def message_display(self, text, yloc=.45, xloc=.5):
+        largetext = pyg.font.Font('freesansbold.ttf', 50)
+        textsurf, textrect = self.text_objects(text, largetext)
+        textrect.center = (self.width * xloc), (self.height * yloc)
+        self._display_surf.blit(textsurf, textrect)
         
+    def on_pause(self):
+        if not self.paused:
+            self.paused = True
+            self.message_display("GAME PAUSED", .30)
+            self.message_display("Press p to unpause")
+            self.message_display("Press q to quit", .65)
+            pyg.display.update()
+        else:
+            self.paused = False
+
     def on_input_focus(self):
         pass
 
@@ -33,9 +53,19 @@ class HandleEvent():
             Sprites.player1.updown = True
             
         elif event.key == pyg.K_SPACE:
+            reload = 0
             for bullet in Sprites.clip:
                 if not bullet.alive:
                     bullet.fire(self.player_xpos, self.player_ypos)
+                    reload = 5
+                    break
+                if reload > 0:
+                    reoload -= 1
+        elif event.key == pyg.K_p:
+            self.on_pause()
+        elif event.key == pyg.K_q:
+            if self.paused:
+                self.on_exit()
 
     def on_key_up(self, event):
         if event.key == pyg.K_LEFT or event.key == pyg.K_RIGHT:
@@ -65,10 +95,13 @@ class HandleEvent():
         pass
     def on_mbutton_down(self, event):
         pass
+
     def on_minimize(self):
-        pass
+        self.paused = True
+
     def on_restore(self):
         pass
+
     def on_resize(self,event):
         pass
     def on_expose(self):
@@ -81,7 +114,7 @@ class HandleEvent():
             self.message_display("Game Over")
             self.message_display("Press any key to try again", .65)
             pyg.display.update()
-            time.sleep(1)
+            time.sleep(1.5)
             while True:
                 for event in pyg.event.get():
                     if event.type == pyg.KEYDOWN:
@@ -101,16 +134,6 @@ class HandleEvent():
                 aliens.alive = False
             self._player_hitbox = pyg.Rect(self.player_xpos, self.player_ypos,
                                            Sprites.player1.ln, Sprites.player1.ht)
-
-    def text_objects(self, text, font):
-        textsurface = font.render(text, True, self.white)
-        return textsurface, textsurface.get_rect()
-
-    def message_display(self, text, yloc=.45, xloc=.5):
-        largetext = pyg.font.Font('freesansbold.ttf', 50)
-        textsurf, textrect = self.text_objects(text, largetext)
-        textrect.center = (self.width * xloc), (self.height * yloc)
-        self._display_surf.blit(textsurf, textrect)
 
     def on_exit(self):
         self._running = False

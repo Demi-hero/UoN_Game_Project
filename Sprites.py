@@ -42,15 +42,6 @@ class Player:
         self.flight_y = 0
         self.flight_x = 0
 
-    # event handler?
-    def on_hit(self):
-        self.lives -= 1
-        self.x = BORDER
-        self.y = HEIGHT//2
-        self.draw()
-    # event handler
-
-
 class Bullet:
     # image is 33 by 8 px
     bull = pyg.image.load(os.path.join("images", "bullet.png"))
