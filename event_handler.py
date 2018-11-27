@@ -56,8 +56,47 @@ class HandleEvent():
         self._display_surf.blit(Game_Data.background.bg1, (Game_Data.background.bg1_x, 0))
         self._display_surf.blit(Game_Data.background.bg2, (Game_Data.background.bg2_x, 0))
         self.message_display("Game Over", 0.35)
-        self.message_display("Player Name: {}".format(Game_Data.player1.player_name), .05, .05)
+        self.message_display("Player Name: {}".format(Game_Data.player1.player_name), .5, .5)
         pyg.display.flip()
+
+    def scorboard_check(self):
+        for lists in self.scores:
+            if self.score > int(lists[1]):
+                return True
+        return False
+
+    def on_new_highscore(self):
+        self.altering_name = True
+        self.high_score = self.score
+        self.message_display("NEW HIGH SCORE: {}!".format(self.score), .55)
+        while self.altering_name:
+            for event in pyg.event.get():
+                if event.type == pyg.KEYDOWN:
+                    if event.unicode.isalpha():
+                        Game_Data.player1.update_name(event.unicode)
+                    elif event.key == pyg.K_BACKSPACE:
+                        Game_Data.player1.update_name("", 1)
+                    elif event.key == pyg.K_RETURN:
+                        if len(Game_Data.player1.player_name) < 3:
+                            Game_Data.player1.update_name()
+                        else:
+                            self.scoreboard = [Game_Data.player1.player_name, self.score]
+                            self.altering_name = False
+                elif event.type == pyg.QUIT:
+                    pyg.quit()
+                    quit()
+                self.game_over_display()
+        with open("highscore.csv", "w", newline='') as f:
+            scorewriter = csv.writer(f, delimiter=',')
+            for value, lists in enumerate(self.scores):
+                if self.scoreboard[1] > int(lists[1]):
+                    self.scores.insert(value, self.scoreboard)
+                    break
+            if len(self.scores) > 10:
+                self.scores[:] = self.scores[:-1]
+            for lists in self.scores:
+                print(lists)
+                scorewriter.writerow((lists[0], lists[1]))
 
     def on_pause(self, minimised=0):
         if not self.paused:
@@ -141,6 +180,7 @@ class HandleEvent():
 
     def on_resize(self,event):
         pass
+
     def on_expose(self):
         pass
 
@@ -148,37 +188,8 @@ class HandleEvent():
         self.lives -= 1
         if self.lives == 0:
             # play sad game over music
-            if self.score > self.high_score:
-                self.altering_name = True
-                self.high_score = self.score
-                self.message_display("NEW HIGH SCORE: {}!".format(self.score), .55)
-                while self.altering_name:
-                    for event in pyg.event.get():
-                        if event.type == pyg.KEYDOWN:
-                            if event.unicode.isalpha():
-                                Game_Data.player1.update_name(event.unicode)
-                            elif event.key == pyg.K_BACKSPACE:
-                                Game_Data.player1.update_name("", 1)
-                            elif event.key == pyg.K_RETURN:
-                                if len(Game_Data.player1.player_name) < 3:
-                                    Game_Data.player1.update_name()
-                                else:
-                                    self.scoreboard = [Game_Data.player1.player_name, self.score]
-                                    self.altering_name = False
-                        elif event.type == pyg.QUIT:
-                            return
-                        self.game_over_display()
-                with open("highscore.csv", "w", newline='') as f:
-                    scorewriter = csv.writer(f, delimiter=',')
-                    for value, lists in enumerate(self.scores):
-                        if self.scoreboard[1] > int(lists[1]):
-                            self.scores.insert(value, self.scoreboard)
-                            break
-                    if len(self.scores) > 10:
-                        self.scores[:] = self.scores[:-1]
-                    for lists in self.scores:
-                        print(lists)
-                        scorewriter.writerow((lists[0], lists[1]))
+            if self.scorboard_check():
+                self.on_new_highscore()
             else:
                 self.message_display("Highscore: {}".format(self.high_score))
                 self.message_display("Your Score: {}".format(self.score), .55)
@@ -211,8 +222,9 @@ class HandleEvent():
     def on_exit(self):
         self._running = False
 
-    def on_user(self,event):
+    def on_user(self, event):
         pass
+
     def on_event(self, event):
         # means you only ever need to use the on_event function.
         # runs all the event types as a master event
