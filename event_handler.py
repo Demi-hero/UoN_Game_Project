@@ -22,14 +22,14 @@ class HandleEvent():
         textrect.center = (self.width * xloc), (self.height * yloc)
         self._display_surf.blit(textsurf, textrect)
         
-    def on_pause(self):
+    def on_pause(self, minimised=0):
         if not self.paused:
             self.paused = True
             self.message_display("GAME PAUSED", .30)
             self.message_display("Press p to unpause")
             self.message_display("Press q to quit", .65)
             pyg.display.update()
-        else:
+        elif not minimised:
             self.paused = False
 
     def on_input_focus(self):
@@ -97,10 +97,10 @@ class HandleEvent():
         pass
 
     def on_minimize(self):
-        self.paused = True
+        self.on_pause(1)
 
     def on_restore(self):
-        pass
+        print("I was run")
 
     def on_resize(self,event):
         pass
@@ -191,11 +191,12 @@ class HandleEvent():
                     self.on_input_focus()
                 else:
                     self.on_input_blur()
+            elif event.state == 6:
+                if not event.gain:
+                    self.on_minimize()
             elif event.state == 4:
                 if event.gain:
                     self.on_restore()
-                else:
-                    self.on_minimize()
  
 
 if __name__ == "__main__" :

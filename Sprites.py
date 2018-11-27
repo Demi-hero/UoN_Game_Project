@@ -8,7 +8,6 @@ BORDER = 10
 
 
 class Background:
-#    background = pyg.image.load(os.path.join("images", "background.jpg"))
     bg1 = pyg.image.load(os.path.join("images", "background.jpg"))
     bg2 = pyg.image.load(os.path.join("images", "background.jpg"))
     
