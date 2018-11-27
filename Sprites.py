@@ -74,7 +74,7 @@ class Bullet:
 
 class Alien:
     # image is 100 by 133 px
-    ship = pyg.image.load(os.path.join("images", "enemy_purple.png"))
+    ship = pyg.image.load(os.path.join("images", "alien.png"))
     ht = 100
     ln = 133
     vx = -3

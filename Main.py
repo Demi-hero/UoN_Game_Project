@@ -170,6 +170,7 @@ class App(EH.HandleEvent):
     # what to do when clearing images
     def on_cleanup(self):
         pyg.quit()
+        quit()
 
     # what to do when exicuting the file.
     def on_execute(self):
