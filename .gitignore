@@ -6,3 +6,5 @@
 .idea/UoN_Game_Project.iml
 .idea/vcs.xml
 .idea/workspace.xml
+__pycache__/Sprites.cpython-37.pyc
+__pycache__/event_handler.cpython-37.pyc

@@ -36,6 +36,7 @@ class App(EH.HandleEvent):
         self.score = 0
         self.lives = 0
         self.paused = False
+        # self.load_data()  # do we want to define this in sprites /  Game Data as opposed to Event handler?
 
     # do on initialisation
     def on_init(self):
@@ -121,18 +122,11 @@ class App(EH.HandleEvent):
             self._display_surf.fill(self.white)
             self._display_surf.blit(Sprites.background.bg1, (Sprites.background.bg1_x, 0))
             self._display_surf.blit(Sprites.background.bg2, (Sprites.background.bg2_x, 0))
-    #        self._display_surf.blit(self._backgroud_image, (0, 0))
-    #        self._display_surf.blit(self._image_surf, (self.player_xpos,
-    #                                                   self.player_ypos))
-            
-            # animate thurst on up or down
+
             if Sprites.player1.updown:
                 self._display_surf.blit(Sprites.player1.shiptop[Sprites.player1.flight_y//3],
                                         (self.player_xpos, self.player_ypos))
                 Sprites.player1.flight_y += 1
-    #        else:
-    #            self._display_surf.blit(self._image_surf, (self.player_xpos,
-    #                                                   self.player_ypos))
             
             # animate thrust on left or right
             elif Sprites.player1.leftright:
