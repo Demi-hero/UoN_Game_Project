@@ -41,16 +41,12 @@ class HandleEvent():
                 reader = csv.reader(f, delimiter=',')
                 for row in reader:
                     self.scores.append(row)
-                print(self.scores)
                 self.high_score = int(self.scores[0][1])
         except FileNotFoundError:
             self.create_false_hs()
-            print("FnF error")
         except ValueError:
-            print("Value Error")
             self.create_false_hs()
         except IndexError:
-            print("I am confused")
             self.create_false_hs()
 
     def game_over_display(self):
@@ -97,7 +93,6 @@ class HandleEvent():
             if len(self.scores) > 10:
                 self.scores[:] = self.scores[:-1]
             for lists in self.scores:
-                print(lists)
                 scorewriter.writerow((lists[0], lists[1]))
 
     def highscore_display(self):
@@ -127,8 +122,6 @@ class HandleEvent():
             for event in pyg.event.get():
                 self.on_event(event)
             pyg.display.flip()
-
-
 
     def on_pause(self, minimised=0):
         if not self.paused:
@@ -223,6 +216,9 @@ class HandleEvent():
     def on_crash(self):
         self.lives -= 1
         if self.lives == 0:
+            self.lives = 3
+            Game_Data.player1.updown = False
+            Game_Data.player1.leftright = False
             # play sad game over music
             if self.scorboard_check():
                 self.on_new_highscore()

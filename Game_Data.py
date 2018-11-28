@@ -7,12 +7,14 @@ HEIGHT = 540
 BORDER = 10
 HS_FILE = "highscore.txt"
 
+
 class Background:
     bg1 = pyg.image.load(os.path.join("images", "background.jpg"))
     bg2 = pyg.image.load(os.path.join("images", "background.jpg"))
     
     bg1_x = 0
     bg2_x = bg1.get_width()
+
 
 class Startup:
 
@@ -21,7 +23,6 @@ class Startup:
         self.h = pyg.image.load(os.path.join("images", "h.png"))
         self.l = pyg.image.load(os.path.join("images", "L.png"))
         self.space = pyg.image.load(os.path.join("images", "spacebar.png"))
-
 
 
 class Player:
