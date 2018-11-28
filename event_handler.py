@@ -66,8 +66,10 @@ class HandleEvent():
         self.high_score = self.score
         while self.altering_name:
             self.game_over_display()
-            self.message_display("NEW TOP SCORE: {}!".format(self.score), .55)
-            self.message_display("Player Name: {}".format(Game_Data.player1.player_name), .5, .5)
+            self.message_display("YOU MADE THE SCORE BOARD WITH: {}!".format(self.score), .45)
+            self.message_display("PLEASE ENTER YOUR NAME", .5, .5)
+            self.message_display("Player Name: {}".format(Game_Data.player1.player_name), .55, .55)
+
             for event in pyg.event.get():
                 if event.type == pyg.KEYDOWN:
                     if len(Game_Data.player1.player_name) > 3:
@@ -106,16 +108,15 @@ class HandleEvent():
     def on_startup(self):
         self._display_surf.blit(Game_Data.background.bg1, (Game_Data.background.bg1_x, 0))
         self._display_surf.blit(Game_Data.background.bg2, (Game_Data.background.bg2_x, 0))
-        self.message_display("THE LAST", yloc=.2, size=50)
-        self.message_display("PYFighter", yloc=.3, size=50)
-        self.message_display("Highscores :",xloc=.35)
-        self.message_display(" Lore :", xloc=.65)
-        self.message_display("Movement", yloc=.55, xloc=.3)
-        self.message_display("Shoot", yloc=.55, xloc=.7)
-        self._display_surf.blit(Game_Data.startup.arrows, (205, 312))
-        self._display_surf.blit(Game_Data.startup.h, (425, 228))
-        self._display_surf.blit(Game_Data.startup.l, (675, 228))
-        self._display_surf.blit(Game_Data.startup.space, (595, 355))
+        # self.message_display("Highscores :",xloc=.35)
+        # self.message_display(" Lore :", xloc=.65)
+        self.message_display("Movement", yloc=.57, xloc=.26)
+        self.message_display("Shoot", yloc=.65, xloc=.7)
+        self._display_surf.blit(Game_Data.startup.title, (221, 0))
+        self._display_surf.blit(Game_Data.startup.arrows, (160, 320))
+        # self._display_surf.blit(Game_Data.startup.h, (425, 228))
+        # self._display_surf.blit(Game_Data.startup.l, (675, 228))
+        self._display_surf.blit(Game_Data.startup.space, (591, 375))
         self.message_display("Press Shoot to Start", .9, size=35)
         pyg.display.flip()
         while self.startup:

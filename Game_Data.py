@@ -23,6 +23,7 @@ class Startup:
         self.h = pyg.image.load(os.path.join("images", "h.png"))
         self.l = pyg.image.load(os.path.join("images", "L.png"))
         self.space = pyg.image.load(os.path.join("images", "spacebar.png"))
+        self.title = pyg.image.load(os.path.join("images", "Title.png"))
 
 
 class Player:
