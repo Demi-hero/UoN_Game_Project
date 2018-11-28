@@ -18,11 +18,12 @@ class HandleEvent():
         textsurface = font.render(text, True, self.white)
         return textsurface, textsurface.get_rect()
 
-    def message_display(self, text, yloc=.45, xloc=.5):
-        largetext = pyg.font.Font('freesansbold.ttf', 50)
+    def message_display(self, text, yloc=.45, xloc=.5, size=25):
+        largetext = pyg.font.Font('freesansbold.ttf', size)
         textsurf, textrect = self.text_objects(text, largetext)
         textrect.center = (self.width * xloc), (self.height * yloc)
         self._display_surf.blit(textsurf, textrect)
+
     def create_false_hs(self):
         with open("highscore.csv", "w", newline='') as csvfile:
             filewriter = csv.writer(csvfile, delimiter=",")
@@ -56,7 +57,7 @@ class HandleEvent():
         self._display_surf.blit(Game_Data.background.bg1, (Game_Data.background.bg1_x, 0))
         self._display_surf.blit(Game_Data.background.bg2, (Game_Data.background.bg2_x, 0))
         self.message_display("Game Over", 0.35)
-        self.message_display("Player Name: {}".format(Game_Data.player1.player_name), .5, .5)
+
         pyg.display.flip()
 
     def scorboard_check(self):
@@ -85,6 +86,7 @@ class HandleEvent():
                 elif event.type == pyg.QUIT:
                     pyg.quit()
                     quit()
+                self.message_display("Player Name: {}".format(Game_Data.player1.player_name), .5, .5)
                 self.game_over_display()
         with open("highscore.csv", "w", newline='') as f:
             scorewriter = csv.writer(f, delimiter=',')
@@ -97,6 +99,15 @@ class HandleEvent():
             for lists in self.scores:
                 print(lists)
                 scorewriter.writerow((lists[0], lists[1]))
+
+    def highscore_display(self):
+        pos = 0.1
+        self.game_over_display()
+        self.message_display("HIGH SCORES", pos)
+        for values in self.scores:
+            pos += 0.05
+            self.message_display("{} : {}".format(values[0], values[1]), pos)
+
 
     def on_pause(self, minimised=0):
         if not self.paused:
@@ -176,7 +187,7 @@ class HandleEvent():
         self.on_pause(1)
 
     def on_restore(self):
-        print("I was run")
+        pass
 
     def on_resize(self,event):
         pass
@@ -191,10 +202,9 @@ class HandleEvent():
             if self.scorboard_check():
                 self.on_new_highscore()
             else:
-                self.message_display("Highscore: {}".format(self.high_score))
-                self.message_display("Your Score: {}".format(self.score), .55)
-
-            self.message_display("Press any key to try again", .65)
+                self.highscore_display()
+                self.message_display("Your Score: {}".format(self.score), .75)
+            self.message_display("Press any key to try again", .85)
             pyg.display.update()
             time.sleep(1.5)
             while True:
