@@ -5,7 +5,7 @@ from random import randint
 WIDTH = 960
 HEIGHT = 540
 BORDER = 10
-
+HS_FILE = "highscore.txt"
 
 class Background:
     bg1 = pyg.image.load(os.path.join("images", "background.jpg"))
@@ -13,6 +13,16 @@ class Background:
     
     bg1_x = 0
     bg2_x = bg1.get_width()
+
+class Startup:
+
+    def __init__(self):
+        self.arrows = pyg.image.load(os.path.join("images", "PixelKeys2.png"))
+        self.h = pyg.image.load(os.path.join("images", "h.png"))
+        self.l = pyg.image.load(os.path.join("images", "L.png"))
+        self.space = pyg.image.load(os.path.join("images", "spacebar.png"))
+
+
 
 class Player:
     # image is 205 by 43 px from side, 205 by 95 from top view
@@ -40,6 +50,13 @@ class Player:
         self.leftright = False
         self.flight_y = 0
         self.flight_x = 0
+        self.player_name = ""
+
+    def update_name(self,new_letter="", delete=0):
+        if not delete:
+            self.player_name += new_letter
+        else:
+            self.player_name = self.player_name[:-1]
 
 class Bullet:
     # image is 33 by 8 px
@@ -82,6 +99,7 @@ class Alien:
         self.alive = True
 
 
+startup = Startup()
 background = Background()
 player1 = Player(BORDER, HEIGHT//2)
 aa = Bullet()
