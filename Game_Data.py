@@ -14,6 +14,16 @@ class Background:
     bg1_x = 0
     bg2_x = bg1.get_width()
 
+class Startup:
+
+    def __init__(self):
+        self.arrows = pyg.image.load(os.path.join("images", "PixelKeys2.png"))
+        self.h = pyg.image.load(os.path.join("images", "h.png"))
+        self.l = pyg.image.load(os.path.join("images", "L.png"))
+        self.space = pyg.image.load(os.path.join("images", "spacebar.png"))
+
+
+
 class Player:
     # image is 205 by 43 px from side, 205 by 95 from top view
     ship = pyg.image.load(os.path.join("images", "hero_side.png"))
@@ -89,6 +99,7 @@ class Alien:
         self.alive = True
 
 
+startup = Startup()
 background = Background()
 player1 = Player(BORDER, HEIGHT//2)
 aa = Bullet()

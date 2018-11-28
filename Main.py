@@ -33,24 +33,22 @@ class App(EH.HandleEvent):
         self.ypos_change = 0
         self.move = False
         self.score = 0
-        self.lives = 0
+        self.lives = 3
         self.paused = False
+        self.startup = True
 
     # do on initialisation
     def on_init(self):
         pyg.init()
-
+        self._running = True
         self._display_surf = pyg.display.set_mode(self.size,
                                                      pyg.HWSURFACE)
         # sets the window name
-        self._running = True
         pyg.display.set_caption('A Try Force Production')
         
         # this is how I manage the frames per second
         self.clock = pyg.time.Clock()
         self.load_data()
-
-
 
         # loads the images in to the related image_surf variable
         self._image_surf = Game_Data.player1.ship
@@ -162,10 +160,12 @@ class App(EH.HandleEvent):
 
     # what to do when exicuting the file.
     def on_execute(self):
-        self.lives = 3
         self.score = 0
         if not self.on_init():
             self._running = False
+
+        while self.startup:
+            self.on_startup()
 
         while self._running:
             for event in pyg.event.get():
