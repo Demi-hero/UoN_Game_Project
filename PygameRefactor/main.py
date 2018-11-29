@@ -47,6 +47,7 @@ class Main(HandleEvent):
                     self.gameover(Player1, Bullet1, Alien1)
 
                 # update the display
+                print(Bullet1.alive_bullets)
                 pyg.display.flip()
                 self.clock.tick(self.framerate)
 
