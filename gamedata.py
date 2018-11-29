@@ -1,7 +1,5 @@
 import pygame as pyg
 import os
-# update the imports to not need to import *
-from eventhandler import *
 from random import randint
 import csv
 
@@ -24,7 +22,10 @@ class FileStore:
 
     def load_data(self):
         self.scores = []
-        # high score load
+        self.background_music = os.path.join("sounds", "OrbitBeat130.wav")
+        self.pewpew = pyg.mixer.Sound(os.path.join("sounds", "pew.wav"))
+        self.boom = pyg.mixer.Sound(os.path.join("sounds", "boom.wav"))
+        # load in the high scores
         try:
             # have used with to double make sure I closed the file
             with open("highScore.csv", "r", newline='') as f:
@@ -38,6 +39,9 @@ class FileStore:
             self.create_false_hs()
         except IndexError:
             self.create_false_hs()
+        pyg.mixer.init()
+        pyg.mixer.music.load(self.background_music)
+        pyg.mixer.music.play(-1)
 
     def create_false_hs(self):
         with open("highscore.csv", "w", newline='') as csvfile:
@@ -67,8 +71,8 @@ class Background:
     def __init__(self):
         self.white = (255,255,255)
         # loading the background image - two copies, to allow it to scroll
-        self.bg1 = pyg.image.load(os.path.join("images", "background.jpg"))
-        self.bg2 = pyg.image.load(os.path.join("images", "background.jpg"))
+        self.bg1 = pyg.Surface.convert(pyg.image.load(os.path.join("images", "background.jpg")))
+        self.bg2 = pyg.Surface.convert(pyg.image.load(os.path.join("images", "background.jpg")))
         self.bg1_x = 0
         self.bg2_x = self.bg1.get_width()
 
@@ -86,13 +90,13 @@ class Background:
 
 class Player:
     # loading the player sprite and getting it's dimensions
-    sprite = pyg.image.load(os.path.join("images", "hero_side.png"))
+    sprite = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side.png")))
     ln = sprite.get_width()
     ht = sprite.get_height()
     # loading the images for the sprite with animated thrusters
-    animated_sprite = [pyg.image.load(os.path.join("images", "hero_side1.png")),
-               pyg.image.load(os.path.join("images", "hero_side2.png")),
-               pyg.image.load(os.path.join("images", "hero_side3.png"))]
+    animated_sprite = [pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side1.png"))),
+               pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side2.png"))),
+               pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side3.png")))]
     # this is the x-coordinate offset of the animated image, to account for it being longer due to the thrusters
     animation_offset_x = ln - animated_sprite[0].get_width()
 
@@ -165,7 +169,7 @@ class Player:
 
 class Bullet:
     # loading the bullet sprite and getting it's dimensions
-    sprite = pyg.image.load(os.path.join("images", "bullet.png"))
+    sprite = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "bullet.png")))
     ln = sprite.get_width()
     ht = sprite.get_height()
 
@@ -203,7 +207,7 @@ class Bullet:
 
 class Alien:
     # loading the alien sprite and getting it's dimensions
-    sprite = pyg.image.load(os.path.join("images", "alien.png"))
+    sprite = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "enemy1.png")))
     ln = sprite.get_width()
     ht = sprite.get_height()
 
@@ -211,9 +215,9 @@ class Alien:
         # initiates spawn position at the right of the screen
         self.x = WIDTH
         # alien velocity
-        self.vx = -3
+        self.vx = -4
         # spawn rate - the SMALLER the number, the MORE OFTEN they spawn
-        self.spawn_rate = 75
+        self.spawn_rate = 50
         # score for a kill
         self.kill_score = 20
         # score change if enemy gets through
@@ -272,16 +276,16 @@ class Alien:
                 Player.on_hit(self, Bullet, Main)
 
 class AlienSmart(Alien):
-	
+
 	def __init__(self):
 		Alien.__init__(self)
 		self.spawn_rate = 100
 		self.speed = 1
 		self.width_limit = WIDTH * 0.8
-	
+
 	def get_alive_aliensmart(self):
 		return self.alive_aliens
-		
+
 	def update(self, Player, Main):
 		player_pos = Player.get_gun_location()
 		if (randint(1, self.spawn_rate) == 1) and (self.alive_aliens == []):
@@ -296,5 +300,5 @@ class AlienSmart(Alien):
 				self.vy = -self.speed
 			else:
 				self.vy = 0
-			alien[1] += self.vy			
+			alien[1] += self.vy
 			Background.screen.blit(self.sprite, (alien[0], alien[1]))
