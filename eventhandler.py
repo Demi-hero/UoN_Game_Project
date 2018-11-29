@@ -23,6 +23,7 @@ class HandleEvent():
                 self.on_key_down(event, player, bullet, files)
 
     def on_exit(self):
+        self.startup = False
         self.running = False
 
     def on_key_down(self, event, player, bullet, files):
