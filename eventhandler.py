@@ -14,25 +14,25 @@ class HandleEvent():
         Player.move(x_dir, y_dir)
 
     # this runs for every event and calls the relevant method
-    def on_event(self, event, Player="" , Bullet=""):
+    def on_event(self, event, player="", bullet=""):
         # breaks out of the main game loop if QUIT event occurs (closing window), cleanup occurs after
         if event.type == pyg.QUIT:
                 self.on_exit()
         # checks for when keys are pressed
         elif event.type == pyg.KEYDOWN:
-                self.on_key_down(event, Player, Bullet)
+                self.on_key_down(event, player, bullet)
 
     def on_exit(self):
         self.running = False
 
-    def on_key_down(self, event, Player, Bullet):
+    def on_key_down(self, event, player, bullet):
         # spacebar triggers firing sequence - takes gun position from player, passes to bullet fire method
         if event.key == pyg.K_SPACE:
             if self.startup:
                 self.startup = False
             else:
-                gun_pos = Player.get_gun_location()
-                Bullet.fire(gun_pos)
+                gun_pos = player.get_gun_location()
+                bullet.fire(gun_pos)
         # p opens the pause screen, and q quits if on the pause screen
         elif event.key == pyg.K_p:
             self.on_pause()

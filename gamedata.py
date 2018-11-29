@@ -1,5 +1,6 @@
 import pygame as pyg
 import os
+# update the imports to not need to import *
 from eventhandler import *
 from random import randint
 import csv
@@ -61,7 +62,7 @@ class FileStore:
 
 # Background object contains the display, and draws and updates the animated background
 class Background:
-    screen = pyg.display.set_mode((WIDTH, HEIGHT))
+    screen = pyg.display.set_mode((WIDTH, HEIGHT), pyg.HWSURFACE)
 
     def __init__(self):
         self.white = (255,255,255)

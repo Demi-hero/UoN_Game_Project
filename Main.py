@@ -1,7 +1,9 @@
 import pygame as pyg
 import os
+# change these imports to not import *
 from gamedata import *
 from eventhandler import *
+
 
 class Main(HandleEvent):
 
@@ -74,6 +76,7 @@ class Main(HandleEvent):
                 # update the display
                 pyg.display.flip()
                 self.clock.tick(self.framerate)
+
 
 App = Main()
 App.execute()
