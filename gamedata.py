@@ -24,6 +24,9 @@ class FileStore:
 
     def load_data(self):
         self.scores = []
+        self.background_music = os.path.join("sounds", "OrbitBeat130.wav")
+        self.pewpew = pyg.mixer.Sound(os.path.join("sounds", "pew.wav"))
+        self.boomboom = pyg.mixer.Sound(os.path.join("sounds", "boom.wav"))
         # high score load
         try:
             # have used with to double make sure I closed the file
@@ -38,6 +41,9 @@ class FileStore:
             self.create_false_hs()
         except IndexError:
             self.create_false_hs()
+        pyg.mixer.init()
+        pyg.mixer.music.load(self.background_music)
+        pyg.mixer.music.play(-1)
 
     def create_false_hs(self):
         with open("highscore.csv", "w", newline='') as csvfile:

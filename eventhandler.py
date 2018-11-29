@@ -28,6 +28,7 @@ class HandleEvent():
     def on_key_down(self, event, player, bullet):
         # spacebar triggers firing sequence - takes gun position from player, passes to bullet fire method
         if event.key == pyg.K_SPACE:
+            self.Files.pewpew.play()
             if self.startup:
                 self.startup = False
             else:
