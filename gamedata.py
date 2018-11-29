@@ -270,3 +270,31 @@ class Alien:
             # if the alien and player hitboxes collide, calls the player method, re-initialising the objects
             if alien_hitbox.colliderect(player_hitbox):
                 Player.on_hit(self, Bullet, Main)
+
+class AlienSmart(Alien):
+	
+	def __init__(self):
+		Alien.__init__(self)
+		self.spawn_rate = 100
+		self.speed = 1
+		self.width_limit = WIDTH * 0.8
+	
+	def get_alive_aliensmart(self):
+		return self.alive_aliens
+		
+	def update(self, Player, Main):
+		player_pos = Player.get_gun_location()
+		if (randint(1, self.spawn_rate) == 1) and (self.alive_aliens == []):
+			spawn_pos = [self.x, (randint(0,4) * HEIGHT//5) + BORDER]
+			self.alive_aliens += [spawn_pos]
+		for alien in self.alive_aliens:
+			if alien[0] > self.width_limit:
+				alien[0] += self.vx
+			if alien[1] < player_pos[1]:
+				self.vy = self.speed
+			elif alien[1] > player_pos[1]:
+				self.vy = -self.speed
+			else:
+				self.vy = 0
+			alien[1] += self.vy			
+			Background.screen.blit(self.sprite, (alien[0], alien[1]))
