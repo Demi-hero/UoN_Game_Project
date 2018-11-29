@@ -14,21 +14,21 @@ class HandleEvent():
         Player.move(x_dir, y_dir)
 
     # this runs for every event and calls the relevant method
-    def on_event(self, event, player="", bullet=""):
+    def on_event(self, event, player="", bullet="", files=''):
         # breaks out of the main game loop if QUIT event occurs (closing window), cleanup occurs after
         if event.type == pyg.QUIT:
                 self.on_exit()
         # checks for when keys are pressed
         elif event.type == pyg.KEYDOWN:
-                self.on_key_down(event, player, bullet)
+                self.on_key_down(event, player, bullet, files)
 
     def on_exit(self):
         self.running = False
 
-    def on_key_down(self, event, player, bullet):
+    def on_key_down(self, event, player, bullet, files):
         # spacebar triggers firing sequence - takes gun position from player, passes to bullet fire method
         if event.key == pyg.K_SPACE:
-            self.Files.pewpew.play()
+            files.pewpew.play()
             if self.startup:
                 self.startup = False
             else:

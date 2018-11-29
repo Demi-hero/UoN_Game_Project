@@ -26,8 +26,8 @@ class FileStore:
         self.scores = []
         self.background_music = os.path.join("sounds", "OrbitBeat130.wav")
         self.pewpew = pyg.mixer.Sound(os.path.join("sounds", "pew.wav"))
-        self.boomboom = pyg.mixer.Sound(os.path.join("sounds", "boom.wav"))
-        # high score load
+        self.boom = pyg.mixer.Sound(os.path.join("sounds", "boom.wav"))
+        # load in the high scores
         try:
             # have used with to double make sure I closed the file
             with open("highScore.csv", "r", newline='') as f:
