@@ -209,7 +209,7 @@ class Bullet:
 
 class Alien:
     # loading the alien sprite and getting it's dimensions
-    sprite = pyg.image.load(os.path.join("images", "alien.png"))
+    sprite = pyg.image.load(os.path.join("images", "enemy1.png"))
     ln = sprite.get_width()
     ht = sprite.get_height()
 

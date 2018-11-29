@@ -72,7 +72,7 @@ class Main(HandleEvent):
 
                 # if out of lives - game over (see eventhandler)
                 if self.lives < 1:
-                    self.gameover(Player1, Bullet1, Alien1)
+                    self.gameover(Board, Player1, Bullet1, Alien1, Files)
 
                 # update the display
                 pyg.display.flip()
