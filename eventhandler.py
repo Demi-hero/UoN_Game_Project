@@ -6,6 +6,24 @@ import csv
 
 class HandleEvent():
 
+    def on_startup(self, background, files):
+        background.update()
+        # self.message_display("Highscores :",xloc=.35)
+        # self.message_display(" Lore :", xloc=.65)
+        self.message_display("Movement", yloc=.57, xloc=.26)
+        self.message_display("Shoot", yloc=.65, xloc=.7)
+        background.screen.blit(files.title, (221, 0))
+        background.screen.blit(files.arrows, (160, 320))
+        # gamedata.background.screen.blit(Game_Data.startup.h, (425, 228))
+        # gamedata.background.screen.blit(Game_Data.startup.l, (675, 228))
+        background.screen.blit(files.space, (591, 375))
+        self.message_display("Press Shoot to Start", .9, font_size=35)
+        pyg.display.flip()
+        while self.startup:
+            for event in pyg.event.get():
+                self.on_event(event, files=files)
+            pyg.display.flip()
+
     # calculating the player movement direction based on arrow keys held down
     def player_movement(self, Player):
         keystate = pyg.key.get_pressed()
@@ -14,20 +32,22 @@ class HandleEvent():
         Player.move(x_dir, y_dir)
 
     # this runs for every event and calls the relevant method
-    def on_event(self, event, player="", bullet=""):
+    def on_event(self, event, player="", bullet="", files=''):
         # breaks out of the main game loop if QUIT event occurs (closing window), cleanup occurs after
         if event.type == pyg.QUIT:
                 self.on_exit()
         # checks for when keys are pressed
         elif event.type == pyg.KEYDOWN:
-                self.on_key_down(event, player, bullet)
+                self.on_key_down(event, player, bullet, files)
 
     def on_exit(self):
+        self.startup = False
         self.running = False
 
-    def on_key_down(self, event, player, bullet):
+    def on_key_down(self, event, player, bullet, files):
         # spacebar triggers firing sequence - takes gun position from player, passes to bullet fire method
         if event.key == pyg.K_SPACE:
+            files.pewpew.play()
             if self.startup:
                 self.startup = False
             else:
@@ -57,13 +77,13 @@ class HandleEvent():
         elif not minimised:
             self.paused = False
 
-    def gameover(self, Player, Bullet, Alien):
+    def gameover(self, Board, Player, Bullet, Alien, Files):
         # display high score messages
-        if self.scorboard_check():
-            self.on_new_highscore()
+        if self.scorboard_check(Files):
+            self.on_new_highscore(Board, Player, Files)
         else:
             self.message_display("Your Score: {}".format(self.score), .75)
-        self.highscore_display()
+        self.highscore_display(Board, Files)
         self.message_display("Press any key to try again", .85)
         pyg.display.update()
         time.sleep(1.5)
@@ -81,9 +101,9 @@ class HandleEvent():
                     self.__init__()
                     return
 
-    def game_over_display(self):
+    def game_over_display(self, board):
         # the text we want on every game over page
-        self.Board.update()
+        board.update()
         self.message_display("Game Over", yloc=0.1, font_size=35)
 
     # code for creating messages
@@ -99,41 +119,42 @@ class HandleEvent():
 
     # methods for the high score handling
 
-    def highscore_display(self):
+    def highscore_display(self, board, files):
         pos = 0.2
-        self.game_over_display()
+        self.game_over_display(board)
         self.message_display("HIGH SCORES", pos, font_size=45)
         pos += 0.05
-        for values in self.Files.scores:
+        for values in files.scores:
             pos += 0.05
             self.message_display("{} : {}".format(values[0], values[1]), pos, font_size=20)
 
-    def on_new_highscore(self):
-        self.Player1.altering_name = True
-        self.Files.high_score = self.score
-        while self.Player1.altering_name:
-            self.game_over_display()
+    def on_new_highscore(self, board, player, files):
+        player.altering_name = True
+        files.high_score = self.score
+        while player.altering_name:
+            self.game_over_display(board)
             self.message_display("YOU MADE THE SCORE BOARD WITH: {}!".format(self.score), .45, font_size=35)
             self.message_display("PLEASE ENTER YOUR NAME", .55, .5, font_size=35)
-            self.message_display("Player Name: {}".format(self.Player1.player_name), .65, font_size=35)
+            self.message_display("Player Name: {}".format(player.player_name), .65, font_size=35)
 
             for event in pyg.event.get():
                 if event.type == pyg.KEYDOWN:
                     if event.unicode.isalpha():
-                        self. Player1.update_name(event.unicode)
+                        player.update_name(event.unicode)
                     elif event.key == pyg.K_BACKSPACE:
-                        self.Player1.update_name("", 1)
+                        player.update_name("", 1)
                     elif event.key == pyg.K_RETURN:
-                        self.Files.scoreboard = [self.Player1.player_name, self.score]
-                        self.Player1.altering_name = False
+                        files.scoreboard = [player.player_name, self.score]
+                        player.altering_name = False
                 elif event.type == pyg.QUIT:
                     pyg.quit()
                     quit()
             pyg.display.flip()
-        self.Files.update_scores()
+        files.update_scores()
 
-    def scorboard_check(self):
-        for lists in self.Files.scores:
+    def scorboard_check(self, Files):
+        for lists in Files.scores:
             if self.score > int(lists[1]):
                 return True
         return False
+
