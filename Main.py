@@ -13,7 +13,7 @@ class Main(eh.HandleEvent):
         self.lives = 3
         self.score = 0
         self.clock = pyg.time.Clock()
-        self.framerate = 120
+        self.framerate = 100
 
     def execute(self):
         pyg.init()
@@ -36,8 +36,12 @@ class Main(eh.HandleEvent):
 
             # updating the object states, and drawing to screen (see gamedata)
             if not self.paused:
+                Board.draw()
+                Player1.draw()
+                Bullet1.draw()
+                Alien1.draw()
+
                 Board.update()
-                Player1.update()
                 Bullet1.update()
                 # passes main (self) to alien update and detect_collision to update score and lives
                 Alien1.update(self)
@@ -60,4 +64,3 @@ App = Main()
 App.execute()
 pyg.quit()
 os._exit(0)
-
