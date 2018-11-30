@@ -3,6 +3,7 @@ import os
 # change these imports to not import *
 from gamedata import *
 from eventhandler import *
+import time
 
 
 class Main(HandleEvent):
@@ -15,6 +16,7 @@ class Main(HandleEvent):
         self.score = 0
         self.clock = pyg.time.Clock()
         self.framerate = 100
+        self.starttime = time.time()
         # objects created inside the class. Not sure if this is a good thing or not?
 
     # will need refactoring to match rest of code style is how the code handles start up
@@ -65,7 +67,9 @@ class Main(HandleEvent):
                 Alien1.update(self)
                 # detecting collisions between aliens and bullets, and aliens and player
                 Alien1.detect_collisions(Player1, Bullet1, self)
-
+                # if enough time has passed and no power ups spawn a power up
+                    # powerups.spawn or some such.
+                    # reset the time counter
                 # display lives and score at top of screen
                 self.message_display("Score:{}".format(self.score), 0.03, 0.1, 20)
                 self.message_display("Lives: {}".format(self.lives), 0.03, .85, 20)
