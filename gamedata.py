@@ -69,7 +69,6 @@ class Background:
     screen = pyg.display.set_mode((WIDTH, HEIGHT), pyg.HWSURFACE)
 
     def __init__(self):
-        self.white = (255,255,255)
         # loading the background image - two copies, to allow it to scroll
         self.bg1 = pyg.Surface.convert(pyg.image.load(os.path.join("images", "background.jpg")))
         self.bg2 = pyg.Surface.convert(pyg.image.load(os.path.join("images", "background.jpg")))
@@ -77,9 +76,6 @@ class Background:
         self.bg2_x = self.bg1.get_width()
 
     def update(self):
-        self.screen.fill(self.white)
-        self.screen.blit(self.bg1, (self.bg1_x, 0))
-        self.screen.blit(self.bg2, (self.bg2_x, 0))
         # updating the background positions so it scrolls
         self.bg1_x -= 1
         self.bg2_x -= 1
@@ -87,6 +83,11 @@ class Background:
                 self.bg1_x = self.bg2_x + self.bg2.get_width()
         if self.bg2_x <= -(self.bg2.get_width()):
                 self.bg2_x = self.bg1_x + self.bg1.get_width()
+
+    def draw(self):
+        self.screen.blit(self.bg1, (self.bg1_x, 0))
+        self.screen.blit(self.bg2, (self.bg2_x, 0))
+
 
 class Player:
     # loading the player sprite and getting it's dimensions
@@ -147,7 +148,7 @@ class Player:
         if (y_new > BORDER) and (y_new < HEIGHT-BORDER-self.ht):
             self.y = y_new
 
-    def update(self):
+    def draw(self):
         # moves hitbox to current position and draws self on screen
         self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
         # if player moving backwards, draws ship without thrusters
@@ -201,8 +202,10 @@ class Bullet:
             if bullet[0] > WIDTH:
                 # removes bullets as they leave the screen
                 self.alive_bullets.remove(bullet)
-            Background.screen.blit(self.sprite, (bullet[0], bullet[1]))
 
+    def draw(self):
+        for bullet in self.alive_bullets:
+            Background.screen.blit(self.sprite, (bullet[0], bullet[1]))
 
 
 class Alien:
@@ -238,10 +241,8 @@ class Alien:
             spawn_pos = [self.x, (randint(0,4) * (HEIGHT//5)) + BORDER]
             # runs a collision check to make sure the new alien won't spawn overlapping an existing alien
             spawn_collision = False
-            spawn_hitbox = pyg.Rect(spawn_pos[0], spawn_pos[1], self.ln, self.ht)
             for alien in self.alive_aliens:
-                alien_hitbox = pyg.Rect(alien[0], alien[1], self.ln, self.ht)
-                if alien_hitbox.colliderect(spawn_hitbox):
+                if (spawn_pos[1] == alien[1]) and (spawn_pos[0] <= alien[0]+self.ln):
                     spawn_collision = True
             if not spawn_collision:
                 # adds the new 'live' alien to the alive_aliens list
@@ -254,6 +255,9 @@ class Alien:
                 self.alive_aliens.remove(alien)
                 # updates score
                 Main.update_score(self.penalty)
+
+    def draw(self):
+        for alien in self.alive_aliens:
             Background.screen.blit(self.sprite, (alien[0], alien[1]))
 
     def detect_collisions(self, Player, Bullet, Main):
@@ -262,18 +266,17 @@ class Alien:
         alive_bullets = Bullet.get_alive_bullets()
         bullet_size = Bullet.get_size()
         for alien in self.alive_aliens:
-            # creates a hitbox for all the currently alive aliens
+            # calculates if a collision has occurred between an alien and the player
             alien_hitbox = pyg.Rect(alien[0], alien[1], self.ln, self.ht)
-            for bull in alive_bullets:
-                # creates a hitbox for all the currentlt alive bullets
-                bullet_hitbox = pyg.Rect(bull[0], bull[1], bullet_size[0], bullet_size[1])
-                # if the alien and bullet hitboxes collide, calls their relevant methods
-                if alien_hitbox.colliderect(bullet_hitbox):
-                    self.on_hit(alien, Main)
-                    Bullet.on_hit(bull)
-            # if the alien and player hitboxes collide, calls the player method, re-initialising the objects
             if alien_hitbox.colliderect(player_hitbox):
                 Player.on_hit(self, Bullet, Main)
+                return
+            for bull in alive_bullets:
+                # calculates if a collision has occurred between a bullet and alien
+                if (bull[0]+bullet_size[0] >= alien[0]) and (bull[1] >= alien[1]-bullet_size[1]) and (bull[1] <= alien[1]+self.ht):
+                    self.on_hit(alien, Main)
+                    Bullet.on_hit(bull)
+
 
 class AlienSmart(Alien):
 
