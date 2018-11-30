@@ -211,6 +211,7 @@ class Bullet:
 class Alien:
     # loading the alien sprite and getting it's dimensions
     sprite = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "enemy1.png")))
+    sprite2 = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "enemy2.png")))
     ln = sprite.get_width()
     ht = sprite.get_height()
 
@@ -230,9 +231,12 @@ class Alien:
 
     def on_hit(self, hit_alien, Main):
         # when a collision occurs, removes the relevant alien from the alive_aliens list
-        self.alive_aliens.remove(hit_alien)
         # updates score
         Main.update_score(self.kill_score)
+        if hit_alien[2] == 1:
+            self.alive_aliens.remove(hit_alien)
+        else:
+            hit_alien[2] -= 1
 
     def update(self, Main):
         # generates a random integer between 1 and spawn_rate - if the number == 1, tries to spawn an alien
@@ -246,7 +250,7 @@ class Alien:
                     spawn_collision = True
             if not spawn_collision:
                 # adds the new 'live' alien to the alive_aliens list
-                self.alive_aliens += [spawn_pos]
+                self.alive_aliens += [spawn_pos + [randint(1,2)]]
         # iterates through the alive_aliens list, updating positions based on velocity, and draws to screen
         for alien in self.alive_aliens:
             alien[0] += self.vx
@@ -258,7 +262,10 @@ class Alien:
 
     def draw(self):
         for alien in self.alive_aliens:
-            Background.screen.blit(self.sprite, (alien[0], alien[1]))
+            if alien[2] == 1:
+                Background.screen.blit(self.sprite, (alien[0], alien[1]))
+            else:
+                Background.screen.blit(self.sprite2, (alien[0], alien[1]))
 
     def detect_collisions(self, Player, Bullet, Main):
         player_hitbox = Player.get_hitbox()
