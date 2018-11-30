@@ -7,6 +7,7 @@ import csv
 class HandleEvent():
 
     def on_startup(self, background, files):
+        background.draw()
         background.update()
         # self.message_display("Highscores :",xloc=.35)
         # self.message_display(" Lore :", xloc=.65)
@@ -103,6 +104,7 @@ class HandleEvent():
 
     def game_over_display(self, board):
         # the text we want on every game over page
+        board.draw()
         board.update()
         self.message_display("Game Over", yloc=0.1, font_size=35)
 
@@ -157,4 +159,3 @@ class HandleEvent():
             if self.score > int(lists[1]):
                 return True
         return False
-
