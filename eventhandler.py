@@ -61,13 +61,16 @@ class HandleEvent():
             if self.paused:
                 self.on_exit()
         elif event.key == pyg.K_b:
-            if self.bombs > 0:
-                files.ult.play()
-                self.update_score((len(alien.alive_aliens)*40))
-                board.screen.fill(self.white)
-                pyg.display.update()
-                alien.alive_aliens = []
-                self.bombs -= 1
+            self.on_bomb(board, alien, files)
+
+    def on_bomb(self, board, alien, files):
+        if self.bombs > 0:
+            files.ult.play()
+            self.update_score((len(alien.alive_aliens) * 40))
+            board.screen.fill(self.white)
+            pyg.display.update()
+            alien.alive_aliens = []
+            self.bombs -= 1
 
     # update score and lives
     def update_score(self, points):

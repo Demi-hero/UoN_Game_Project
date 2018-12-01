@@ -1,6 +1,5 @@
 import pygame as pyg
 import os
-import time
 import gamedata as gd
 import eventhandler as eh
 
@@ -13,24 +12,19 @@ class Main(eh.HandleEvent):
         self.lives = 3
         self.bombs = 1
         self.score = 0
+        self.white = (255,255,255)
         self.clock = pyg.time.Clock()
         self.framerate = 100
 
     def execute(self):
         pyg.init()
-        Files = FileStore()
-        Board = Background()
-        Player1 = Player()
-        Bullet1 = Bullet()
-        Alien1 = Alien()
-        power_up = PowerUp(self)
-
         # creating the screen and game objects
         Files = gd.FileStore()
         Board = gd.Background()
         Player1 = gd.Player()
         Bullet1 = gd.Bullet()
         Alien1 = gd.Alien()
+        power_up = gd.PowerUp(self)
 
         while self.startup:
             self.on_startup(Board, Files)
@@ -46,6 +40,7 @@ class Main(eh.HandleEvent):
             if not self.paused:
                 Board.draw()
                 Player1.draw()
+                power_up.spawn(Player1)
                 Bullet1.draw()
                 Alien1.draw()
                 Board.update()
