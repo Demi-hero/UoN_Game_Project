@@ -276,3 +276,49 @@ class Alien:
             # if the alien and player hitboxes collide, calls the player method, re-initialising the objects
             if alien_hitbox.colliderect(player_hitbox):
                 Player.on_hit(self, Bullet, Main)
+
+class PowerUp:
+
+    def __init__(self, Main):
+        self.main = Main
+        self.spawned = False
+        self.powers_dict = {0: [pyg.image.load(os.path.join("images", "hero_life.png")), 93, 25, self.extra_life],
+                            1: [pyg.image.load(os.path.join("images", "bomb.png")), 58, 100, self.extra_bomb]}
+        self.starttime = time.time()
+
+        self.power_up = []
+        self.spawn_pos = (0,0)
+
+    def spawn(self, player):
+        if (time.time() - self.starttime)//1 == 30 and not self.spawned:
+            # generate a random number between 0 and however many
+            self.power_up = self.powers_dict[randint(0, 1)]
+            self.spawn_pos = (randint(BORDER, (WIDTH//2)-self.power_up[1]),
+                              randint(BORDER, HEIGHT-BORDER-self.power_up[2]))
+            self.hitbox = pyg.Rect(self.spawn_pos[0], self.spawn_pos[1], self.power_up[1], self.power_up[2])
+            self.spawned = True
+            Background.screen.blit(self.power_up[0],self.spawn_pos)
+        elif (time.time() - self.starttime)//1 == 60:
+            self.starttime = time.time()
+            self.spawn_pos = (randint(BORDER, (WIDTH//2)-self.power_up[1]),
+                              randint(BORDER, HEIGHT-BORDER-self.power_up[2]))
+            self.spawned = False
+        elif self.spawned:
+            self.collection(player)
+            if self.spawned:
+                Background.screen.blit(self.power_up[0], self.spawn_pos)
+
+    def extra_life(self):
+        if self.spawned:
+            self.main.lives += 1
+
+    def extra_bomb(self):
+        if self.spawned:
+            self.main.bombs += 1
+
+    def collection(self, player):
+        # how to tell when player and powerup hitboxes collied
+        player_hitbox = player.get_hitbox()
+        if self.hitbox.colliderect(player_hitbox):
+            self.power_up[3]()
+            self.spawned = False

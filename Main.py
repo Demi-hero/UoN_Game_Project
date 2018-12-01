@@ -13,6 +13,7 @@ class Main(HandleEvent):
         self.running = True
         self.paused = False
         self.lives = 3
+        self.bombs = 1
         self.score = 0
         self.clock = pyg.time.Clock()
         self.framerate = 100
@@ -45,6 +46,7 @@ class Main(HandleEvent):
         Player1 = Player()
         Bullet1 = Bullet()
         Alien1 = Alien()
+        power_up = PowerUp(self)
 
         # creating the screen and game objects
 
@@ -63,6 +65,7 @@ class Main(HandleEvent):
                 Board.update()
                 Player1.update()
                 Bullet1.update()
+                power_up.spawn(Player1)
                 # passes main (self) to alien update and detect_collision to update score and lives
                 Alien1.update(self)
                 # detecting collisions between aliens and bullets, and aliens and player
@@ -73,6 +76,7 @@ class Main(HandleEvent):
                 # display lives and score at top of screen
                 self.message_display("Score:{}".format(self.score), 0.03, 0.1, 20)
                 self.message_display("Lives: {}".format(self.lives), 0.03, .85, 20)
+                self.message_display("Bombs: {}".format(self.bombs), 0.03, .75, 20)
 
                 # if out of lives - game over (see eventhandler)
                 if self.lives < 1:
