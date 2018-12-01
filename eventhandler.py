@@ -33,27 +33,27 @@ class HandleEvent():
         Player.move(x_dir, y_dir)
 
     # this runs for every event and calls the relevant method
-    def on_event(self, event, board="", player="",alien="", bullet="", files=""):
+    def on_event(self, event, board='', Tokens='', files=""):
         # breaks out of the main game loop if QUIT event occurs (closing window), cleanup occurs after
         if event.type == pyg.QUIT:
                 self.on_exit()
         # checks for when keys are pressed
         elif event.type == pyg.KEYDOWN:
-                self.on_key_down(event, board, player,alien, bullet, files,)
+                self.on_key_down(event, board, Tokens, files,)
 
     def on_exit(self):
         self.startup = False
         self.running = False
 
-    def on_key_down(self, event, board, player, alien, bullet, files):
+    def on_key_down(self, event, board, Tokens, files):
         # spacebar triggers firing sequence - takes gun position from player, passes to bullet fire method
         if event.key == pyg.K_SPACE:
             files.pewpew.play()
             if self.startup:
                 self.startup = False
             else:
-                gun_pos = player.get_gun_location()
-                bullet.fire(gun_pos)
+                gun_pos = Tokens[0].get_gun_location()
+                Tokens[1].fire(gun_pos)
         # p opens the pause screen, and q quits if on the pause screen
         elif event.key == pyg.K_p:
             self.on_pause()
@@ -61,15 +61,16 @@ class HandleEvent():
             if self.paused:
                 self.on_exit()
         elif event.key == pyg.K_b:
-            self.on_bomb(board, alien, files)
+            self.on_bomb(board, Tokens, files)
 
-    def on_bomb(self, board, alien, files):
+    def on_bomb(self, board, Tokens, files):
         if self.bombs > 0:
             files.ult.play()
-            self.update_score((len(alien.alive_aliens) * 40))
+            self.update_score(((len(Tokens[2].alive_aliens)+len(Tokens[3].alive_aliens)) * 40))
             board.screen.fill(self.white)
             pyg.display.update()
-            alien.alive_aliens = []
+            Tokens[2].__init__()
+            Tokens[3].__init__()
             self.bombs -= 1
 
     # update score and lives
