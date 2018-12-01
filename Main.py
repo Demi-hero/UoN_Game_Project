@@ -18,6 +18,7 @@ class Main(HandleEvent):
         self.clock = pyg.time.Clock()
         self.framerate = 100
         self.starttime = time.time()
+        self.white = (255, 255, 255)
         # objects created inside the class. Not sure if this is a good thing or not?
 
     # will need refactoring to match rest of code style is how the code handles start up
@@ -57,7 +58,7 @@ class Main(HandleEvent):
         while self.running:
             # taking the player input, passing to event handler
             for event in pyg.event.get():
-                self.on_event(event, Player1, Bullet1, Files)
+                self.on_event(event, Board, Player1, Alien1, Bullet1, Files)
             self.player_movement(Player1)
 
             # updating the object states, and drawing to screen (see gamedata)

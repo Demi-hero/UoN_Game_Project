@@ -14,12 +14,6 @@ BORDER = 10
 class FileStore:
     # class containing all the files that need loading in game that don't relate to an in game sprite.
     def __init__(self):
-        self.arrows = pyg.image.load(os.path.join("images", "PixelKeys2.png"))
-        self.h = pyg.image.load(os.path.join("images", "h.png"))
-        self.l = pyg.image.load(os.path.join("images", "L.png"))
-        self.space = pyg.image.load(os.path.join("images", "spacebar.png"))
-        self.title = pyg.image.load(os.path.join("images", "Title.png"))
-        self.scores = []
         self.load_data()
 
     def load_data(self):
@@ -27,6 +21,13 @@ class FileStore:
         self.background_music = os.path.join("sounds", "OrbitBeat130.wav")
         self.pewpew = pyg.mixer.Sound(os.path.join("sounds", "pew.wav"))
         self.boom = pyg.mixer.Sound(os.path.join("sounds", "boom.wav"))
+        self.ult = pyg.mixer.Sound(os.path.join("sounds", "ult.wav"))
+        self.arrows = pyg.image.load(os.path.join("images", "PixelKeys2.png"))
+        self.h = pyg.image.load(os.path.join("images", "h.png"))
+        self.l = pyg.image.load(os.path.join("images", "L.png"))
+        self.space = pyg.image.load(os.path.join("images", "spacebar.png"))
+        self.title = pyg.image.load(os.path.join("images", "Title.png"))
+
         # load in the high scores
         try:
             # have used with to double make sure I closed the file
@@ -281,6 +282,7 @@ class PowerUp:
 
     def __init__(self, Main):
         self.main = Main
+        self.pickup = pyg.mixer.Sound(os.path.join("sounds", "Power-Up.wav"))
         self.spawned = False
         self.powers_dict = {0: [pyg.image.load(os.path.join("images", "hero_life.png")), 93, 25, self.extra_life],
                             1: [pyg.image.load(os.path.join("images", "bomb.png")), 58, 100, self.extra_bomb]}
@@ -290,7 +292,7 @@ class PowerUp:
         self.spawn_pos = (0,0)
 
     def spawn(self, player):
-        if (time.time() - self.starttime)//1 == 30 and not self.spawned:
+        if (time.time() - self.starttime)//1 == 3 and not self.spawned:
             # generate a random number between 0 and however many
             self.power_up = self.powers_dict[randint(0, 1)]
             self.spawn_pos = (randint(BORDER, (WIDTH//2)-self.power_up[1]),
@@ -298,7 +300,7 @@ class PowerUp:
             self.hitbox = pyg.Rect(self.spawn_pos[0], self.spawn_pos[1], self.power_up[1], self.power_up[2])
             self.spawned = True
             Background.screen.blit(self.power_up[0],self.spawn_pos)
-        elif (time.time() - self.starttime)//1 == 60:
+        elif (time.time() - self.starttime)//1 == 10:
             self.starttime = time.time()
             self.spawn_pos = (randint(BORDER, (WIDTH//2)-self.power_up[1]),
                               randint(BORDER, HEIGHT-BORDER-self.power_up[2]))
@@ -320,5 +322,6 @@ class PowerUp:
         # how to tell when player and powerup hitboxes collied
         player_hitbox = player.get_hitbox()
         if self.hitbox.colliderect(player_hitbox):
+            self.pickup.play()
             self.power_up[3]()
             self.spawned = False
