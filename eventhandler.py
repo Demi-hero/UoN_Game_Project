@@ -89,10 +89,10 @@ class HandleEvent():
         elif not minimised:
             self.paused = False
 
-    def gameover(self, Board, Player, Bullet, Alien, Files):
+    def gameover(self, Board, Tokens, Files):
         # display high score messages
         if self.scorboard_check(Files):
-            self.on_new_highscore(Board, Player, Files)
+            self.on_new_highscore(Board, Tokens[0], Files)
         else:
             self.message_display("Your Score: {}".format(self.score), .75)
         self.highscore_display(Board, Files)
@@ -107,9 +107,8 @@ class HandleEvent():
                     os._exit(0)
                 elif event.type == pyg.KEYDOWN:
                     # if key pressed, re-initialises everything and breaks from loop
-                    Player.__init__()
-                    Bullet.__init__()
-                    Alien.__init__()
+                    for token in Tokens:
+                        token.__init__()
                     self.__init__()
                     return
 
