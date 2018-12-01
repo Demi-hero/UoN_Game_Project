@@ -13,12 +13,6 @@ BORDER = 10
 class FileStore:
     # class containing all the files that need loading in game that don't relate to an in game sprite.
     def __init__(self):
-        self.arrows = pyg.image.load(os.path.join("images", "PixelKeys2.png"))
-        self.h = pyg.image.load(os.path.join("images", "h.png"))
-        self.l = pyg.image.load(os.path.join("images", "L.png"))
-        self.space = pyg.image.load(os.path.join("images", "spacebar.png"))
-        self.title = pyg.image.load(os.path.join("images", "Title.png"))
-        self.scores = []
         self.load_data()
 
     def load_data(self):
@@ -26,6 +20,12 @@ class FileStore:
         self.background_music = os.path.join("sounds", "OrbitBeat130.wav")
         self.pewpew = pyg.mixer.Sound(os.path.join("sounds", "pew.wav"))
         self.boom = pyg.mixer.Sound(os.path.join("sounds", "boom.wav"))
+        self.arrows = pyg.image.load(os.path.join("images", "PixelKeys2.png"))
+        self.h = pyg.image.load(os.path.join("images", "h.png"))
+        self.l = pyg.image.load(os.path.join("images", "L.png"))
+        self.ult = pyg.mixer.Sound(os.path.join("sounds", "ult.wav"))
+        self.space = pyg.image.load(os.path.join("images", "spacebar.png"))
+        self.title = pyg.image.load(os.path.join("images", "Title.png"))
         # load in the high scores
         try:
             # have used with to double make sure I closed the file
