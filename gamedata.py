@@ -1,7 +1,5 @@
 import pygame as pyg
 import os
-# update the imports to not need to import *
-from eventhandler import *
 from random import randint
 import csv
 
@@ -18,9 +16,6 @@ class FileStore:
 
     def load_data(self):
         self.scores = []
-        self.background_music = os.path.join("sounds", "OrbitBeat130.wav")
-        self.pewpew = pyg.mixer.Sound(os.path.join("sounds", "pew.wav"))
-        self.boom = pyg.mixer.Sound(os.path.join("sounds", "boom.wav"))
         self.ult = pyg.mixer.Sound(os.path.join("sounds", "ult.wav"))
         self.arrows = pyg.image.load(os.path.join("images", "PixelKeys2.png"))
         self.h = pyg.image.load(os.path.join("images", "h.png"))
@@ -28,6 +23,11 @@ class FileStore:
         self.space = pyg.image.load(os.path.join("images", "spacebar.png"))
         self.title = pyg.image.load(os.path.join("images", "Title.png"))
 
+    def load_data(self):
+        self.scores = []
+        self.background_music = os.path.join("sounds", "OrbitBeat130.wav")
+        self.pewpew = pyg.mixer.Sound(os.path.join("sounds", "pew.wav"))
+        self.boom = pyg.mixer.Sound(os.path.join("sounds", "boom.wav"))
         # load in the high scores
         try:
             # have used with to double make sure I closed the file
@@ -72,17 +72,13 @@ class Background:
     screen = pyg.display.set_mode((WIDTH, HEIGHT), pyg.HWSURFACE)
 
     def __init__(self):
-        self.white = (255,255,255)
         # loading the background image - two copies, to allow it to scroll
-        self.bg1 = pyg.image.load(os.path.join("images", "background.jpg"))
-        self.bg2 = pyg.image.load(os.path.join("images", "background.jpg"))
+        self.bg1 = pyg.Surface.convert(pyg.image.load(os.path.join("images", "background.jpg")))
+        self.bg2 = pyg.Surface.convert(pyg.image.load(os.path.join("images", "background.jpg")))
         self.bg1_x = 0
         self.bg2_x = self.bg1.get_width()
 
     def update(self):
-        self.screen.fill(self.white)
-        self.screen.blit(self.bg1, (self.bg1_x, 0))
-        self.screen.blit(self.bg2, (self.bg2_x, 0))
         # updating the background positions so it scrolls
         self.bg1_x -= 1
         self.bg2_x -= 1
@@ -91,15 +87,20 @@ class Background:
         if self.bg2_x <= -(self.bg2.get_width()):
                 self.bg2_x = self.bg1_x + self.bg1.get_width()
 
+    def draw(self):
+        self.screen.blit(self.bg1, (self.bg1_x, 0))
+        self.screen.blit(self.bg2, (self.bg2_x, 0))
+
+
 class Player:
     # loading the player sprite and getting it's dimensions
-    sprite = pyg.image.load(os.path.join("images", "hero_side.png"))
+    sprite = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side.png")))
     ln = sprite.get_width()
     ht = sprite.get_height()
     # loading the images for the sprite with animated thrusters
-    animated_sprite = [pyg.image.load(os.path.join("images", "hero_side1.png")),
-               pyg.image.load(os.path.join("images", "hero_side2.png")),
-               pyg.image.load(os.path.join("images", "hero_side3.png"))]
+    animated_sprite = [pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side1.png"))),
+               pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side2.png"))),
+               pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side3.png")))]
     # this is the x-coordinate offset of the animated image, to account for it being longer due to the thrusters
     animation_offset_x = ln - animated_sprite[0].get_width()
 
@@ -150,7 +151,7 @@ class Player:
         if (y_new > BORDER) and (y_new < HEIGHT-BORDER-self.ht):
             self.y = y_new
 
-    def update(self):
+    def draw(self):
         # moves hitbox to current position and draws self on screen
         self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
         # if player moving backwards, draws ship without thrusters
@@ -172,7 +173,7 @@ class Player:
 
 class Bullet:
     # loading the bullet sprite and getting it's dimensions
-    sprite = pyg.image.load(os.path.join("images", "bullet.png"))
+    sprite = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "bullet.png")))
     ln = sprite.get_width()
     ht = sprite.get_height()
 
@@ -204,13 +205,16 @@ class Bullet:
             if bullet[0] > WIDTH:
                 # removes bullets as they leave the screen
                 self.alive_bullets.remove(bullet)
-            Background.screen.blit(self.sprite, (bullet[0], bullet[1]))
 
+    def draw(self):
+        for bullet in self.alive_bullets:
+            Background.screen.blit(self.sprite, (bullet[0], bullet[1]))
 
 
 class Alien:
     # loading the alien sprite and getting it's dimensions
-    sprite = pyg.image.load(os.path.join("images", "enemy1.png"))
+    sprite = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "enemy1.png")))
+    sprite2 = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "enemy2.png")))
     ln = sprite.get_width()
     ht = sprite.get_height()
 
@@ -218,9 +222,9 @@ class Alien:
         # initiates spawn position at the right of the screen
         self.x = WIDTH
         # alien velocity
-        self.vx = -3
+        self.vx = -4
         # spawn rate - the SMALLER the number, the MORE OFTEN they spawn
-        self.spawn_rate = 75
+        self.spawn_rate = 50
         # score for a kill
         self.kill_score = 20
         # score change if enemy gets through
@@ -230,9 +234,12 @@ class Alien:
 
     def on_hit(self, hit_alien, Main):
         # when a collision occurs, removes the relevant alien from the alive_aliens list
-        self.alive_aliens.remove(hit_alien)
         # updates score
         Main.update_score(self.kill_score)
+        if hit_alien[2] == 1:
+            self.alive_aliens.remove(hit_alien)
+        else:
+            hit_alien[2] -= 1
 
     def update(self, Main):
         # generates a random integer between 1 and spawn_rate - if the number == 1, tries to spawn an alien
@@ -241,14 +248,12 @@ class Alien:
             spawn_pos = [self.x, (randint(0,4) * (HEIGHT//5)) + BORDER]
             # runs a collision check to make sure the new alien won't spawn overlapping an existing alien
             spawn_collision = False
-            spawn_hitbox = pyg.Rect(spawn_pos[0], spawn_pos[1], self.ln, self.ht)
             for alien in self.alive_aliens:
-                alien_hitbox = pyg.Rect(alien[0], alien[1], self.ln, self.ht)
-                if alien_hitbox.colliderect(spawn_hitbox):
+                if (spawn_pos[1] == alien[1]) and (spawn_pos[0] <= alien[0]+self.ln):
                     spawn_collision = True
             if not spawn_collision:
                 # adds the new 'live' alien to the alive_aliens list
-                self.alive_aliens += [spawn_pos]
+                self.alive_aliens += [spawn_pos + [randint(1,2)]]
         # iterates through the alive_aliens list, updating positions based on velocity, and draws to screen
         for alien in self.alive_aliens:
             alien[0] += self.vx
@@ -257,7 +262,13 @@ class Alien:
                 self.alive_aliens.remove(alien)
                 # updates score
                 Main.update_score(self.penalty)
-            Background.screen.blit(self.sprite, (alien[0], alien[1]))
+
+    def draw(self):
+        for alien in self.alive_aliens:
+            if alien[2] == 1:
+                Background.screen.blit(self.sprite, (alien[0], alien[1]))
+            else:
+                Background.screen.blit(self.sprite2, (alien[0], alien[1]))
 
     def detect_collisions(self, Player, Bullet, Main):
         player_hitbox = Player.get_hitbox()
@@ -265,18 +276,47 @@ class Alien:
         alive_bullets = Bullet.get_alive_bullets()
         bullet_size = Bullet.get_size()
         for alien in self.alive_aliens:
-            # creates a hitbox for all the currently alive aliens
+            # calculates if a collision has occurred between an alien and the player
             alien_hitbox = pyg.Rect(alien[0], alien[1], self.ln, self.ht)
+            if alien_hitbox.colliderect(player_hitbox):
+                Player.on_hit(self, Bullet, Main)
+                return
             for bull in alive_bullets:
-                # creates a hitbox for all the currentlt alive bullets
-                bullet_hitbox = pyg.Rect(bull[0], bull[1], bullet_size[0], bullet_size[1])
-                # if the alien and bullet hitboxes collide, calls their relevant methods
-                if alien_hitbox.colliderect(bullet_hitbox):
+                # calculates if a collision has occurred between a bullet and alien
+                if (bull[0]+bullet_size[0] >= alien[0]) and (bull[1] >= alien[1]-bullet_size[1]) and (bull[1] <= alien[1]+self.ht):
                     self.on_hit(alien, Main)
                     Bullet.on_hit(bull)
             # if the alien and player hitboxes collide, calls the player method, re-initialising the objects
             if alien_hitbox.colliderect(player_hitbox):
                 Player.on_hit(self, Bullet, Main)
+
+class AlienSmart(Alien):
+
+    def __init__(self):
+        Alien.__init__(self)
+        self.spawn_rate = 100
+        self.speed = 1
+        self.width_limit = WIDTH * 0.8
+
+    def get_alive_aliensmart(self):
+        return self.alive_aliens
+
+    def update(self, Player, Main):
+        player_pos = Player.get_gun_location()
+        if (randint(1, self.spawn_rate) == 1) and (self.alive_aliens == []):
+            spawn_pos = [self.x, (randint(0,4) * HEIGHT//5) + BORDER]
+            self.alive_aliens += [spawn_pos]
+        for alien in self.alive_aliens:
+            if alien[0] > self.width_limit:
+                alien[0] += self.vx
+            if alien[1] < player_pos[1]:
+                self.vy = self.speed
+            elif alien[1] > player_pos[1]:
+                self.vy = -self.speed
+            else:
+                self.vy = 0
+            alien[1] += self.vy
+            Background.screen.blit(self.sprite, (alien[0], alien[1]))
 
 class PowerUp:
 

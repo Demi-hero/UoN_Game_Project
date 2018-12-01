@@ -1,12 +1,10 @@
 import pygame as pyg
 import os
-# change these imports to not import *
-from gamedata import *
-from eventhandler import *
 import time
+import gamedata as gd
+import eventhandler as eh
 
-
-class Main(HandleEvent):
+class Main(eh.HandleEvent):
 
     def __init__(self):
         self.startup = True
@@ -17,28 +15,6 @@ class Main(HandleEvent):
         self.score = 0
         self.clock = pyg.time.Clock()
         self.framerate = 100
-        self.starttime = time.time()
-        self.white = (255, 255, 255)
-        # objects created inside the class. Not sure if this is a good thing or not?
-
-    # will need refactoring to match rest of code style is how the code handles start up
-    def on_startup(self, background, files):
-        background.update()
-        # self.message_display("Highscores :",xloc=.35)
-        # self.message_display(" Lore :", xloc=.65)
-        self.message_display("Movement", yloc=.57, xloc=.26)
-        self.message_display("Shoot", yloc=.65, xloc=.7)
-        background.screen.blit(files.title, (221, 0))
-        background.screen.blit(files.arrows, (160, 320))
-        # gamedata.background.screen.blit(Game_Data.startup.h, (425, 228))
-        # gamedata.background.screen.blit(Game_Data.startup.l, (675, 228))
-        background.screen.blit(files.space, (591, 375))
-        self.message_display("Press Shoot to Start", .9, font_size=35)
-        pyg.display.flip()
-        while self.startup:
-            for event in pyg.event.get():
-                self.on_event(event, files=files)
-            pyg.display.flip()
 
     def execute(self):
         pyg.init()
@@ -50,6 +26,11 @@ class Main(HandleEvent):
         power_up = PowerUp(self)
 
         # creating the screen and game objects
+        Files = gd.FileStore()
+        Board = gd.Background()
+        Player1 = gd.Player()
+        Bullet1 = gd.Bullet()
+        Alien1 = gd.Alien()
 
         while self.startup:
             self.on_startup(Board, Files)
@@ -63,17 +44,17 @@ class Main(HandleEvent):
 
             # updating the object states, and drawing to screen (see gamedata)
             if not self.paused:
+                Board.draw()
+                Player1.draw()
+                Bullet1.draw()
+                Alien1.draw()
                 Board.update()
-                Player1.update()
                 Bullet1.update()
-                power_up.spawn(Player1)
+
                 # passes main (self) to alien update and detect_collision to update score and lives
                 Alien1.update(self)
                 # detecting collisions between aliens and bullets, and aliens and player
                 Alien1.detect_collisions(Player1, Bullet1, self)
-                # if enough time has passed and no power ups spawn a power up
-                    # powerups.spawn or some such.
-                    # reset the time counter
                 # display lives and score at top of screen
                 self.message_display("Score:{}".format(self.score), 0.03, 0.1, 20)
                 self.message_display("Lives: {}".format(self.lives), 0.03, .85, 20)
@@ -86,7 +67,6 @@ class Main(HandleEvent):
                 # update the display
                 pyg.display.flip()
                 self.clock.tick(self.framerate)
-
 
 App = Main()
 App.execute()

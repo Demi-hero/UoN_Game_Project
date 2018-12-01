@@ -6,6 +6,25 @@ import csv
 
 class HandleEvent():
 
+    def on_startup(self, background, files):
+        background.draw()
+        background.update()
+        # self.message_display("Highscores :",xloc=.35)
+        # self.message_display(" Lore :", xloc=.65)
+        self.message_display("Movement", yloc=.57, xloc=.26)
+        self.message_display("Shoot", yloc=.65, xloc=.7)
+        background.screen.blit(files.title, (221, 0))
+        background.screen.blit(files.arrows, (160, 320))
+        # gamedata.background.screen.blit(Game_Data.startup.h, (425, 228))
+        # gamedata.background.screen.blit(Game_Data.startup.l, (675, 228))
+        background.screen.blit(files.space, (591, 375))
+        self.message_display("Press Shoot to Start", .9, font_size=35)
+        pyg.display.flip()
+        while self.startup:
+            for event in pyg.event.get():
+                self.on_event(event, files=files)
+            pyg.display.flip()
+
     # calculating the player movement direction based on arrow keys held down
     def player_movement(self, Player):
         keystate = pyg.key.get_pressed()
@@ -93,6 +112,7 @@ class HandleEvent():
 
     def game_over_display(self, board):
         # the text we want on every game over page
+        board.draw()
         board.update()
         self.message_display("Game Over", yloc=0.1, font_size=35)
 
