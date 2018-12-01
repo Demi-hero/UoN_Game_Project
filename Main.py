@@ -1,5 +1,6 @@
 import pygame as pyg
 import os
+import time
 import gamedata as gd
 import eventhandler as eh
 
