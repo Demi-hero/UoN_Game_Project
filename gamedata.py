@@ -292,7 +292,7 @@ class PowerUp:
         self.spawn_pos = (0,0)
 
     def spawn(self, player):
-        if (time.time() - self.starttime)//1 == 3 and not self.spawned:
+        if (time.time() - self.starttime)//1 == 30 and not self.spawned:
             # generate a random number between 0 and however many
             self.power_up = self.powers_dict[randint(0, 1)]
             self.spawn_pos = (randint(BORDER, (WIDTH//2)-self.power_up[1]),
@@ -300,7 +300,7 @@ class PowerUp:
             self.hitbox = pyg.Rect(self.spawn_pos[0], self.spawn_pos[1], self.power_up[1], self.power_up[2])
             self.spawned = True
             Background.screen.blit(self.power_up[0],self.spawn_pos)
-        elif (time.time() - self.starttime)//1 == 10:
+        elif (time.time() - self.starttime)//1 == 60:
             self.starttime = time.time()
             self.spawn_pos = (randint(BORDER, (WIDTH//2)-self.power_up[1]),
                               randint(BORDER, HEIGHT-BORDER-self.power_up[2]))
