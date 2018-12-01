@@ -25,7 +25,8 @@ class Main(eh.HandleEvent):
         Bullet1 = gd.Bullet()
         Alien1 = gd.Alien()
         power_up = gd.PowerUp(self)
-
+        Tokens = [Player1, Bullet1, Alien1, AlienSmart, AlBullet]
+        
         while self.startup:
             self.on_startup(Board, Files)
 
@@ -43,13 +44,21 @@ class Main(eh.HandleEvent):
                 power_up.spawn(Player1)
                 Bullet1.draw()
                 Alien1.draw()
+                AlienSmart.draw()
+                AlBullet.draw()
+                
                 Board.update()
                 Bullet1.update()
-
                 # passes main (self) to alien update and detect_collision to update score and lives
-                Alien1.update(self)
+                Alien1.update(AlBullet, self)
+                AlienSmart.update(Player1, AlBullet, self)
+                AlBullet.update()
+                
                 # detecting collisions between aliens and bullets, and aliens and player
-                Alien1.detect_collisions(Player1, Bullet1, self)
+                Alien1.detect_collisions(Tokens, self)
+                AlienSmart.detect_collisions(Tokens, self)
+                AlBullet.detect_collisions(Tokens, self)
+                
                 # display lives and score at top of screen
                 self.message_display("Score:{}".format(self.score), 0.03, 0.1, 20)
                 self.message_display("Lives: {}".format(self.lives), 0.03, .85, 20)
@@ -57,7 +66,7 @@ class Main(eh.HandleEvent):
 
                 # if out of lives - game over (see eventhandler)
                 if self.lives < 1:
-                    self.gameover(Board, Player1, Bullet1, Alien1, Files)
+                    self.gameover(Board, Tokens, Files)
 
                 # update the display
                 pyg.display.flip()
