@@ -24,9 +24,11 @@ class Main(eh.HandleEvent):
         Player1 = gd.Player()
         Bullet1 = gd.Bullet()
         Alien1 = gd.Alien()
+        AlienSmart = gd.AlienSmart()
+        AlBullet = gd.AlBullet()
         power_up = gd.PowerUp(self)
         Tokens = [Player1, Bullet1, Alien1, AlienSmart, AlBullet]
-        
+
         while self.startup:
             self.on_startup(Board, Files)
 
@@ -34,7 +36,7 @@ class Main(eh.HandleEvent):
         while self.running:
             # taking the player input, passing to event handler
             for event in pyg.event.get():
-                self.on_event(event, Board, Player1, Alien1, Bullet1, Files)
+                self.on_event(event, Board, Tokens, Files)
             self.player_movement(Player1)
 
             # updating the object states, and drawing to screen (see gamedata)
@@ -46,19 +48,19 @@ class Main(eh.HandleEvent):
                 Alien1.draw()
                 AlienSmart.draw()
                 AlBullet.draw()
-                
+
                 Board.update()
                 Bullet1.update()
                 # passes main (self) to alien update and detect_collision to update score and lives
                 Alien1.update(AlBullet, self)
                 AlienSmart.update(Player1, AlBullet, self)
                 AlBullet.update()
-                
+
                 # detecting collisions between aliens and bullets, and aliens and player
                 Alien1.detect_collisions(Tokens, self)
                 AlienSmart.detect_collisions(Tokens, self)
                 AlBullet.detect_collisions(Tokens, self)
-                
+
                 # display lives and score at top of screen
                 self.message_display("Score:{}".format(self.score), 0.03, 0.1, 20)
                 self.message_display("Lives: {}".format(self.lives), 0.03, .85, 20)
