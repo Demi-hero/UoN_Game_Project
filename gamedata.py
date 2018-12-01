@@ -1,5 +1,6 @@
 import pygame as pyg
 import os
+import time
 from random import randint
 import csv
 
