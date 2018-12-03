@@ -69,8 +69,8 @@ class HandleEvent():
             self.update_score(((len(Tokens[2].alive_aliens)+len(Tokens[3].alive_aliens)) * 40))
             board.screen.fill(self.white)
             pyg.display.update()
-            Tokens[2].__init__()
-            Tokens[3].__init__()
+            for value in range(2, 5):
+                Tokens[value].__init__()
             self.bombs -= 1
 
     # update score and lives
