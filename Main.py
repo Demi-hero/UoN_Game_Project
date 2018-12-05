@@ -34,6 +34,7 @@ class Main(eh.HandleEvent):
         while self.startup:
             self.on_startup(self.Board, self.Files)
 
+        self.Board.screen.fill((0,0,0))
         # main game loop
         while self.running:
             # taking the player input, passing to event handler
