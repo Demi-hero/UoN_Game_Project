@@ -11,6 +11,7 @@ BORDER = 10
 
 
 class FileStore:
+
     # class containing all the files that need loading in game that don't relate to an in game sprite.
     def __init__(self):
         self.load_data()
@@ -87,30 +88,29 @@ class Background(pyg.sprite.Sprite):
         if self.bg2_x <= -(self.bg2.get_width()):
                 self.bg2_x = self.bg1_x + self.bg1.get_width()
 
-    def draw(self):
+    def start_up_draw(self):
         self.screen.blit(self.bg1, (self.bg1_x, 0))
         self.screen.blit(self.bg2, (self.bg2_x, 0))
 
 
 class Player(pyg.sprite.Sprite):
     # loading the player sprite and getting it's dimensions
-    sprite = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side.png")))
-    ln = sprite.get_width()
-    ht = sprite.get_height()
+
     # loading the images for the sprite with animated thrusters
-    animated_sprite = [pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side1.png"))),
-               pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side2.png"))),
-               pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side3.png")))]
+    #animated_sprite = [pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side1.png"))),
+    #           pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side2.png"))),
+    #           pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side3.png")))]
     # this is the x-coordinate offset of the animated image, to account for it being longer due to the thrusters
-    animation_offset_x = ln - animated_sprite[0].get_width()
 
     def __init__(self):
         # initialising position on screen, speed and hitbox
         pyg.sprite.Sprite.__init__(self)
-        self.x = BORDER
-        self.y = HEIGHT//2 - self.ht
+        self.sprite = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side.png")))
+        self.rect = self.sprite.get_rect()
+        #self.x = BORDER
+        # self.y = HEIGHT//2 - self.ht
         self.speed = 4
-        self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
+        # self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
         # animation loop - as it increments up, different images of the sprite are drawn, resulting in animation
         self.animation_loop = 0
         # x-axis velocity, used to determine whether to animate thrusters
@@ -123,9 +123,6 @@ class Player(pyg.sprite.Sprite):
         x_gun = self.x + self.ln//2
         y_gun = self.y + self.ht//2
         return [x_gun, y_gun]
-
-    def get_hitbox(self):
-        return self.hitbox
 
     def on_hit(self, Tokens, Main):
         # when player is hit, re-initialises the objects to clear the screen
@@ -143,29 +140,16 @@ class Player(pyg.sprite.Sprite):
             velocity = self.speed
         # this step is here for animation purposes - it flags whether to animate thrusters
         self.x_vel = x_dir
-        x_new = self.x + (x_dir * velocity)
-        y_new = self.y + (y_dir * velocity)
+        x_new = self.rect.x + (x_dir * velocity)
+        y_new = self.rect.y + (y_dir * velocity)
         # checks if the new positions are in the play area, and updates if they are
         if (x_new > BORDER) and (x_new < (WIDTH//2)):
-            self.x = x_new
+            self.rect.x = x_new
         if (y_new > BORDER) and (y_new < HEIGHT-BORDER-self.ht):
-            self.y = y_new
+            self.rect.y = y_new
 
-    def draw(self):
-        # moves hitbox to current position and draws self on screen
-        self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
-        # if player moving backwards, draws ship without thrusters
-        if self.x_vel < 0:
-            Background.screen.blit(self.sprite, (self.x, self.y))
-        # otherwise draws animated ship, and increments through animation loop
-        else:
-            Background.screen.blit(self.animated_sprite[self.animation_loop//3], (self.x+self.animation_offset_x, self.y))
-            self.animation_loop += 1
-            # reseting animation loop as only has three images to cycle through
-            if self.animation_loop >= 9:
-                self.animation_loop = 0
 
-    def update_name(self,new_letter="", delete=0):
+    def update_name(self, new_letter="", delete=0):
         if not delete:
             self.player_name += new_letter
         else:
@@ -174,27 +158,18 @@ class Player(pyg.sprite.Sprite):
 
 class Bullet(pyg.sprite.Sprite):
     # loading the bullet sprite and getting it's dimensions
-    sprite = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "bullet.png")))
-    ln = sprite.get_width()
-    ht = sprite.get_height()
 
-    def __init__(self):
+
+    def __init__(self, x, y):
         pyg.sprite.Sprite.__init__(self)
         # bullet velocity
+        self.sprite = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "bullet.png")))
         self.vx = 15
+        self.rect = self.sprite.get_rect()
+        self.rect.bottom = y
+        self.rect.ceterx = x
         # a list of lists - each entry is the [x,y] co-ordinates of a 'live' bullet
-        self.alive_bullets = []
 
-    def get_alive_bullets(self):
-        return self.alive_bullets
-
-    def get_size(self):
-        # returns its dimensions so the alien detect_collisions method can create hitboxes
-        return [self.ln, self.ht]
-
-    def fire(self, gun_pos):
-        # method called by event handler when space bar pressed - adds a 'live' bullet to the list at curren gun position
-        self.alive_bullets += [gun_pos]
 
     def on_hit(self, hit_bullet):
         # when a collision occurs, removes the relevant bullet from the alive_bullets list
@@ -202,11 +177,10 @@ class Bullet(pyg.sprite.Sprite):
 
     def update(self):
         # iterates through the alive bullets list, updating positions based on velocity, and draws to screen
-        for bullet in self.alive_bullets:
-            bullet[0] += self.vx
-            if (bullet[0] > WIDTH) or (bullet[0] < 0):
-                # removes bullets as they leave the screen
-                self.alive_bullets.remove(bullet)
+        self.rect.x += self.vx
+        if self.rect.right < 0:
+            # removes bullets as they leave the screen
+            self.kill()
 
     def draw(self):
         for bullet in self.alive_bullets:
@@ -217,13 +191,13 @@ class Alien(pyg.sprite.Sprite):
     # loading the alien sprite and getting it's dimensions
     sprite = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "enemy1.png")))
     sprite2 = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "enemy2.png")))
-    ln = sprite.get_width()
-    ht = sprite.get_height()
 
     def __init__(self):
         pyg.sprite.Sprite.__init__(self)
         # initiates spawn position at the right of the screen
-        self.x = WIDTH
+        self.rect = self.image.get_rect()
+        self.radius = int(self.rect.width/2)
+        self.rect.x = WIDTH
         # alien velocity
         self.vx = -4
         # spawn rate - the SMALLER the number, the MORE OFTEN they spawn
@@ -235,6 +209,7 @@ class Alien(pyg.sprite.Sprite):
         self.penalty = -10
         # a list of lists - each entry is the [x,y] co-ordinates of a 'live' alien
         self.alive_aliens = []
+        self.last_update = pyg.time.get_ticks()
 
     def on_hit(self, hit_alien, Main):
         # when a collision occurs, removes the relevant alien from the alive_aliens list
@@ -245,10 +220,11 @@ class Alien(pyg.sprite.Sprite):
         else:
             hit_alien[2] -= 1
 
-    def update(self, AlBullet, Main):
-        # increases the spawn rate as player's score increases
-        if (Main.score > 0) and (Main.score%300 == 0) and (self.spawn_rate > 15):
+    def drop_spawn_rate(self):
+        if self.spawn_rate > 15:
             self.spawn_rate -= 1
+
+    def update(self, AlBullet, Main):
         # generates a random integer between 1 and spawn_rate - if the number == 1, tries to spawn an alien
         if randint(1, self.spawn_rate) == 1:
             # uses a random integer to choose the y position to spawn - five possible tracks can be followed
@@ -265,7 +241,7 @@ class Alien(pyg.sprite.Sprite):
         for alien in self.alive_aliens:
             alien[0] += self.vx
             if alien[0] < (0-self.ln):
-                # removes bullets as they leave the screen
+                # removes aliens as they leave the screen
                 self.alive_aliens.remove(alien)
                 # updates score
                 Main.update_score(self.penalty)
@@ -273,6 +249,8 @@ class Alien(pyg.sprite.Sprite):
             if randint(1,self.fire_rate) == 1:
                 AlBullet.fire([alien[0], alien[1]+self.ht//2])
 
+
+# below this is going in the bin
     def draw(self):
         for alien in self.alive_aliens:
             if alien[2] == 1:
@@ -304,7 +282,7 @@ class AlienSmart(Alien):
         Alien.__init__(self)
         self.spawn_rate = 75
         self.fire_rate = 40
-        self.speed = 1
+        self.vy = 1
         self.width_limit = WIDTH * 0.8
 
     def update(self, Player, AlBullet, Main):
@@ -318,9 +296,9 @@ class AlienSmart(Alien):
                 alien[0] += self.vx
             # then tracks the player's y position
             if (alien[1]+self.ht//2) < player_pos[1]:
-                self.vy = self.speed
+                self.vy = self.vy
             elif (alien[1]+self.ht//2) > player_pos[1]:
-                self.vy = -self.speed
+                self.vy = -self.vy
             else:
                 self.vy = 0
             alien[1] += self.vy
@@ -361,7 +339,7 @@ class PowerUp(pyg.sprite.Sprite):
         self.power_up = []
         self.spawn_pos = (0, 0)
 
-    def spawn(self, player):
+    def update(self, player):
         if (time.time() - self.starttime)//1 == 2 and not self.spawned:
             # generate a random number between 0 and however many
             self.power_up = self.powers_dict[randint(0, 1)]
@@ -391,7 +369,7 @@ class PowerUp(pyg.sprite.Sprite):
 
     def collection(self, player):
         # how to tell when player and powerup hitboxes collied
-        if self.hitbox.colliderect(player.get_hitbox()):
+        if pyg.sprite.spritecollide(player, self, 1):
             self.pickup.play()
             self.power_up[3]()
             self.spawned = False
