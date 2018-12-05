@@ -1,6 +1,6 @@
 import pygame as pyg
 import os
-import gamedata
+import gamedata as gd
 import time
 import csv
 
@@ -30,7 +30,7 @@ class HandleEvent():
             Alien1.drop_spawn_rate()
 
     def on_dead_alien(self):
-            al = gamedata.Alien()
+            al = gd.Alien()
             self.all_sprites.add(al)
             self.Alien1.add(al)
 
@@ -55,9 +55,9 @@ class HandleEvent():
         self.running = False
 
     def shoot(self):
-        self.bullet = self.Bullet(self.rect.centerx, self.rect.top)
+        self.bullet = gd.Bullet(self.Player1.rect.centerx, self.Player1.rect.top)
         self.all_sprites.add(self.bullet)
-        self.bullets.add(self.bullet)
+        self.Bullet1.add(self.bullet)
 
     def on_key_down(self, event, board, files):
         # spacebar triggers firing sequence - takes gun position from player, passes to bullet fire method
@@ -77,14 +77,14 @@ class HandleEvent():
             if not self.paused:
                 self.on_bomb(board, files)
 # this needs a fundimental rework
-    def on_bomb(self, board, Tokens, files):
+    def on_bomb(self, board, files):
         if self.bombs > 0:
             files.ult.play()
-            self.update_score(((len(Tokens[2].alive_aliens)+len(Tokens[3].alive_aliens)) * 40))
+            self.update_score((len(self.all_sprites.sprites()) * 40))
             board.screen.fill(self.white)
             pyg.display.update()
-            for value in range(2, 5):
-                Tokens[value].__init__()
+            for value in self.all_sprites.sprites():
+                value.__init__()
             self.bombs -= 1
 
     # update score and lives
@@ -141,8 +141,8 @@ class HandleEvent():
     def message_display(self, text, yloc=.45, xloc=.5, font_size=50):
         largetext = pyg.font.Font('freesansbold.ttf', font_size)
         textsurf, textrect = self.text_objects(text, largetext)
-        textrect.center = (gamedata.WIDTH * xloc), (gamedata.HEIGHT * yloc)
-        gamedata.Background.screen.blit(textsurf, textrect)
+        textrect.center = (gd.WIDTH * xloc), (gd.HEIGHT * yloc)
+        gd.Background.screen.blit(textsurf, textrect)
 
     # methods for the high score handling
 

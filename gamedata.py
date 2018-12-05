@@ -167,7 +167,7 @@ class Bullet(pyg.sprite.Sprite):
         self.vx = 15
         self.rect = self.sprite.get_rect()
         self.rect.bottom = y
-        self.rect.ceterx = x
+        self.rect.centerx = x
         # a list of lists - each entry is the [x,y] co-ordinates of a 'live' bullet
 
 

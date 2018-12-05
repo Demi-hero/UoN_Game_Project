@@ -6,6 +6,7 @@ import eventhandler as eh
 class Main(eh.HandleEvent):
 
     def __init__(self):
+        pyg.init()
         self.startup = True
         self.running = True
         self.paused = False
@@ -15,34 +16,34 @@ class Main(eh.HandleEvent):
         self.white = (255,255,255)
         self.clock = pyg.time.Clock()
         self.framerate = 100
+        self.all_sprites = pyg.sprite.Group()
+        self.Player1 = gd.Player()
+        self.Board = gd.Background()
+        self.Files = gd.FileStore()
+        self.Bullet1 = pyg.sprite.Group()
+        self.Alien1 = pyg.sprite.Group()
+        self.AlienSmart = pyg.sprite.Group()
+        self.AlBullet = pyg.sprite.Group()
+        self.power_up = pyg.sprite.Sprite
 
     def execute(self):
-        pyg.init()
         # creating the screen and game objects
-        Board = gd.Background()
-        Files = gd.FileStore()
-        all_sprites = pyg.sprite.Group()
-        Player1 = gd.Player()
-        Bullet1 = pyg.sprite.Group()
-        Alien1 = pyg.sprite.Group()
-        AlienSmart = pyg.sprite.Group()
-        AlBullet = pyg.sprite.Group()
-        power_up = pyg.sprite.Sprite
+
         # all_sprites.add(power_up)
 
         while self.startup:
-            self.on_startup(Board, Files)
+            self.on_startup(self.Board, self.Files)
 
         # main game loop
         while self.running:
             # taking the player input, passing to event handler
             for event in pyg.event.get():
-                self.on_event(event, Board, Files)
+                self.on_event(event, self.Board, self.Files)
 
             # updating the object states, and drawing to screen (see gamedata)
             if not self.paused:
-                self.player_movement(Player1)
-                all_sprites.update()
+                self.player_movement(self.Player1)
+                self.all_sprites.update()
                 # power_up.spawn(Player1)
                 # Board.update()
                 # Bullet1.update()
@@ -52,13 +53,13 @@ class Main(eh.HandleEvent):
                 # AlBullet.update()
 
                 # detecting collisions between aliens and bullets, and aliens and player
-                hits = pyg.sprite.groupcollide(Alien1, Bullet1, True, True)
+                hits = pyg.sprite.groupcollide(self.Alien1, self.Bullet1, True, True)
                 for hit in hits:
-                    score += 20
+                    self.score += 20
                     # eploud goes here
                     self.on_dead_alien()
 
-                hits = pyg.sprite.spritecollide(Player1, Alien1, False, pyg.sprite.collide_circle)
+                hits = pyg.sprite.spritecollide(self.Player1, self.Alien1, False, pyg.sprite.collide_circle)
                 for hit in hits:
                     self.on_dead_alien()
                 # display lives and score at top of screen
@@ -68,9 +69,9 @@ class Main(eh.HandleEvent):
 
                 # if out of lives - game over (see eventhandler)
                 if self.lives < 1:
-                    self.gameover(Board, Tokens, Files)
+                    self.gameover(self.Board, self.Files)
 
-                all_sprites.draw(Board.screen)
+                self.all_sprites.draw(self.Board.screen)
                 # update the display
                 pyg.display.flip()
                 self.clock.tick(self.framerate)
