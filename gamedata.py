@@ -65,12 +65,14 @@ class FileStore:
             for lists in self.scores:
                 scorewriter.writerow((lists[0], lists[1]))
 
+
 # Background object contains the display, and draws and updates the animated background
-class Background:
+class Background(pyg.sprite.Sprite):
     screen = pyg.display.set_mode((WIDTH, HEIGHT), pyg.HWSURFACE)
 
     def __init__(self):
         # loading the background image - two copies, to allow it to scroll
+        pyg.sprite.Sprite.__init__(self)
         self.bg1 = pyg.Surface.convert(pyg.image.load(os.path.join("images", "background.jpg")))
         self.bg2 = pyg.Surface.convert(pyg.image.load(os.path.join("images", "background.jpg")))
         self.bg1_x = 0
@@ -90,7 +92,7 @@ class Background:
         self.screen.blit(self.bg2, (self.bg2_x, 0))
 
 
-class Player:
+class Player(pyg.sprite.Sprite):
     # loading the player sprite and getting it's dimensions
     sprite = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side.png")))
     ln = sprite.get_width()
@@ -104,6 +106,7 @@ class Player:
 
     def __init__(self):
         # initialising position on screen, speed and hitbox
+        pyg.sprite.Sprite.__init__(self)
         self.x = BORDER
         self.y = HEIGHT//2 - self.ht
         self.speed = 4
@@ -168,13 +171,15 @@ class Player:
         else:
             self.player_name = self.player_name[:-1]
 
-class Bullet:
+
+class Bullet(pyg.sprite.Sprite):
     # loading the bullet sprite and getting it's dimensions
     sprite = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "bullet.png")))
     ln = sprite.get_width()
     ht = sprite.get_height()
 
     def __init__(self):
+        pyg.sprite.Sprite.__init__(self)
         # bullet velocity
         self.vx = 15
         # a list of lists - each entry is the [x,y] co-ordinates of a 'live' bullet
@@ -208,7 +213,7 @@ class Bullet:
             Background.screen.blit(self.sprite, (bullet[0], bullet[1]))
 
 
-class Alien:
+class Alien(pyg.sprite.Sprite):
     # loading the alien sprite and getting it's dimensions
     sprite = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "enemy1.png")))
     sprite2 = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "enemy2.png")))
@@ -216,6 +221,7 @@ class Alien:
     ht = sprite.get_height()
 
     def __init__(self):
+        pyg.sprite.Sprite.__init__(self)
         # initiates spawn position at the right of the screen
         self.x = WIDTH
         # alien velocity
@@ -340,9 +346,10 @@ class AlBullet(Bullet):
                 Tokens[0].on_hit(Tokens, Main)
 
 
-class PowerUp:
+class PowerUp(pyg.sprite.Sprite):
 
     def __init__(self, Main):
+        pyg.sprite.Sprite.__init__(self)
         self.main = Main
         self.pickup = pyg.mixer.Sound(os.path.join("sounds", "Power-Up.wav"))
         self.spawned = False
