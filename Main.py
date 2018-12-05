@@ -48,7 +48,6 @@ class Main(eh.HandleEvent):
                 Alien1.draw()
                 AlienSmart.draw()
                 AlBullet.draw()
-
                 Board.update()
                 Bullet1.update()
                 # passes main (self) to alien update and detect_collision to update score and lives

@@ -61,7 +61,8 @@ class HandleEvent():
             if self.paused:
                 self.on_exit()
         elif event.key == pyg.K_b:
-            self.on_bomb(board, Tokens, files)
+            if not self.paused:
+                self.on_bomb(board, Tokens, files)
 
     def on_bomb(self, board, Tokens, files):
         if self.bombs > 0:
