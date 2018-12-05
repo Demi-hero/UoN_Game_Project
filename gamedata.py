@@ -351,7 +351,7 @@ class PowerUp:
         self.starttime = time.time()
         for key in self.powers_dict:
             print("{} : {}".format(key, self.powers_dict[key]))
-        self.power_up = []
+        self.power_up = self.powers_dict[randint(0, 1)]
         self.spawn_pos = (0, 0)
 
     def spawn(self, player):
