@@ -1,13 +1,13 @@
 import pygame as pyg
 import os
-import gamedata as gd
+import gamedata
 import time
 import csv
 
 class HandleEvent():
 
     def on_startup(self, background, files):
-        background.start_up_draw()
+        background.draw()
         background.update()
         # self.message_display("Highscores :",xloc=.35)
         # self.message_display(" Lore :", xloc=.65)
@@ -25,15 +25,6 @@ class HandleEvent():
                 self.on_event(event, files=files)
             pyg.display.flip()
 
-    def point_threshold(self):
-        if self.score > 0 and self.score % 300 == 0:
-            Alien1.drop_spawn_rate()
-
-    def on_dead_alien(self):
-            al = gd.Alien()
-            self.all_sprites.add(al)
-            self.Alien1.add(al)
-
     # calculating the player movement direction based on arrow keys held down
     def player_movement(self, Player):
         keystate = pyg.key.get_pressed()
@@ -42,31 +33,27 @@ class HandleEvent():
         Player.move(x_dir, y_dir)
 
     # this runs for every event and calls the relevant method
-    def on_event(self, event, board='', files=""):
+    def on_event(self, event, board='', Tokens='', files=""):
         # breaks out of the main game loop if QUIT event occurs (closing window), cleanup occurs after
         if event.type == pyg.QUIT:
                 self.on_exit()
         # checks for when keys are pressed
         elif event.type == pyg.KEYDOWN:
-                self.on_key_down(event, board, files)
+                self.on_key_down(event, board, Tokens, files,)
 
     def on_exit(self):
         self.startup = False
         self.running = False
 
-    def shoot(self):
-        self.bullet = gd.Bullet(self.Player1.rect.centerx, self.Player1.rect.top)
-        self.all_sprites.add(self.bullet)
-        self.Bullet1.add(self.bullet)
-
-    def on_key_down(self, event, board, files):
+    def on_key_down(self, event, board, Tokens, files):
         # spacebar triggers firing sequence - takes gun position from player, passes to bullet fire method
         if event.key == pyg.K_SPACE:
             files.pewpew.play()
             if self.startup:
                 self.startup = False
             else:
-                self.shoot()
+                gun_pos = Tokens[0].get_gun_location()
+                Tokens[1].fire(gun_pos)
         # p opens the pause screen, and q quits if on the pause screen
         elif event.key == pyg.K_p:
             self.on_pause()
@@ -74,17 +61,16 @@ class HandleEvent():
             if self.paused:
                 self.on_exit()
         elif event.key == pyg.K_b:
-            if not self.paused:
-                self.on_bomb(board, files)
-# this needs a fundimental rework
-    def on_bomb(self, board, files):
+            self.on_bomb(board, Tokens, files)
+
+    def on_bomb(self, board, Tokens, files):
         if self.bombs > 0:
             files.ult.play()
-            self.update_score((len(self.all_sprites.sprites()) * 40))
+            self.update_score(((len(Tokens[2].alive_aliens)+len(Tokens[3].alive_aliens)) * 40))
             board.screen.fill(self.white)
             pyg.display.update()
-            for value in self.all_sprites.sprites():
-                value.__init__()
+            Tokens[2].__init__()
+            Tokens[3].__init__()
             self.bombs -= 1
 
     # update score and lives
@@ -141,8 +127,8 @@ class HandleEvent():
     def message_display(self, text, yloc=.45, xloc=.5, font_size=50):
         largetext = pyg.font.Font('freesansbold.ttf', font_size)
         textsurf, textrect = self.text_objects(text, largetext)
-        textrect.center = (gd.WIDTH * xloc), (gd.HEIGHT * yloc)
-        gd.Background.screen.blit(textsurf, textrect)
+        textrect.center = (gamedata.WIDTH * xloc), (gamedata.HEIGHT * yloc)
+        gamedata.Background.screen.blit(textsurf, textrect)
 
     # methods for the high score handling
 
