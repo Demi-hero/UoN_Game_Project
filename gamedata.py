@@ -155,6 +155,16 @@ class Player(pyg.sprite.Sprite):
             self.rect.x = self.x_new
         if (self.y_new > BORDER) and (self.y_new < HEIGHT-BORDER-self.ht):
             self.rect.y = self.y_new
+        # print (f"{self.x_vel}")
+        if self.x_vel < 0:
+            self.sprite = self.sprite
+            print(f"{self.sprite}")
+        else:
+            self.sprite = self.animated_sprite[self.animation_loop//3]
+            self.animation_loop += 1
+            print(f"{self.sprite}")
+            if self.animation_loop >= 9:
+                self.animation_loop = 0
 
     def update_name(self, new_letter="", delete=0):
         if not delete:

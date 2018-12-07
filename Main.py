@@ -57,8 +57,8 @@ class Main(eh.HandleEvent):
                 # check to see if a mob hit the player
                 hits = pyg.sprite.spritecollide(gd.player, gd.aliens, True, pyg.sprite.collide_circle)
                 for hit in hits:
-                    print (hit)
                     self.lives -= 1
+                    # gd.player.__init__()
                     # gd.player.death()
                     # player.shield -= hit.radius * 2
 #                   expl = gd.Explosion(hit.rect.center, 'sm')
@@ -69,10 +69,8 @@ class Main(eh.HandleEvent):
                 for alien in gd.aliens:
                     if alien.rect.x < 0 - alien.ln:
                         gd.aliens.remove(alien)
-                        self.score - 10
+                        self.score -= 10
                         gd.new_alien()
-
-
 
                 Board.draw()
                 gd.all_sprites.draw(gd.Background.screen)
