@@ -22,6 +22,7 @@ class FileStore(pyg.sprite.Sprite):
     def __init__(self):
         self.load_data()
         pyg.sprite.Sprite.__init__(self)
+
     def load_data(self):
         self.scores = []
         self.background_music = os.path.join("sounds", "OrbitBeat130.wav")
