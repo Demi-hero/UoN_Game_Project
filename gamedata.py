@@ -204,11 +204,11 @@ class Alien(pyg.sprite.Sprite):
 
     def __init__(self):
         pyg.sprite.Sprite.__init__(self)
-        self.image_orig = pyg.transform.scale(self.sprite, (100, 100))
-#        self.image_orig.set_colorkey(white)
-        self.image = self.image_orig.copy()
-        # initiates spawn position at the right of the screen
-        self.x = WIDTH
+        self.image = self.sprite
+        self.rect = self.image.get_rect()
+        self.rect.x = WIDTH + self.ln
+        self.rect.y = randint(BORDER, HEIGHT - BORDER - self.ht)
+        self.radius = int(self.rect.width * .85 / 2)
         # alien velocity
         self.vx = -4
         # spawn rate - the SMALLER the number, the MORE OFTEN they spawn
@@ -219,10 +219,10 @@ class Alien(pyg.sprite.Sprite):
         # score change if enemy gets through
         self.penalty = -10
         # a list of lists - each entry is the [x,y] co-ordinates of a 'live' alien
-        self.alive_aliens = []
-        self.rect = self.image.get_rect()
-        self.radius = int(self.rect.width * .85 / 2)
-        self.x = WIDTH
+
+
+    def update(self):
+        self.rect.x += self.vx
 
 #    def on_hit(self, hit_alien, Main):
         # when a collision occurs, removes the relevant alien from the alive_aliens list
@@ -233,46 +233,47 @@ class Alien(pyg.sprite.Sprite):
 #        else:
 #            hit_alien[2] -= 1
 
+
+    """
     def update(self):
         self.speedx = 0
         self.speedy = 0
-            
 
-#    def update(self, AlBullet, Main):
+    def update(self, AlBullet, Main):
         # increases the spawn rate as player's score increases
-#        if (Main.score > 0) and (Main.score%300 == 0) and (self.spawn_rate > 15):
-#            self.spawn_rate -= 1
+        if (Main.score > 0) and (Main.score%300 == 0) and (self.spawn_rate > 15):
+            self.spawn_rate -= 1
         # generates a random integer between 1 and spawn_rate - if the number == 1, tries to spawn an alien
-#        if randint(1, self.spawn_rate) == 1:
+        if randint(1, self.spawn_rate) == 1:
             # uses a random integer to choose the y position to spawn - five possible tracks can be followed
-#            spawn_pos = [self.x, (randint(0,4) * (HEIGHT//5)) + BORDER]
+            spawn_pos = [self.x, (randint(0,4) * (HEIGHT//5)) + BORDER]
             # runs a collision check to make sure the new alien won't spawn overlapping an existing alien
-#            spawn_collision = False
-#            for alien in self.alive_aliens:
-#                if (spawn_pos[1] == alien[1]) and (spawn_pos[0] <= alien[0]+self.ln):
-#                    spawn_collision = True
-#            if not spawn_collision:
+            spawn_collision = False
+            for alien in self.alive_aliens:
+                if (spawn_pos[1] == alien[1]) and (spawn_pos[0] <= alien[0]+self.ln):
+                    spawn_collision = True
+            if not spawn_collision:
                 # adds the new 'live' alien to the alive_aliens list
-#                self.alive_aliens += [spawn_pos + [randint(1,2)]]
+                self.alive_aliens += [spawn_pos + [randint(1,2)]]
         # iterates through the alive_aliens list, updating positions based on velocity, and draws to screen
-#        for alien in self.alive_aliens:
-#            alien[0] += self.vx
-#            if alien[0] < (0-self.ln):
+        for alien in self.alive_aliens:
+            alien[0] += self.vx
+            if alien[0] < (0-self.ln):
                 # removes bullets as they leave the screen
-#                self.alive_aliens.remove(alien)
+                self.alive_aliens.remove(alien)
                 # updates score
-#                Main.update_score(self.penalty)
+                Main.update_score(self.penalty)
             # aliens now shoot back at player
-#            if randint(1,self.fire_rate) == 1:
-#                AlBullet.fire([alien[0], alien[1]+self.ht//2])
-
+            if randint(1,self.fire_rate) == 1:
+                AlBullet.fire([alien[0], alien[1]+self.ht//2])
+    
    # def draw(self):
     #    for alien in self.alive_aliens:
      #       if alien[2] == 1:
       #          Background.screen.blit(self.sprite, (alien[0], alien[1]))
        #     else:
         #        Background.screen.blit(self.sprite2, (alien[0], alien[1]))
-"""
+
     def detect_collisions(self, Tokens, Main):
         player_hitbox = Tokens[0].get_hitbox()
         # gets the list of alive bullets and the size of the bullets

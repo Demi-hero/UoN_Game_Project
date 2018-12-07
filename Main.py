@@ -43,46 +43,40 @@ class Main(eh.HandleEvent):
 
             # updating the object states, and drawing to screen (see gamedata)
             if not self.paused:
-                Board.draw()
-                gd.all_sprites.draw(Board.screen)
+
                 Board.update()
                 gd.all_sprites.update()
 
-                # passes main (self) to alien update and detect_collision to update score and lives
-#                Alien1.update(AlBullet, self)
-#                AlienSmart.update(Player1, AlBullet, self)
-#                AlBullet.update()
-
-                # detecting collisions between aliens and bullets, and aliens and player
-#                Alien1.detect_collisions(Tokens, self)
-#                AlienSmart.detect_collisions(Tokens, self)
-#                AlBullet.detect_collisions(Tokens, self)
-                
-                 # Update
-
-
                 # check to see if a bullet hit a mob
                 hits = pyg.sprite.groupcollide(gd.aliens, self.bullets, True, True)
+                if hits:
+                    print(hits)
                 for hit in hits:
-                    self.score += 50 - hit.radius
-#        random.choice(expl_sounds).play()
-#        expl = Explosion(hit.rect.center, 'lg')
-#        all_sprites.add(expl)
+                    self.score += 50
+                    print(hit)
                     gd.new_alien()
 
                 # check to see if a mob hit the player
                 hits = pyg.sprite.spritecollide(gd.player, gd.aliens, True, pyg.sprite.collide_circle)
+                if hits:
+                    print(hits)
                 for hit in hits:
-#                   player.shield -= hit.radius * 2
-#                   expl = Explosion(hit.rect.center, 'sm')
-#                   all_sprites.add(expl)
+                    print (hit)
+                    self.lives -= 1
+                    # gd.player.death()
+                    # player.shield -= hit.radius * 2
+#                   expl = gd.Explosion(hit.rect.center, 'sm')
+#                   gd.all_sprites.add(expl)
                     gd.new_alien()
 #        if player.shield <= 0:
 #            running = False
+                aliens = len(gd.aliens)
+                if aliens < 5:
+                    gd.new_alien()
 
-                # Draw / render
-#                screen.fill(white)
-#                screen.blit(background, background_rect)
+
+
+                Board.draw()
                 gd.all_sprites.draw(gd.Background.screen)
 
                 # display lives and score at top of screen

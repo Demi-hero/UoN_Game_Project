@@ -112,7 +112,8 @@ class HandleEvent():
                 elif event.type == pyg.KEYDOWN:
                     # if key pressed, re-initialises everything and breaks from loop
                     for token in Tokens:
-                        token.__init__()
+                        gamedata.player.rect.x = gamedata.BORDER
+                        gamedata.player.rect.y = gamedata.HEIGHT//2 - gamedata.player.ht
                     self.__init__()
                     return
 
