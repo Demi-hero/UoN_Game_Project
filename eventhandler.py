@@ -111,12 +111,10 @@ class HandleEvent():
                     os._exit(0)
                 elif event.type == pyg.KEYDOWN:
                     # if key pressed, re-initialises everything and breaks from loop
-                    gamedata.player.rect.x = gamedata.BORDER
-                    gamedata.player.rect.y = gamedata.HEIGHT//2 - gamedata.player.ht
                     for sprite in gamedata.all_sprites:
                         gamedata.all_sprites.remove(sprite)
-                    player = gamedata.Player()
-                    gamedata.all_sprites.add(player)
+                    gamedata.player = gamedata.Player()
+                    gamedata.all_sprites.add(gamedata.player)
                     for i in range(8):
                         gamedata.new_alien()
                     self.__init__()
