@@ -3,6 +3,8 @@ import os
 import gamedata as gd
 import eventhandler as eh
 # no realy push me
+
+
 class Main(eh.HandleEvent):
 
     def __init__(self):

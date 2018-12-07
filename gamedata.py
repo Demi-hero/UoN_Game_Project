@@ -157,10 +157,10 @@ class Player(pyg.sprite.Sprite):
             self.rect.y = self.y_new
         # print (f"{self.x_vel}")
         if self.x_vel < 0:
-            self.sprite = self.sprite
+            self.image = self.sprite
             print(f"{self.sprite}")
         else:
-            self.sprite = self.animated_sprite[self.animation_loop//3]
+            self.image = self.animated_sprite[self.animation_loop//3]
             self.animation_loop += 1
             print(f"{self.sprite}")
             if self.animation_loop >= 9:
