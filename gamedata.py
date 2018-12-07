@@ -156,7 +156,7 @@ class Player(pyg.sprite.Sprite):
         if (self.y_new > BORDER) and (self.y_new < HEIGHT-BORDER-self.ht):
             self.rect.y = self.y_new
 
-    def update_name(self,new_letter="", delete=0):
+    def update_name(self, new_letter="", delete=0):
         if not delete:
             self.player_name += new_letter
         else:
@@ -191,6 +191,7 @@ class Bullet(pyg.sprite.Sprite):
 
 def new_alien():
     alien = Alien()
+    alien.collide(aliens)
     all_sprites.add(alien)
     aliens.add(alien)
 
@@ -206,7 +207,7 @@ class Alien(pyg.sprite.Sprite):
         pyg.sprite.Sprite.__init__(self)
         self.image = self.sprite
         self.rect = self.image.get_rect()
-        self.rect.x = WIDTH + self.ln
+        self.rect.x = WIDTH + self.ln + randint(1, 100)
         self.rect.y = randint(BORDER, HEIGHT - BORDER - self.ht)
         self.radius = int(self.rect.width * .85 / 2)
         # alien velocity
@@ -223,6 +224,11 @@ class Alien(pyg.sprite.Sprite):
 
     def update(self):
         self.rect.x += self.vx
+
+    def collide(self, sprite_group):
+        if pyg.sprite.spritecollide(self, sprite_group, False):
+            self.rect.x += self.ln * randint(2, 5)
+            self.collide(sprite_group)
 
 #    def on_hit(self, hit_alien, Main):
         # when a collision occurs, removes the relevant alien from the alive_aliens list

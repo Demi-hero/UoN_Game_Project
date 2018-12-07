@@ -49,8 +49,6 @@ class Main(eh.HandleEvent):
 
                 # check to see if a bullet hit a mob
                 hits = pyg.sprite.groupcollide(gd.aliens, self.bullets, True, True)
-                if hits:
-                    print(hits)
                 for hit in hits:
                     self.score += 50
                     print(hit)
@@ -58,8 +56,6 @@ class Main(eh.HandleEvent):
 
                 # check to see if a mob hit the player
                 hits = pyg.sprite.spritecollide(gd.player, gd.aliens, True, pyg.sprite.collide_circle)
-                if hits:
-                    print(hits)
                 for hit in hits:
                     print (hit)
                     self.lives -= 1
@@ -70,9 +66,11 @@ class Main(eh.HandleEvent):
                     gd.new_alien()
 #        if player.shield <= 0:
 #            running = False
-                aliens = len(gd.aliens)
-                if aliens < 5:
-                    gd.new_alien()
+                for alien in gd.aliens:
+                    if alien.rect.x < 0 - alien.ln:
+                        gd.aliens.remove(alien)
+                        self.score - 10
+                        gd.new_alien()
 
 
 
