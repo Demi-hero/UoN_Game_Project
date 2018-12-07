@@ -15,6 +15,7 @@ class Main(eh.HandleEvent):
         self.white = (255,255,255)
         self.clock = pyg.time.Clock()
         self.framerate = 100
+        self.bullets = pyg.sprite.Group()
 
     def execute(self):
         pyg.init()
@@ -25,9 +26,10 @@ class Main(eh.HandleEvent):
         Bullet1 = gd.Bullet()
         Alien1 = gd.Alien()
         AlienSmart = gd.AlienSmart()
-#        AlBullet = gd.AlBullet()
+        # AlBullet = gd.AlBullet()
         power_up = gd.PowerUp(self)
         Tokens = [Player1, Bullet1, Alien1, AlienSmart]
+
 
         while self.startup:
             self.on_startup(Board, Files)
@@ -37,7 +39,7 @@ class Main(eh.HandleEvent):
             # taking the player input, passing to event handler
             for event in pyg.event.get():
                 self.on_event(event, Board, Tokens, Files)
-            self.player_movement(Player1)
+            self.player_movement(gd.player)
 
             # updating the object states, and drawing to screen (see gamedata)
             if not self.paused:
@@ -45,15 +47,7 @@ class Main(eh.HandleEvent):
                 gd.all_sprites.draw(Board.screen)
                 Board.update()
                 gd.all_sprites.update()
-                # Player1.draw()
-                # power_up.spawn(Player1)
-                # Bullet1.draw()
-                # Alien1.draw()
-                # AlienSmart.draw()
-#                AlBullet.draw()
 
-
-                # Bullet1.update()
                 # passes main (self) to alien update and detect_collision to update score and lives
 #                Alien1.update(AlBullet, self)
 #                AlienSmart.update(Player1, AlBullet, self)
@@ -68,7 +62,7 @@ class Main(eh.HandleEvent):
 
 
                 # check to see if a bullet hit a mob
-                hits = pyg.sprite.groupcollide(gd.aliens, gd.bullets, True, True)
+                hits = pyg.sprite.groupcollide(gd.aliens, self.bullets, True, True)
                 for hit in hits:
                     self.score += 50 - hit.radius
 #        random.choice(expl_sounds).play()

@@ -52,8 +52,11 @@ class HandleEvent():
             if self.startup:
                 self.startup = False
             else:
-                gun_pos = Tokens[0].get_gun_location()
-                Tokens[1].fire(gun_pos)
+                bullet = gamedata.Bullet()
+                bullet.rect.x = gamedata.player.rect.x + gamedata.player.ln//2
+                bullet.rect.y = gamedata.player.rect.y + gamedata.player.ht//2
+                gamedata.all_sprites.add(bullet)
+                self.bullets.add(bullet)
         # p opens the pause screen, and q quits if on the pause screen
         elif event.key == pyg.K_p:
             self.on_pause()
