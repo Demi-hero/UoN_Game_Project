@@ -117,16 +117,17 @@ class Player(pyg.sprite.Sprite):
         self.ht = self.sprite.get_height()
         self.image = self.sprite
         self.rect = self.image.get_rect()
-        # initialising position on screen, speed and hitbox
         self.radius = 20
-        self.x = BORDER
-        self.y = HEIGHT//2 - self.ht
-        self.rect.centerx = WIDTH // 2
-        self.rect.bottom = HEIGHT - 10
+
+        # initialises starting position on the board.
+        self.rect.x = BORDER
+        self.rect.y = HEIGHT//2 - self.ht
         self.speed = 4
 #        self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
+
         # animation loop - as it increments up, different images of the sprite are drawn, resulting in animation
         self.animation_loop = 0
+
         # x-axis velocity, used to determine whether to animate thrusters
         self.x_vel = 0
         self.altering_name = False
@@ -134,8 +135,8 @@ class Player(pyg.sprite.Sprite):
         
     def get_gun_location(self):
         # returns the gun position to the event handler, who passes it to bullet fire method
-        x_gun = self.x + self.ln//2
-        y_gun = self.y + self.ht//2
+        x_gun = self.rect.x + self.ln//2
+        y_gun = self.rect.y + self.ht//2
         return [x_gun, y_gun]
 
     def get_hitbox(self):
@@ -159,13 +160,14 @@ class Player(pyg.sprite.Sprite):
             velocity = self.speed
         # this step is here for animation purposes - it flags whether to animate thrusters
         self.x_vel = x_dir
-        x_new = self.x + (x_dir * velocity)
-        y_new = self.y + (y_dir * velocity)
+        x_new = self.rect.x + (x_dir * velocity)
+        y_new = self.rect.y + (y_dir * velocity)
+        print(f"x:{x_new}, y:{y_new}")
         # checks if the new positions are in the play area, and updates if they are
         if (x_new > BORDER) and (x_new < (WIDTH//2)):
-            self.x = x_new
+            self.rect.x = x_new
         if (y_new > BORDER) and (y_new < HEIGHT-BORDER-self.ht):
-            self.y = y_new
+            self.rect.y = y_new
 
     def draw(self):
         # moves hitbox to current position and draws self on screen
@@ -391,14 +393,14 @@ class PowerUp(pyg.sprite.Sprite):
         self.pickup = pyg.mixer.Sound(os.path.join("sounds", "Power-Up.wav"))
         self.spawned = False
         self.powers_dict = {0: [pyg.image.load(os.path.join("images", "hero_life.png")), 93, 25, self.extra_life],
-                            1: [pyg.image.load(os.path.join("images", "bomb3.png")), 58, 100, self.extra_bomb]}
+                            1: [pyg.image.load(os.path.join("images", "bomb.png")), 58, 100, self.extra_bomb]}
         self.starttime = time.time()
 
         self.power_up = []
         self.spawn_pos = (0,0)
 
     def spawn(self, player):
-        if (time.time() - self.starttime)//1 == 3 and not self.spawned:
+        if (time.time() - self.starttime)//1 == 10 and not self.spawned:
             # generate a random number between 0 and however many
             self.power_up = self.powers_dict[randint(0, 1)]
             self.spawn_pos = (randint(BORDER, (WIDTH//2)-self.power_up[1]),
@@ -406,7 +408,7 @@ class PowerUp(pyg.sprite.Sprite):
             self.hitbox = pyg.Rect(self.spawn_pos[0], self.spawn_pos[1], self.power_up[1], self.power_up[2])
             self.spawned = True
             Background.screen.blit(self.power_up[0],self.spawn_pos)
-        elif (time.time() - self.starttime)//1 == 10:
+        elif (time.time() - self.starttime)//1 == 30:
             self.starttime = time.time()
             self.spawn_pos = (randint(BORDER, (WIDTH//2)-self.power_up[1]),
                               randint(BORDER, HEIGHT-BORDER-self.power_up[2]))

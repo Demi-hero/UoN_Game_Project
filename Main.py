@@ -42,15 +42,18 @@ class Main(eh.HandleEvent):
             # updating the object states, and drawing to screen (see gamedata)
             if not self.paused:
                 Board.draw()
-                Player1.draw()
-                power_up.spawn(Player1)
-                Bullet1.draw()
-                Alien1.draw()
-                AlienSmart.draw()
+                gd.all_sprites.draw(Board.screen)
+                Board.update()
+                gd.all_sprites.update()
+                # Player1.draw()
+                # power_up.spawn(Player1)
+                # Bullet1.draw()
+                # Alien1.draw()
+                # AlienSmart.draw()
 #                AlBullet.draw()
 
-                Board.update()
-                Bullet1.update()
+
+                # Bullet1.update()
                 # passes main (self) to alien update and detect_collision to update score and lives
 #                Alien1.update(AlBullet, self)
 #                AlienSmart.update(Player1, AlBullet, self)
@@ -62,7 +65,7 @@ class Main(eh.HandleEvent):
 #                AlBullet.detect_collisions(Tokens, self)
                 
                  # Update
-                gd.all_sprites.update()
+
 
                 # check to see if a bullet hit a mob
                 hits = pyg.sprite.groupcollide(gd.aliens, gd.bullets, True, True)
