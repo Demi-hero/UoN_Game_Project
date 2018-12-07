@@ -105,7 +105,7 @@ class Player(pyg.sprite.Sprite):
                pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side2.png"))),
                pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side3.png")))]
     # this is the x-coordinate offset of the animated image, to account for it being longer due to the thrusters
-    animation_offset_x = ln - animated_sprite[0].get_width()
+#    animation_offset_x = ln - animated_sprite[0].get_width()
 
     def __init__(self):
         pyg.sprite.Sprite.__init__(self)
@@ -155,14 +155,14 @@ class Player(pyg.sprite.Sprite):
             self.rect.x = self.x_new
         if (self.y_new > BORDER) and (self.y_new < HEIGHT-BORDER-self.ht):
             self.rect.y = self.y_new
-        # print (f"{self.x_vel}")
+        # if player moving backwards, draws ship without thrusters
         if self.x_vel < 0:
-            self.image = self.sprite
-            print(f"{self.sprite}")
+            self.sprite = self.sprite
+        # otherwise draws animated ship, and increments through animation loop
         else:
-            self.image = self.animated_sprite[self.animation_loop//3]
+            self.sprite = self.animated_sprite[self.animation_loop//3]
             self.animation_loop += 1
-            print(f"{self.sprite}")
+            # reseting animation loop as only has three images to cycle through
             if self.animation_loop >= 9:
                 self.animation_loop = 0
 
@@ -355,7 +355,40 @@ class AlBullet(Bullet):
             if player_hitbox.colliderect(bullet_hitbox):
                 Tokens[0].on_hit(Tokens, Main)
 """
+class Explosion(pyg.sprite.Sprite):
+    def __init__(self, center, size):
+        pyg.sprite.Sprite.__init__(self)
+        self.size = size        
+        self.frame = 0
+        self.last_update = pyg.time.get_ticks()
+        self.frame_rate = 50        
+        self.explosion_anim = {}
+        self.explosion_anim['lg'] = []
+        self.explosion_anim['sm'] = []
+        for i in range(1,6):
+            filename = 'boom{}.png'.format(i)
+            img = pyg.image.load(os.path.join("images", filename)).convert_alpha()
+            img_lg = pyg.transform.scale(img, (75, 75))
+            self.explosion_anim['lg'].append(img_lg)
+            img_sm = pyg.transform.scale(img, (100, 100))
+            self.explosion_anim['sm'].append(img_sm)
+        self.image = self.explosion_anim[self.size][0]
+        self.rect = self.image.get_rect()
+        self.rect.center = center
 
+    def update(self):
+        now = pyg.time.get_ticks()
+        if now - self.last_update > self.frame_rate:
+            self.last_update = now
+            self.frame += 1
+            if self.frame == len(self.explosion_anim[self.size]):
+                self.kill()
+            else:
+                center = self.rect.center
+                self.image = self.explosion_anim[self.size][self.frame]
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+                
 class PowerUp(pyg.sprite.Sprite):
 
     def __init__(self, Main):

@@ -3,8 +3,6 @@ import os
 import gamedata as gd
 import eventhandler as eh
 # no realy push me
-
-
 class Main(eh.HandleEvent):
 
     def __init__(self):
@@ -53,26 +51,29 @@ class Main(eh.HandleEvent):
                 hits = pyg.sprite.groupcollide(gd.aliens, self.bullets, True, True)
                 for hit in hits:
                     self.score += 50
-                    print(hit)
+                    Files.boom.play()
+                    gd.expl = gd.Explosion(hit.rect.center, 'lg')
+                    gd.all_sprites.add(gd.expl)
                     gd.new_alien()
 
                 # check to see if a mob hit the player
                 hits = pyg.sprite.spritecollide(gd.player, gd.aliens, True, pyg.sprite.collide_circle)
                 for hit in hits:
+                    print (hit)
                     self.lives -= 1
-                    # gd.player.__init__()
-                    # gd.player.death()
-                    # player.shield -= hit.radius * 2
-#                   expl = gd.Explosion(hit.rect.center, 'sm')
-#                   gd.all_sprites.add(expl)
+                    Files.boom.play()
+                    gd.expl = gd.Explosion(hit.rect.center, 'sm')
+                    gd.all_sprites.add(gd.expl)
                     gd.new_alien()
 #        if player.shield <= 0:
 #            running = False
                 for alien in gd.aliens:
                     if alien.rect.x < 0 - alien.ln:
                         gd.aliens.remove(alien)
-                        self.score -= 10
+                        self.score - 10
                         gd.new_alien()
+
+
 
                 Board.draw()
                 gd.all_sprites.draw(gd.Background.screen)
