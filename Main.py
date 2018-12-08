@@ -65,16 +65,11 @@ class Main(eh.HandleEvent):
                     gd.expl = gd.Explosion(hit.rect.center, 'sm')
                     gd.all_sprites.add(gd.expl)
                     gd.new_alien()
-#        if player.shield <= 0:
-#            running = False
                 for alien in gd.aliens:
                     if alien.rect.x < 0 - alien.ln:
                         gd.aliens.remove(alien)
                         self.score -= 10
                         gd.new_alien()
-
-
-
                 Board.draw()
                 gd.all_sprites.draw(gd.Background.screen)
 
