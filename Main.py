@@ -70,7 +70,7 @@ class Main(eh.HandleEvent):
                 for alien in gd.aliens:
                     if alien.rect.x < 0 - alien.ln:
                         gd.aliens.remove(alien)
-                        self.score - 10
+                        self.score -= 10
                         gd.new_alien()
 
 
