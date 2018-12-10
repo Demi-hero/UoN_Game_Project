@@ -35,7 +35,6 @@ class Main(eh.HandleEvent):
         Alien1 = gd.Alien()
         # AlienSmart = gd.AlienSmart()
         # AlBullet = gd.AlBullet()
-        power_up = gd.PowerUp()
         Tokens = [Player1, Bullet1, Alien1]
 
 
@@ -45,8 +44,7 @@ class Main(eh.HandleEvent):
         # main game loop
         while self.running:
             # taking the player input, passing to event handler
-            print(self.starttime)
-            if (time.time() - self.starttime)//1 == 3:
+            if (time.time() - self.starttime)//1 == 10 and len(self.power_ups) == 0:
                 self.new_powerup()
                 print("Power up baby")
             for event in pyg.event.get():
@@ -69,6 +67,10 @@ class Main(eh.HandleEvent):
                     gd.expl = gd.Explosion(hit.rect.center, 'lg')
                     gd.all_sprites.add(gd.expl)
                     gd.new_alien()
+
+                hits = pyg.sprite.spritecollide(gd.player, self.power_ups, True)
+                for hit in hits:
+                    print("Power up collected")
 
                 # check to see if a mob hit the player
                 hits = pyg.sprite.spritecollide(gd.player, gd.aliens, True, pyg.sprite.collide_circle)
