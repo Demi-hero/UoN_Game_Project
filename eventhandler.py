@@ -53,9 +53,9 @@ class HandleEvent():
                 self.startup = False
             else:
                 bullet = gamedata.Bullet()
-                bullet.rect.x = gamedata.player.rect.x + gamedata.player.ln//2
-                bullet.rect.y = gamedata.player.rect.y + gamedata.player.ht//2
-                gamedata.all_sprites.add(bullet)
+                bullet.rect.x = self.player.rect.x + self.player.ln//2
+                bullet.rect.y = self.player.rect.y + self.player.ht//2
+                self.all_sprites.add(bullet)
                 self.bullets.add(bullet)
         # p opens the pause screen, and q quits if on the pause screen
         elif event.key == pyg.K_p:
@@ -72,13 +72,13 @@ class HandleEvent():
             files.ult.play()
             self.update_score(1000)
             board.screen.fill(self.white)
-            for alien in gamedata.aliens:
+            for alien in self.aliens:
                 alien.kill()
                 counter += 1
             pyg.display.update()
             self.bombs -= 1
             for i in range(counter):
-                gamedata.new_alien()
+                self.new_alien(self)
 
 
     # update score and lives
@@ -116,12 +116,13 @@ class HandleEvent():
                     os._exit(0)
                 elif event.type == pyg.KEYDOWN:
                     # if key pressed, re-initialises everything and breaks from loop
-                    for sprite in gamedata.all_sprites:
+                    for sprite in self.all_sprites:
                         sprite.kill()
-                    gamedata.player = gamedata.Player()
-                    gamedata.all_sprites.add(gamedata.player)
+                    self.player = gamedata.Player()
+                    self.all_sprites.add(self.player)
                     for i in range(8):
-                        gamedata.new_alien()
+                        print(f"alien{i}")
+                        self.new_alien(self)
                     self.__init__()
                     return
 
@@ -182,3 +183,9 @@ class HandleEvent():
             if self.score > int(lists[1]):
                 return True
         return False
+
+    def new_alien(self, main):
+        alien = gamedata.Alien(main)
+        alien.collide(self.aliens)
+        self.all_sprites.add(alien)
+        self.aliens.add(alien)

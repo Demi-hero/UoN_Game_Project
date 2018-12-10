@@ -115,7 +115,7 @@ class Player(pyg.sprite.Sprite):
         self.image = self.sprite
         self.rect = self.image.get_rect()
         # change to a rect?
-        self.radius = 100
+        # self.radius = 100
         self.hidden = False
         self.hide_timer = pyg.time.get_ticks()
 
@@ -197,11 +197,7 @@ class Bullet(pyg.sprite.Sprite):
         self.rect.x += self.vx
 
 
-def new_alien():
-    alien = Alien()
-    alien.collide(aliens)
-    all_sprites.add(alien)
-    aliens.add(alien)
+
 
 class Alien(pyg.sprite.Sprite):
     sprite = pyg.image.load(os.path.join("images", "enemy2.png")).convert_alpha()
@@ -212,8 +208,9 @@ class Alien(pyg.sprite.Sprite):
               pyg.image.load(os.path.join("images", "enemy2.png")).convert_alpha(),
               pyg.image.load(os.path.join("images", "enemy3.png")).convert_alpha()]
 
-    def __init__(self):
+    def __init__(self, main):
         pyg.sprite.Sprite.__init__(self)
+        self.main = main
         self.image = self.sprite
         self.rect = self.image.get_rect()
         self.rect.x = WIDTH + self.ln + randint(1, 100)
@@ -242,9 +239,9 @@ class Alien(pyg.sprite.Sprite):
         if self.smart == 10:
             if self.rect.x > self.width_limit:
                 self.rect.x += self.vx
-            if self.rect.y < player.rect.y:
+            if self.rect.y < self.main.player.rect.y:
                 self.rect.y += self.vy
-            elif self.rect.y > player.rect.y:
+            elif self.rect.y > self.main.player.rect.y:
                 self.rect.y -= self.vy
         else:
             self.rect.x += self.vx
@@ -255,8 +252,8 @@ class Alien(pyg.sprite.Sprite):
                 self.animation_loop = 0
         if randint(1,1000) == 1:
             albull = AlBullet(self.rect.x, (self.rect.y+self.ht//2))
-            alienbullets.add(albull)
-            all_sprites.add(albull)
+            self.main.alienbullets.add(albull)
+            self.main.all_sprites.add(albull)
 
 
 
@@ -307,6 +304,8 @@ class Explosion(pyg.sprite.Sprite):
 
 class PowerUp(pyg.sprite.Sprite):
 
+
+
     def __init__(self,main):
         self.main = main
         pyg.sprite.Sprite.__init__(self)
@@ -323,7 +322,7 @@ class PowerUp(pyg.sprite.Sprite):
     def update(self):
         if (time.time() - self.starttime)//1 == 3 and not self.spawned:
             print("I should spawn a power up")
-            # generate a random number between 0 and however many
+            # generate a random number between 1 and however many
             self.power_up = self.powers_dict[randint(1, 2)]
             self.image = self.power_up[0]
             self.rect = self.image.get_rect()
@@ -347,10 +346,3 @@ class PowerUp(pyg.sprite.Sprite):
         self.main.bombs += 1
 
 
-all_sprites = pyg.sprite.Group()
-aliens = pyg.sprite.Group()
-player = Player()
-all_sprites.add(player)
-for i in range(8):
-    new_alien()
-alienbullets = pyg.sprite.Group()
