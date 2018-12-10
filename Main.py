@@ -1,3 +1,4 @@
+
 import pygame as pyg
 import os
 import gamedata as gd
@@ -29,9 +30,6 @@ class Main(eh.HandleEvent):
         # creating the screen and game objects
         Files = gd.FileStore()
         Board = gd.Background()
-        # AlienSmart = gd.AlienSmart()
-        # AlBullet = gd.AlBullet()
-
 
         while self.startup:
             self.on_startup(Board, Files)
@@ -83,6 +81,19 @@ class Main(eh.HandleEvent):
                         gd.aliens.remove(alien)
                         self.score -= 10
                         gd.new_alien()
+                for bullet in self.bullets:
+                    if bullet.rect.x > gd.WIDTH:
+                        self.bullets.remove(bullet)
+                for bullet in gd.alienbullets:
+                    if bullet.rect.x < (0 - bullet.ln):
+                        gd.alienbullets.remove(bullet)
+                hits = pyg.sprite.spritecollide(gd.player, gd.alienbullets, True)
+                for hit in hits:
+                    self.lives -= 1
+                    Files.boom.play()
+                    gd.expl = gd.Explosion(hit.rect.center, 'sm')
+                    gd.all_sprites.add(gd.expl)
+                    gd.player.hide()
 
                 Board.draw()
                 gd.all_sprites.draw(gd.Background.screen)
