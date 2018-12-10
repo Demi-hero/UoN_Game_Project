@@ -49,9 +49,7 @@ class Main(eh.HandleEvent):
 
                 if (time.time() - self.starttime) // 1 == 3 and len(self.power_ups) == 0:
                     self.new_powerup()
-                    print("Power up baby")
-                elif (time.time() - self.starttime) // 1 == 15:
-                    print("Timer Reset")
+                elif (time.time() - self.starttime) // 1 > 15:
                     self.starttime = time.time()
                 Board.update()
                 gd.all_sprites.update()
