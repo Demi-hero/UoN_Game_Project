@@ -3,7 +3,6 @@ import os
 import gamedata as gd
 import eventhandler as eh
 import time
-# no realy push me
 class Main(eh.HandleEvent):
 
     def __init__(self):
@@ -21,7 +20,7 @@ class Main(eh.HandleEvent):
         self.power_ups = pyg.sprite.Group()
 
     def new_powerup(self):
-        power_up = gd.PowerUp()
+        power_up = gd.PowerUp(self)
         self.power_ups.add(power_up)
         gd.all_sprites.add(power_up)
 
@@ -40,9 +39,12 @@ class Main(eh.HandleEvent):
         # main game loop
         while self.running:
             # taking the player input, passing to event handler
-            if (time.time() - self.starttime)//1 == 10 and len(self.power_ups) == 0:
+            if (time.time() - self.starttime)//1 == 3 and len(self.power_ups) == 0:
                 self.new_powerup()
                 print("Power up baby")
+            elif (time.time() - self.starttime)//1 == 15:
+                print("Timer Reset")
+                self.starttime = time.time()
             for event in pyg.event.get():
                 self.on_event(event, Files)
             self.player_movement(gd.player)
@@ -52,8 +54,6 @@ class Main(eh.HandleEvent):
 
                 Board.update()
                 gd.all_sprites.update()
-
-
 
                 # check to see if a bullet hit a mob
                 hits = pyg.sprite.groupcollide(gd.aliens, self.bullets, True, True)
@@ -66,6 +66,7 @@ class Main(eh.HandleEvent):
 
                 hits = pyg.sprite.spritecollide(gd.player, self.power_ups, True)
                 for hit in hits:
+                    hit.power_up[3]()
                     print("Power up collected")
 
                 # check to see if a mob hit the player

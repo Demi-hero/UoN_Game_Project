@@ -330,7 +330,8 @@ class Explosion(pyg.sprite.Sprite):
 
 class PowerUp(pyg.sprite.Sprite):
 
-    def __init__(self):
+    def __init__(self,main):
+        self.main = main
         pyg.sprite.Sprite.__init__(self)
         self.spawned = False
         self.powers_dict = {0: pyg.image.load(os.path.join("images", "1pixelimage.png")),
@@ -363,14 +364,10 @@ class PowerUp(pyg.sprite.Sprite):
 #            self.collection(player)
 
     def extra_life(self):
-        pass
-     #   if self.spawned:
-      #      .lives += 1
+        self.main.lives += 1
 
     def extra_bomb(self):
-        pass
-#        if self.spawned:
- #           self.main.bombs += 1
+        self.main.bombs += 1
 
 
 
