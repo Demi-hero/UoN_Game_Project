@@ -133,13 +133,6 @@ class Player(pyg.sprite.Sprite):
         self.altering_name = False
         self.player_name = ''
 
-#    def on_hit(self, Tokens, Main):
-        # when player is hit, re-initialises the objects to clear the screen
-#        for token in Tokens:
-#            token.__init__()
-        # updates number of lives
-#        Main.update_lives(-1)
-
 
     def move(self, x_dir, y_dir):
         # takes the direction of movement from the event handler, multiplies by speed
@@ -340,31 +333,31 @@ class PowerUp(pyg.sprite.Sprite):
     def __init__(self):
         pyg.sprite.Sprite.__init__(self)
         self.spawned = False
-        self.powers_dict = {0: [pyg.image.load(os.path.join("images", "hero_life.png")).convert_alpha(), 93, 25, self.extra_life],
-                            1: [pyg.image.load(os.path.join("images", "bomb1.png")).convert_alpha(), 58, 100, self.extra_bomb]}
+        self.powers_dict = {0: pyg.image.load(os.path.join("images", "1pixelimage.png")),
+                            1: [pyg.image.load(os.path.join("images", "hero_life.png")).convert_alpha(), 93, 25, self.extra_life],
+                            2: [pyg.image.load(os.path.join("images", "bomb1.png")).convert_alpha(), 58, 100, self.extra_bomb]}
         self.starttime = time.time()
         self.power_up = []
         self.spawn_pos = (0, 0)
-        self.image = self.powers_dict[0][0]
+        self.image = self.powers_dict[0]
         self.rect = self.image.get_rect()
 
     def update(self):
         if (time.time() - self.starttime)//1 == 3 and not self.spawned:
             print("I should spawn a power up")
             # generate a random number between 0 and however many
-            self.power_up = self.powers_dict[randint(0, 1)]
-            self.spawn_pos = (randint(BORDER, (WIDTH//2)-self.power_up[1]),
-                              randint(BORDER, HEIGHT-BORDER-self.power_up[2]))
-            self.hitbox = pyg.Rect(self.spawn_pos[0], self.spawn_pos[1], self.power_up[1], self.power_up[2])
-            self.spawned = True
+            self.power_up = self.powers_dict[randint(1, 2)]
             self.image = self.power_up[0]
             self.rect = self.image.get_rect()
+            self.rect.x = randint(BORDER, (WIDTH//2)-self.power_up[1])
+            self.rect.y = randint(BORDER, HEIGHT-BORDER-self.power_up[2])
+            self.spawned = True
         elif (time.time() - self.starttime)//1 == 10:
             print("I despawn a power up")
             self.starttime = time.time()
             self.spawn_pos = (randint(BORDER, (WIDTH//2)-self.power_up[1]),
                               randint(BORDER, HEIGHT-BORDER-self.power_up[2]))
-            self.image = None
+            self.image = self.powers_dict[0]
             self.spawned = False
 #        elif self.spawned:
 #            self.collection(player)
