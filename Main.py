@@ -25,10 +25,10 @@ class Main(eh.HandleEvent):
         Player1 = gd.Player()
         Bullet1 = gd.Bullet()
         Alien1 = gd.Alien()
-        AlienSmart = gd.AlienSmart()
+        # AlienSmart = gd.AlienSmart()
         # AlBullet = gd.AlBullet()
         power_up = gd.PowerUp(self)
-        Tokens = [Player1, Bullet1, Alien1, AlienSmart]
+        Tokens = [Player1, Bullet1, Alien1]
 
 
         while self.startup:

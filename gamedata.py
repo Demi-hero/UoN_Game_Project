@@ -249,13 +249,7 @@ class Alien(pyg.sprite.Sprite):
         if self.animation_loop >= 9:
             self.animation_loop = 0
 
-
-
-    
-    def update(self):
-        self.speedx = 0
-        self.speedy = 0
-
+'''
     def update(self, AlBullet, Main):
         # increases the spawn rate as player's score increases
         if (Main.score > 0) and (Main.score%300 == 0) and (self.spawn_rate > 15):
@@ -356,7 +350,7 @@ class AlBullet(Bullet):
 #            bullet_hitbox = pyg.Rect(bullet[0], bullet[1], self.ln, self.ht)
 #            if player_hitbox.colliderect(bullet_hitbox):
 #                Tokens[0].on_hit(Tokens, Main)
-
+'''
 class Explosion(pyg.sprite.Sprite):
     def __init__(self, center, size):
         pyg.sprite.Sprite.__init__(self)
@@ -390,7 +384,9 @@ class Explosion(pyg.sprite.Sprite):
                 self.image = self.explosion_anim[self.size][self.frame]
                 self.rect = self.image.get_rect()
                 self.rect.center = center
-                
+
+
+
 class PowerUp(pyg.sprite.Sprite):
 
     def __init__(self, Main):
