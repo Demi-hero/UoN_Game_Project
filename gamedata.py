@@ -220,7 +220,7 @@ class Alien(pyg.sprite.Sprite):
         self.rect.y = randint(BORDER, HEIGHT - BORDER - self.ht)
         self.radius = 20
         # alien velocity
-        self.vx = -4
+        self.vx = -2
         # spawn rate - the SMALLER the number, the MORE OFTEN they spawn
         self.spawn_rate = 100
         self.fire_rate = 200
@@ -355,8 +355,8 @@ class PowerUp(pyg.sprite.Sprite):
         elif (time.time() - self.starttime)//1 == 10:
             print("I despawn a power up")
             self.starttime = time.time()
-            self.spawn_pos = (randint(BORDER, (WIDTH//2)-self.power_up[1]),
-                              randint(BORDER, HEIGHT-BORDER-self.power_up[2]))
+            self.rect.x = randint(BORDER, (WIDTH // 2) - self.power_up[1])
+            self.rect.y = randint(BORDER, HEIGHT - BORDER - self.power_up[2])
             self.image = self.powers_dict[0]
             self.spawned = False
 #        elif self.spawned:

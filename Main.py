@@ -2,6 +2,7 @@ import pygame as pyg
 import os
 import gamedata as gd
 import eventhandler as eh
+import time
 # no realy push me
 class Main(eh.HandleEvent):
 
