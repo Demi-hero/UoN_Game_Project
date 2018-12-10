@@ -33,19 +33,19 @@ class HandleEvent():
         Player.move(x_dir, y_dir)
 
     # this runs for every event and calls the relevant method
-    def on_event(self, event, board='', Tokens='', files=""):
+    def on_event(self, event, files=""):
         # breaks out of the main game loop if QUIT event occurs (closing window), cleanup occurs after
         if event.type == pyg.QUIT:
                 self.on_exit()
         # checks for when keys are pressed
         elif event.type == pyg.KEYDOWN:
-                self.on_key_down(event, board, Tokens, files,)
+                self.on_key_down(event, files,)
 
     def on_exit(self):
         self.startup = False
         self.running = False
 
-    def on_key_down(self, event, board, Tokens, files):
+    def on_key_down(self, event, files):
         # spacebar triggers firing sequence - takes gun position from player, passes to bullet fire method
         if event.key == pyg.K_SPACE:
             files.pewpew.play()
@@ -93,13 +93,13 @@ class HandleEvent():
         elif not minimised:
             self.paused = False
 
-    def gameover(self, Board, Tokens, Files):
+    def gameover(self, board, player, files):
         # display high score messages
-        if self.scorboard_check(Files):
-            self.on_new_highscore(Board, Tokens[0], Files)
+        if self.scorboard_check(files):
+            self.on_new_highscore(board, player, files)
         else:
             self.message_display("Your Score: {}".format(self.score), .75)
-        self.highscore_display(Board, Files)
+        self.highscore_display(board, files)
         self.message_display("Press any key to try again", .85)
         pyg.display.update()
         time.sleep(1.5)

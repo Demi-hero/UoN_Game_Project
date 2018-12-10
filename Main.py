@@ -30,12 +30,8 @@ class Main(eh.HandleEvent):
         # creating the screen and game objects
         Files = gd.FileStore()
         Board = gd.Background()
-        Player1 = gd.Player()
-        Bullet1 = gd.Bullet()
-        Alien1 = gd.Alien()
         # AlienSmart = gd.AlienSmart()
         # AlBullet = gd.AlBullet()
-        Tokens = [Player1, Bullet1, Alien1]
 
 
         while self.startup:
@@ -48,7 +44,7 @@ class Main(eh.HandleEvent):
                 self.new_powerup()
                 print("Power up baby")
             for event in pyg.event.get():
-                self.on_event(event, Board, Tokens, Files)
+                self.on_event(event, Files)
             self.player_movement(gd.player)
 
             # updating the object states, and drawing to screen (see gamedata)
@@ -98,7 +94,7 @@ class Main(eh.HandleEvent):
 
                 # if out of lives - game over (see eventhandler)
                 if self.lives < 1:
-                    self.gameover(Board, Tokens, Files)
+                    self.gameover(Board, gd.player, Files)
 
                 # update the display
                 pyg.display.flip()
