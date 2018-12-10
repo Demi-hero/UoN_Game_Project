@@ -370,16 +370,6 @@ class PowerUp(pyg.sprite.Sprite):
         self.main.bombs += 1
 
 
-
-"""
-    def collection(self, player):
-        # how to tell when player and powerup hitboxes collied
-        player_hitbox = player.get_hitbox()
-        if self.hitbox.colliderect(player_hitbox):
-            self.pickup.play()
-            self.power_up[3]()
-            self.spawned = False
-"""            
 all_sprites = pyg.sprite.Group()
 aliens = pyg.sprite.Group()
 player = Player()
