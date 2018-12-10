@@ -68,17 +68,14 @@ class HandleEvent():
 
     def on_bomb(self, board, files):
         if self.bombs > 0:
-            counter = 0
             files.ult.play()
             self.update_score(1000)
             board.screen.fill(self.white)
             for alien in self.aliens:
                 alien.kill()
-                counter += 1
             pyg.display.update()
             self.bombs -= 1
-            for i in range(counter):
-                self.new_alien(self)
+            self.new_alien(self.wavenum)
 
 
     # update score and lives
@@ -86,6 +83,20 @@ class HandleEvent():
         self.score += points
     def update_lives(self, change):
         self.lives += change
+
+    def player_death(self, hit):
+        self.lives -= 1
+        self.Files.boom.play()
+        expl = gamedata.Explosion(hit.rect.center, 'sm')
+        self.all_sprites.add(expl)
+        self.player.hide()
+        for alien in self.aliens:
+            alien.kill()
+        for bullet in self.bullets:
+            bullet.kill()
+        for albull in self.alienbullets:
+            albull.kill()
+        self.new_alien(self.wavenum)
 
     # pause screen messages
     def on_pause(self, minimised=0):
@@ -118,12 +129,10 @@ class HandleEvent():
                     # if key pressed, re-initialises everything and breaks from loop
                     for sprite in self.all_sprites:
                         sprite.kill()
-                    self.player = gamedata.Player()
-                    self.all_sprites.add(self.player)
+                    self.__init__()
                     for i in range(8):
                         print(f"alien{i}")
                         self.new_alien(self)
-                    self.__init__()
                     return
 
     def game_over_display(self, board):
@@ -184,8 +193,9 @@ class HandleEvent():
                 return True
         return False
 
-    def new_alien(self, main):
-        alien = gamedata.Alien(main)
-        alien.collide(self.aliens)
-        self.all_sprites.add(alien)
-        self.aliens.add(alien)
+    def new_alien(self, wave):
+        for i in range (wave+7):
+            alien = gamedata.Alien(self)
+            alien.collide(self.aliens)
+            self.all_sprites.add(alien)
+            self.aliens.add(alien)

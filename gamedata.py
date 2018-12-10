@@ -221,11 +221,7 @@ class Alien(pyg.sprite.Sprite):
         self.vy = 1
         # spawn rate - the SMALLER the number, the MORE OFTEN they spawn
         self.spawn_rate = 100
-        self.fire_rate = 200
-        # score for a kill
-        self.kill_score = 20
-        # score change if enemy gets through
-        self.penalty = -10
+        self.fire_rate = 300
         self.animation_loop = 0
         self.smart = randint(1,10)
         self.width_limit = WIDTH*0.8
@@ -235,7 +231,18 @@ class Alien(pyg.sprite.Sprite):
             self.rect.x += self.ln * randint(2, 5)
             self.collide(sprite_group)
 
+    def shoot(self, rate):
+        if (randint(1, rate) == 1) and (self.rect.x < WIDTH):
+            albull = AlBullet(self.rect.x, (self.rect.y + self.ht // 2))
+            self.main.alienbullets.add(albull)
+            self.main.all_sprites.add(albull)
+
     def update(self):
+        self.image = self.animated_sprite[self.animation_loop // 3]
+        self.animation_loop += 1
+        # reseting animation loop as only has three images to cycle through
+        if self.animation_loop >= 9:
+            self.animation_loop = 0
         if self.smart == 10:
             if self.rect.x > self.width_limit:
                 self.rect.x += self.vx
@@ -243,17 +250,10 @@ class Alien(pyg.sprite.Sprite):
                 self.rect.y += self.vy
             elif self.rect.y > self.main.player.rect.y:
                 self.rect.y -= self.vy
+            self.shoot(self.fire_rate//3)
         else:
             self.rect.x += self.vx
-            self.image = self.animated_sprite[self.animation_loop//3]
-            self.animation_loop += 1
-            # reseting animation loop as only has three images to cycle through
-            if self.animation_loop >= 9:
-                self.animation_loop = 0
-        if randint(1,1000) == 1:
-            albull = AlBullet(self.rect.x, (self.rect.y+self.ht//2))
-            self.main.alienbullets.add(albull)
-            self.main.all_sprites.add(albull)
+            self.shoot(self.fire_rate)
 
 
 
@@ -310,7 +310,7 @@ class PowerUp(pyg.sprite.Sprite):
         self.main = main
         pyg.sprite.Sprite.__init__(self)
         self.spawned = False
-        self.powers_dict = {0: pyg.image.load(os.path.join("images", "1pixelimage.png")),
+        self.powers_dict = {0: pyg.image.load(os.path.join("images", "1pixelimage.png")).convert_alpha(),
                             1: [pyg.image.load(os.path.join("images", "hero_life.png")).convert_alpha(), 93, 25, self.extra_life],
                             2: [pyg.image.load(os.path.join("images", "bomb1.png")).convert_alpha(), 58, 100, self.extra_bomb]}
         self.starttime = time.time()
@@ -332,9 +332,10 @@ class PowerUp(pyg.sprite.Sprite):
         elif (time.time() - self.starttime)//1 == 10:
             print("I despawn a power up")
             self.starttime = time.time()
-            self.rect.x = randint(BORDER, (WIDTH // 2) - self.power_up[1])
-            self.rect.y = randint(BORDER, HEIGHT - BORDER - self.power_up[2])
             self.image = self.powers_dict[0]
+            self.rect.x = 0
+            self.rect.y = 0
+
             self.spawned = False
 #        elif self.spawned:
 #            self.collection(player)
