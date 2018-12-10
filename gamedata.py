@@ -24,6 +24,7 @@ class FileStore(pyg.sprite.Sprite):
         self.background_music = os.path.join("sounds", "OrbitBeat130.wav")
         self.pewpew = pyg.mixer.Sound(os.path.join("sounds", "pew.wav"))
         self.boom = pyg.mixer.Sound(os.path.join("sounds", "boom.wav"))
+        self.pickup = pyg.mixer.Sound(os.path.join("sounds", "Power-Up.wav"))
         self.arrows = pyg.image.load(os.path.join("images", "PixelKeys2.png"))
         self.h = pyg.image.load(os.path.join("images", "h.png"))
         self.l = pyg.image.load(os.path.join("images", "L.png"))
@@ -250,59 +251,6 @@ class Alien(pyg.sprite.Sprite):
             self.animation_loop = 0
 
 '''
-    def update(self, AlBullet, Main):
-        # increases the spawn rate as player's score increases
-        if (Main.score > 0) and (Main.score%300 == 0) and (self.spawn_rate > 15):
-            self.spawn_rate -= 1
-        # generates a random integer between 1 and spawn_rate - if the number == 1, tries to spawn an alien
-        if randint(1, self.spawn_rate) == 1:
-            # uses a random integer to choose the y position to spawn - five possible tracks can be followed
-            spawn_pos = [self.rect.x, (randint(0,4) * (HEIGHT//5)) + BORDER]
-            # runs a collision check to make sure the new alien won't spawn overlapping an existing alien
-            spawn_collision = False
-            for alien in self.alive_aliens:
-                if (spawn_pos[1] == alien[1]) and (spawn_pos[0] <= alien[0]+self.ln):
-                    spawn_collision = True
-            if not spawn_collision:
-                # adds the new 'live' alien to the alive_aliens list
-                self.alive_aliens += [spawn_pos + [randint(1,2)]]
-        # iterates through the alive_aliens list, updating positions based on velocity, and draws to screen
-        for alien in self.alive_aliens:
-            alien[0] += self.vx
-            if alien[0] < (0-self.ln):
-                # removes bullets as they leave the screen
-                self.alive_aliens.remove(alien)
-                # updates score
-                Main.update_score(self.penalty)
-            # aliens now shoot back at player
-            if randint(1,self.fire_rate) == 1:
-                AlBullet.fire([alien[0], alien[1]+self.ht//2])
-    
-   # def draw(self):
-    #    for alien in self.alive_aliens:
-     #       if alien[2] == 1:
-      #          Background.screen.blit(self.sprite, (alien[0], alien[1]))
-       #     else:
-        #        Background.screen.blit(self.sprite2, (alien[0], alien[1]))
-
-"""
-    def detect_collisions(self, Tokens, Main):
-        player_hitbox = Tokens[0].get_hitbox()
-        # gets the list of alive bullets and the size of the bullets
-        alive_bullets = Tokens[1].get_alive_bullets()
-        bullet_size = Tokens[1].get_size()
-        for alien in self.alive_aliens:
-            # calculates if a collision has occurred between an alien and the player
-            alien_hitbox = pyg.Rect(alien[0], alien[1], self.ln, self.ht)
-            if alien_hitbox.colliderect(player_hitbox):
-                Tokens[0].on_hit(Tokens, Main)
-                return
-            for bull in alive_bullets:
-                # calculates if a collision has occurred between a bullet and alien
-                if (bull[0]+bullet_size[0] >= alien[0]) and (bull[1] >= alien[1]-bullet_size[1]) and (bull[1] <= alien[1]+self.ht):
-                    self.on_hit(alien, Main)
-                    Tokens[1].on_hit(bull)
-"""
 
 class AlienSmart(Alien):
 
@@ -389,43 +337,47 @@ class Explosion(pyg.sprite.Sprite):
 
 class PowerUp(pyg.sprite.Sprite):
 
-    def __init__(self, Main):
+    def __init__(self):
         pyg.sprite.Sprite.__init__(self)
-        self.main = Main
-        self.pickup = pyg.mixer.Sound(os.path.join("sounds", "Power-Up.wav"))
         self.spawned = False
         self.powers_dict = {0: [pyg.image.load(os.path.join("images", "hero_life.png")).convert_alpha(), 93, 25, self.extra_life],
-                            1: [pyg.image.load(os.path.join("images", "bomb.png")).convert_alpha(), 58, 100, self.extra_bomb]}
+                            1: [pyg.image.load(os.path.join("images", "bomb1.png")).convert_alpha(), 58, 100, self.extra_bomb]}
         self.starttime = time.time()
         self.power_up = []
-        self.spawn_pos = (0,0)
+        self.spawn_pos = (0, 0)
+        self.image = self.powers_dict[0][0]
+        self.rect = self.image.get_rect()
 
     def update(self):
-        if (time.time() - self.starttime)//1 == 10 and not self.spawned:
+        if (time.time() - self.starttime)//1 == 3 and not self.spawned:
+            print("I should spawn a power up")
             # generate a random number between 0 and however many
             self.power_up = self.powers_dict[randint(0, 1)]
             self.spawn_pos = (randint(BORDER, (WIDTH//2)-self.power_up[1]),
                               randint(BORDER, HEIGHT-BORDER-self.power_up[2]))
             self.hitbox = pyg.Rect(self.spawn_pos[0], self.spawn_pos[1], self.power_up[1], self.power_up[2])
             self.spawned = True
-            Background.screen.blit(self.power_up[0],self.spawn_pos)
-        elif (time.time() - self.starttime)//1 == 30:
+            self.image = self.power_up[0]
+            self.rect = self.image.get_rect()
+        elif (time.time() - self.starttime)//1 == 10:
+            print("I despawn a power up")
             self.starttime = time.time()
             self.spawn_pos = (randint(BORDER, (WIDTH//2)-self.power_up[1]),
                               randint(BORDER, HEIGHT-BORDER-self.power_up[2]))
+            self.image = None
             self.spawned = False
 #        elif self.spawned:
 #            self.collection(player)
-            if self.spawned:
-                Background.screen.blit(self.power_up[0], self.spawn_pos)
-
     def extra_life(self):
-        if self.spawned:
-            self.main.lives += 1
+        pass
+     #   if self.spawned:
+      #      self.main.lives += 1
 
     def extra_bomb(self):
-        if self.spawned:
-            self.main.bombs += 1
+        pass
+#        if self.spawned:
+ #           self.main.bombs += 1
+
 """
     def collection(self, player):
         # how to tell when player and powerup hitboxes collied
@@ -437,7 +389,8 @@ class PowerUp(pyg.sprite.Sprite):
 """            
 all_sprites = pyg.sprite.Group()
 aliens = pyg.sprite.Group()
-# bullets = pyg.sprite.Group()
+power_up = PowerUp()
+all_sprites.add(power_up)
 player = Player()
 all_sprites.add(player)
 for i in range(8):

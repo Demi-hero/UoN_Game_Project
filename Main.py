@@ -27,7 +27,7 @@ class Main(eh.HandleEvent):
         Alien1 = gd.Alien()
         # AlienSmart = gd.AlienSmart()
         # AlBullet = gd.AlBullet()
-        power_up = gd.PowerUp(self)
+        power_up = gd.PowerUp()
         Tokens = [Player1, Bullet1, Alien1]
 
 
