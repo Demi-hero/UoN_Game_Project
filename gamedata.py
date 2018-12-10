@@ -399,11 +399,10 @@ class PowerUp(pyg.sprite.Sprite):
         self.powers_dict = {0: [pyg.image.load(os.path.join("images", "hero_life.png")), 93, 25, self.extra_life],
                             1: [pyg.image.load(os.path.join("images", "bomb.png")), 58, 100, self.extra_bomb]}
         self.starttime = time.time()
-
         self.power_up = []
         self.spawn_pos = (0,0)
 
-    def spawn(self, player):
+    def update(self):
         if (time.time() - self.starttime)//1 == 10 and not self.spawned:
             # generate a random number between 0 and however many
             self.power_up = self.powers_dict[randint(0, 1)]
