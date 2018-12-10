@@ -235,10 +235,12 @@ class Alien:
         # a list of lists - each entry is the [x,y] co-ordinates of a 'live' alien
         self.alive_aliens = []
 
-    def on_hit(self, hit_alien, Main):
+    def on_hit(self, hit_alien, Files, Main):
         # when a collision occurs, removes a hit-point from the alien, and updates score
         Main.update_score(self.kill_score)
         hit_alien[2] -= 1
+        if hit_alien[2] == 0:
+            Files.boom.play()
 
     def update(self, AlBullet, Main):
         # increases the spawn rate as player's score increases
@@ -282,7 +284,7 @@ class Alien:
                 if alien[3] > 9:
                     self.alive_aliens.remove(alien)
 
-    def detect_collisions(self, Tokens, Main):
+    def detect_collisions(self, Tokens, Files, Main):
         player_hitbox = Tokens[0].get_hitbox()
         # gets the list of alive bullets and the size of the bullets
         alive_bullets = Tokens[1].get_alive_bullets()
@@ -298,7 +300,7 @@ class Alien:
                 for bull in alive_bullets:
                     # calculates if a collision has occurred between a bullet and alien
                     if (bull[0]+bullet_size[0] >= alien[0]) and (bull[1] >= alien[1]-bullet_size[1]) and (bull[1] <= alien[1]+self.ht):
-                        self.on_hit(alien, Main)
+                        self.on_hit(alien, Files, Main)
                         Tokens[1].on_hit(bull)
 
 
