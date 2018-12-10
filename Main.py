@@ -39,19 +39,20 @@ class Main(eh.HandleEvent):
         # main game loop
         while self.running:
             # taking the player input, passing to event handler
-            if (time.time() - self.starttime)//1 == 3 and len(self.power_ups) == 0:
-                self.new_powerup()
-                print("Power up baby")
-            elif (time.time() - self.starttime)//1 == 15:
-                print("Timer Reset")
-                self.starttime = time.time()
+
             for event in pyg.event.get():
-                self.on_event(event, Files)
+                self.on_event(event, Files, Board)
             self.player_movement(gd.player)
 
             # updating the object states, and drawing to screen (see gamedata)
             if not self.paused:
 
+                if (time.time() - self.starttime) // 1 == 3 and len(self.power_ups) == 0:
+                    self.new_powerup()
+                    print("Power up baby")
+                elif (time.time() - self.starttime) // 1 == 15:
+                    print("Timer Reset")
+                    self.starttime = time.time()
                 Board.update()
                 gd.all_sprites.update()
 

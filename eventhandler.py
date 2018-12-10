@@ -33,19 +33,19 @@ class HandleEvent():
         Player.move(x_dir, y_dir)
 
     # this runs for every event and calls the relevant method
-    def on_event(self, event, files=""):
+    def on_event(self, event, files="", board = ""):
         # breaks out of the main game loop if QUIT event occurs (closing window), cleanup occurs after
         if event.type == pyg.QUIT:
                 self.on_exit()
         # checks for when keys are pressed
         elif event.type == pyg.KEYDOWN:
-                self.on_key_down(event, files,)
+                self.on_key_down(event, files, board)
 
     def on_exit(self):
         self.startup = False
         self.running = False
 
-    def on_key_down(self, event, files):
+    def on_key_down(self, event, files, board):
         # spacebar triggers firing sequence - takes gun position from player, passes to bullet fire method
         if event.key == pyg.K_SPACE:
             files.pewpew.play()
@@ -64,17 +64,22 @@ class HandleEvent():
             if self.paused:
                 self.on_exit()
         elif event.key == pyg.K_b:
-            self.on_bomb(board, Tokens, files)
+            self.on_bomb(board, files)
 
-    def on_bomb(self, board, Tokens, files):
+    def on_bomb(self, board, files):
         if self.bombs > 0:
+            counter = 0
             files.ult.play()
-            self.update_score(((len(Tokens[2].alive_aliens)+len(Tokens[3].alive_aliens)) * 40))
+            self.update_score(1000)
             board.screen.fill(self.white)
+            for alien in gamedata.aliens:
+                alien.kill()
+                counter += 1
             pyg.display.update()
-            Tokens[2].__init__()
-            Tokens[3].__init__()
             self.bombs -= 1
+            for i in range(counter):
+                gamedata.new_alien()
+
 
     # update score and lives
     def update_score(self, points):
