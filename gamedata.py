@@ -76,8 +76,8 @@ class Background(pyg.sprite.Sprite):
     def __init__(self):
         pyg.sprite.Sprite.__init__(self)
         # loading the background image - two copies, to allow it to scroll
-        self.bg1 = pyg.Surface.convert(pyg.image.load(os.path.join("images", "background.jpg")))
-        self.bg2 = pyg.Surface.convert(pyg.image.load(os.path.join("images", "background.jpg")))
+        self.bg1 = pyg.image.load(os.path.join("images", "background.jpg")).convert()
+        self.bg2 = pyg.image.load(os.path.join("images", "background.jpg")).convert()
         self.bg1_x = 0
         self.bg2_x = self.bg1.get_width()
 
@@ -97,13 +97,13 @@ class Background(pyg.sprite.Sprite):
 
 class Player(pyg.sprite.Sprite):
     # loading the player sprite and getting it's dimensions
-    sprite = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side.png")))
+    sprite = pyg.image.load(os.path.join("images", "hero_side.png")).convert_alpha()
     ln = sprite.get_width()
     ht = sprite.get_height()
     # loading the images for the sprite with animated thrusters
-    animated_sprite = [pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side1.png"))),
-               pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side2.png"))),
-               pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "hero_side3.png")))]
+    animated_sprite = [pyg.image.load(os.path.join("images", "hero_side1.png")).convert_alpha(),
+               pyg.image.load(os.path.join("images", "hero_side2.png")).convert_alpha(),
+               pyg.image.load(os.path.join("images", "hero_side3.png")).convert_alpha()]
     # this is the x-coordinate offset of the animated image, to account for it being longer due to the thrusters
 #    animation_offset_x = ln - animated_sprite[0].get_width()
 
@@ -113,7 +113,10 @@ class Player(pyg.sprite.Sprite):
         self.ht = self.sprite.get_height()
         self.image = self.sprite
         self.rect = self.image.get_rect()
-        self.radius = 20
+        # change to a rect?
+        self.radius = 100
+        self.hidden = False
+        self.hide_timer = pyg.time.get_ticks()
 
         # initialises starting position on the board.
         self.x_new = self.rect.x = BORDER
@@ -155,16 +158,26 @@ class Player(pyg.sprite.Sprite):
             self.rect.x = self.x_new
         if (self.y_new > BORDER) and (self.y_new < HEIGHT-BORDER-self.ht):
             self.rect.y = self.y_new
+        if self.hidden and pyg.time.get_ticks() - self.hide_timer > 1000:
+            self.hidden = False
+            self.x_new = self.rect.x = BORDER
+            self.y_new = self.rect.y = HEIGHT//2 - self.ht
         # if player moving backwards, draws ship without thrusters
         if self.x_vel < 0:
-            self.sprite = self.sprite
+            self.image = self.sprite
         # otherwise draws animated ship, and increments through animation loop
         else:
-            self.sprite = self.animated_sprite[self.animation_loop//3]
+            self.image = self.animated_sprite[self.animation_loop//3]
             self.animation_loop += 1
             # reseting animation loop as only has three images to cycle through
             if self.animation_loop >= 9:
                 self.animation_loop = 0
+                
+    def hide(self):
+        # hide the player temporarily
+        self.hidden = True
+        self.hide_timer = pyg.time.get_ticks()
+        self.rect.center = (WIDTH / 2, HEIGHT + 200)
 
     def update_name(self, new_letter="", delete=0):
         if not delete:
@@ -175,7 +188,7 @@ class Player(pyg.sprite.Sprite):
 
 class Bullet(pyg.sprite.Sprite):
     # loading the bullet sprite and getting it's dimensions
-    sprite = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "bullet.png")))
+    sprite = pyg.image.load(os.path.join("images", "bullet.png")).convert_alpha()
     ln = sprite.get_width()
     ht = sprite.get_height()
 
@@ -189,15 +202,6 @@ class Bullet(pyg.sprite.Sprite):
     def update(self):
         self.rect.x += self.vx
 
-#    def on_hit(self, hit_bullet):
-        # when a collision occurs, removes the relevant bullet from the alive_bullets list
-#        self.alive_bullets.remove(hit_bullet)
-    # def update(self):
-      #  self.rect.x += self.vx
-        # kill if it moves off the top of the screen
-        # if self.rect.bottom < 0:
-         #   self.kill()
-
 
 def new_alien():
     alien = Alien()
@@ -205,21 +209,22 @@ def new_alien():
     all_sprites.add(alien)
     aliens.add(alien)
 
-
 class Alien(pyg.sprite.Sprite):
-    # loading the alien sprite and getting it's dimensions
-    sprite = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "enemy1.png")))
-    sprite2 = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "enemy2.png")))
+    sprite = pyg.image.load(os.path.join("images", "enemy2.png")).convert_alpha()
     ln = sprite.get_width()
     ht = sprite.get_height()
-
+    # loading the alien sprite and getting it's dimensions
+    animated_sprite = [pyg.image.load(os.path.join("images", "enemy1.png")).convert_alpha(),
+              pyg.image.load(os.path.join("images", "enemy2.png")).convert_alpha(),
+              pyg.image.load(os.path.join("images", "enemy3.png")).convert_alpha()]
+    
     def __init__(self):
         pyg.sprite.Sprite.__init__(self)
         self.image = self.sprite
         self.rect = self.image.get_rect()
         self.rect.x = WIDTH + self.ln + randint(1, 100)
         self.rect.y = randint(BORDER, HEIGHT - BORDER - self.ht)
-        self.radius = int(self.rect.width * .85 / 2)
+        self.radius = 20
         # alien velocity
         self.vx = -4
         # spawn rate - the SMALLER the number, the MORE OFTEN they spawn
@@ -229,28 +234,24 @@ class Alien(pyg.sprite.Sprite):
         self.kill_score = 20
         # score change if enemy gets through
         self.penalty = -10
-        # a list of lists - each entry is the [x,y] co-ordinates of a 'live' alien
-
-
-    def update(self):
-        self.rect.x += self.vx
+        self.animation_loop = 0
 
     def collide(self, sprite_group):
         if pyg.sprite.spritecollide(self, sprite_group, False):
             self.rect.x += self.ln * randint(2, 5)
             self.collide(sprite_group)
 
-#    def on_hit(self, hit_alien, Main):
-        # when a collision occurs, removes the relevant alien from the alive_aliens list
-        # updates score
-#        Main.update_score(self.kill_score)
-#        if hit_alien[2] == 1:
-#            self.alive_aliens.remove(hit_alien)
-#        else:
-#            hit_alien[2] -= 1
+    def update(self):
+        self.rect.x += self.vx       
+        self.image = self.animated_sprite[self.animation_loop//3]
+        self.animation_loop += 1
+        # reseting animation loop as only has three images to cycle through
+        if self.animation_loop >= 9:
+            self.animation_loop = 0
 
 
-    """
+
+    
     def update(self):
         self.speedx = 0
         self.speedy = 0
@@ -262,7 +263,7 @@ class Alien(pyg.sprite.Sprite):
         # generates a random integer between 1 and spawn_rate - if the number == 1, tries to spawn an alien
         if randint(1, self.spawn_rate) == 1:
             # uses a random integer to choose the y position to spawn - five possible tracks can be followed
-            spawn_pos = [self.x, (randint(0,4) * (HEIGHT//5)) + BORDER]
+            spawn_pos = [self.rect.x, (randint(0,4) * (HEIGHT//5)) + BORDER]
             # runs a collision check to make sure the new alien won't spawn overlapping an existing alien
             spawn_collision = False
             for alien in self.alive_aliens:
@@ -290,6 +291,7 @@ class Alien(pyg.sprite.Sprite):
        #     else:
         #        Background.screen.blit(self.sprite2, (alien[0], alien[1]))
 
+"""
     def detect_collisions(self, Tokens, Main):
         player_hitbox = Tokens[0].get_hitbox()
         # gets the list of alive bullets and the size of the bullets
@@ -338,7 +340,7 @@ class AlienSmart(Alien):
             if randint(1, self.fire_rate) == 1:
                 AlBullet.fire([alien[0], alien[1]+self.ht//2])
 
-"""
+
 class AlBullet(Bullet):
 
     def __init__(self):
@@ -348,13 +350,13 @@ class AlBullet(Bullet):
     def fire(self, pos):
         self.alive_bullets += [pos]
 
-    def detect_collisions(self, Tokens, Main):
-        player_hitbox = Tokens[0].get_hitbox()
-        for bullet in self.alive_bullets:
-            bullet_hitbox = pyg.Rect(bullet[0], bullet[1], self.ln, self.ht)
-            if player_hitbox.colliderect(bullet_hitbox):
-                Tokens[0].on_hit(Tokens, Main)
-"""
+#    def detect_collisions(self, Tokens, Main):
+#        player_hitbox = Tokens[0].get_hitbox()
+#        for bullet in self.alive_bullets:
+#            bullet_hitbox = pyg.Rect(bullet[0], bullet[1], self.ln, self.ht)
+#            if player_hitbox.colliderect(bullet_hitbox):
+#                Tokens[0].on_hit(Tokens, Main)
+
 class Explosion(pyg.sprite.Sprite):
     def __init__(self, center, size):
         pyg.sprite.Sprite.__init__(self)
@@ -368,9 +370,9 @@ class Explosion(pyg.sprite.Sprite):
         for i in range(1,6):
             filename = 'boom{}.png'.format(i)
             img = pyg.image.load(os.path.join("images", filename)).convert_alpha()
-            img_lg = pyg.transform.scale(img, (75, 75))
+            img_lg = pyg.transform.scale(img, (100, 100))
             self.explosion_anim['lg'].append(img_lg)
-            img_sm = pyg.transform.scale(img, (100, 100))
+            img_sm = pyg.transform.scale(img, (75, 75))
             self.explosion_anim['sm'].append(img_sm)
         self.image = self.explosion_anim[self.size][0]
         self.rect = self.image.get_rect()
@@ -396,8 +398,8 @@ class PowerUp(pyg.sprite.Sprite):
         self.main = Main
         self.pickup = pyg.mixer.Sound(os.path.join("sounds", "Power-Up.wav"))
         self.spawned = False
-        self.powers_dict = {0: [pyg.image.load(os.path.join("images", "hero_life.png")), 93, 25, self.extra_life],
-                            1: [pyg.image.load(os.path.join("images", "bomb.png")), 58, 100, self.extra_bomb]}
+        self.powers_dict = {0: [pyg.image.load(os.path.join("images", "hero_life.png")).convert_alpha(), 93, 25, self.extra_life],
+                            1: [pyg.image.load(os.path.join("images", "bomb.png")).convert_alpha(), 58, 100, self.extra_bomb]}
         self.starttime = time.time()
         self.power_up = []
         self.spawn_pos = (0,0)
