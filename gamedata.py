@@ -211,7 +211,7 @@ class Alien(pyg.sprite.Sprite):
     animated_sprite = [pyg.image.load(os.path.join("images", "enemy1.png")).convert_alpha(),
               pyg.image.load(os.path.join("images", "enemy2.png")).convert_alpha(),
               pyg.image.load(os.path.join("images", "enemy3.png")).convert_alpha()]
-    
+
     def __init__(self):
         pyg.sprite.Sprite.__init__(self)
         self.image = self.sprite
@@ -221,6 +221,7 @@ class Alien(pyg.sprite.Sprite):
         self.radius = 20
         # alien velocity
         self.vx = -2
+        self.vy = 1
         # spawn rate - the SMALLER the number, the MORE OFTEN they spawn
         self.spawn_rate = 100
         self.fire_rate = 200
@@ -229,6 +230,8 @@ class Alien(pyg.sprite.Sprite):
         # score change if enemy gets through
         self.penalty = -10
         self.animation_loop = 0
+        self.smart = randint(1,10)
+        self.width_limit = WIDTH*0.8
 
     def collide(self, sprite_group):
         if pyg.sprite.spritecollide(self, sprite_group, False):
@@ -236,62 +239,36 @@ class Alien(pyg.sprite.Sprite):
             self.collide(sprite_group)
 
     def update(self):
-        self.rect.x += self.vx       
-        self.image = self.animated_sprite[self.animation_loop//3]
-        self.animation_loop += 1
-        # reseting animation loop as only has three images to cycle through
-        if self.animation_loop >= 9:
-            self.animation_loop = 0
+        if self.smart == 10:
+            if self.rect.x > self.width_limit:
+                self.rect.x += self.vx
+            if self.rect.y < player.rect.y:
+                self.rect.y += self.vy
+            elif self.rect.y > player.rect.y:
+                self.rect.y -= self.vy
+        else:
+            self.rect.x += self.vx
+            self.image = self.animated_sprite[self.animation_loop//3]
+            self.animation_loop += 1
+            # reseting animation loop as only has three images to cycle through
+            if self.animation_loop >= 9:
+                self.animation_loop = 0
+        if randint(1,1000) == 1:
+            albull = AlBullet(self.rect.x, (self.rect.y+self.ht//2))
+            alienbullets.add(albull)
+            all_sprites.add(albull)
 
-'''
-
-class AlienSmart(Alien):
-
-    def __init__(self):
-        Alien.__init__(self)
-        self.spawn_rate = 75
-        self.fire_rate = 40
-        self.speed = 1
-        self.width_limit = WIDTH * 0.8
-
-    def update(self, Player, AlBullet, Main):
-        player_pos = Player.get_gun_location()
-        if (randint(1, self.spawn_rate) == 1) and (self.alive_aliens == []):
-            spawn_pos = [self.x, (randint(0,4) * HEIGHT//5) + BORDER]
-            self.alive_aliens += [spawn_pos + [randint(1,2)]]
-        for alien in self.alive_aliens:
-            # moves to a point on the right of the screen
-            if alien[0] > self.width_limit:
-                alien[0] += self.vx
-            # then tracks the player's y position
-            if (alien[1]+self.ht//2) < player_pos[1]:
-                self.vy = self.speed
-            elif (alien[1]+self.ht//2) > player_pos[1]:
-                self.vy = -self.speed
-            else:
-                self.vy = 0
-            alien[1] += self.vy
-            # shoots at the player
-            if randint(1, self.fire_rate) == 1:
-                AlBullet.fire([alien[0], alien[1]+self.ht//2])
 
 
 class AlBullet(Bullet):
 
-    def __init__(self):
+    def __init__(self, x, y):
         Bullet.__init__(self)
+        self.rect.x = x
+        self.rect.y = y
         self.vx = -10
 
-    def fire(self, pos):
-        self.alive_bullets += [pos]
-
-#    def detect_collisions(self, Tokens, Main):
-#        player_hitbox = Tokens[0].get_hitbox()
-#        for bullet in self.alive_bullets:
-#            bullet_hitbox = pyg.Rect(bullet[0], bullet[1], self.ln, self.ht)
-#            if player_hitbox.colliderect(bullet_hitbox):
-#                Tokens[0].on_hit(Tokens, Main)
-'''
+        
 class Explosion(pyg.sprite.Sprite):
     def __init__(self, center, size):
         pyg.sprite.Sprite.__init__(self)
@@ -376,3 +353,4 @@ player = Player()
 all_sprites.add(player)
 for i in range(8):
     new_alien()
+alienbullets = pyg.sprite.Group()
