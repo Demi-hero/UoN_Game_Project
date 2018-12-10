@@ -15,8 +15,15 @@ class Main(eh.HandleEvent):
         self.score = 0
         self.white = (255,255,255)
         self.clock = pyg.time.Clock()
+        self.starttime = 0
         self.framerate = 100
         self.bullets = pyg.sprite.Group()
+        self.power_ups = pyg.sprite.Group()
+
+    def new_powerup(self):
+        power_up = gd.PowerUp()
+        self.power_ups.add(power_up)
+        gd.all_sprites.add(power_up)
 
     def execute(self):
         pyg.init()
@@ -34,10 +41,14 @@ class Main(eh.HandleEvent):
 
         while self.startup:
             self.on_startup(Board, Files)
-
+        self.starttime = time.time()
         # main game loop
         while self.running:
             # taking the player input, passing to event handler
+            print(self.starttime)
+            if (time.time() - self.starttime)//1 == 3:
+                self.new_powerup()
+                print("Power up baby")
             for event in pyg.event.get():
                 self.on_event(event, Board, Tokens, Files)
             self.player_movement(gd.player)
@@ -47,6 +58,8 @@ class Main(eh.HandleEvent):
 
                 Board.update()
                 gd.all_sprites.update()
+
+
 
                 # check to see if a bullet hit a mob
                 hits = pyg.sprite.groupcollide(gd.aliens, self.bullets, True, True)

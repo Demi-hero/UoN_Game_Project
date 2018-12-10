@@ -361,15 +361,18 @@ class PowerUp(pyg.sprite.Sprite):
             self.spawned = False
 #        elif self.spawned:
 #            self.collection(player)
+
     def extra_life(self):
         pass
      #   if self.spawned:
-      #      self.main.lives += 1
+      #      .lives += 1
 
     def extra_bomb(self):
         pass
 #        if self.spawned:
  #           self.main.bombs += 1
+
+
 
 """
     def collection(self, player):
@@ -382,8 +385,6 @@ class PowerUp(pyg.sprite.Sprite):
 """            
 all_sprites = pyg.sprite.Group()
 aliens = pyg.sprite.Group()
-power_up = PowerUp()
-all_sprites.add(power_up)
 player = Player()
 all_sprites.add(player)
 for i in range(8):
