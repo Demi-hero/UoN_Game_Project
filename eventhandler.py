@@ -73,6 +73,8 @@ class HandleEvent():
             board.screen.fill(self.white)
             for alien in self.aliens:
                 alien.kill()
+            for bullet in self.alienbullets:
+                bullet.kill()
             pyg.display.update()
             self.bombs -= 1
             self.new_alien(self.wavenum)
@@ -130,9 +132,7 @@ class HandleEvent():
                     for sprite in self.all_sprites:
                         sprite.kill()
                     self.__init__()
-                    for i in range(8):
-                        print(f"alien{i}")
-                        self.new_alien(self)
+                    self.new_alien(self.wavenum)
                     return
 
     def game_over_display(self, board):
