@@ -212,6 +212,11 @@ class Alien:
     # loading the alien sprite and getting it's dimensions
     sprite = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "enemy1.png")))
     sprite2 = pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "enemy2.png")))
+    explode = [pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "boom1.png"))),
+               pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "boom2.png"))),
+               pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "boom3.png"))),
+               pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "boom4.png"))),
+               pyg.Surface.convert_alpha(pyg.image.load(os.path.join("images", "boom5.png")))]
     ln = sprite.get_width()
     ht = sprite.get_height()
 
@@ -231,13 +236,9 @@ class Alien:
         self.alive_aliens = []
 
     def on_hit(self, hit_alien, Main):
-        # when a collision occurs, removes the relevant alien from the alive_aliens list
-        # updates score
+        # when a collision occurs, removes a hit-point from the alien, and updates score
         Main.update_score(self.kill_score)
-        if hit_alien[2] == 1:
-            self.alive_aliens.remove(hit_alien)
-        else:
-            hit_alien[2] -= 1
+        hit_alien[2] -= 1
 
     def update(self, AlBullet, Main):
         # increases the spawn rate as player's score increases
@@ -253,26 +254,33 @@ class Alien:
                 if (spawn_pos[1] == alien[1]) and (spawn_pos[0] <= alien[0]+self.ln):
                     spawn_collision = True
             if not spawn_collision:
-                # adds the new 'live' alien to the alive_aliens list
-                self.alive_aliens += [spawn_pos + [randint(1,2)]]
+                # adds the new 'live' alien to the alive_aliens list, the randint determines hitpoints, and final entry is animation cycle
+                self.alive_aliens += [spawn_pos + [randint(1,2)] + [1]]
         # iterates through the alive_aliens list, updating positions based on velocity, and draws to screen
         for alien in self.alive_aliens:
-            alien[0] += self.vx
-            if alien[0] < (0-self.ln):
-                # removes bullets as they leave the screen
-                self.alive_aliens.remove(alien)
-                # updates score
-                Main.update_score(self.penalty)
-            # aliens now shoot back at player
-            if randint(1,self.fire_rate) == 1:
-                AlBullet.fire([alien[0], alien[1]+self.ht//2])
+            # only updates positions for those whose hitpoints are above 0
+            if alien[2] > 0:
+                alien[0] += self.vx
+                if alien[0] < (0-self.ln):
+                    # removes aliens as they leave the screen
+                    self.alive_aliens.remove(alien)
+                    # updates score
+                    Main.update_score(self.penalty)
+                # aliens now shoot back at player
+                if randint(1,self.fire_rate) == 1:
+                    AlBullet.fire([alien[0], alien[1]+self.ht//2])
 
     def draw(self):
         for alien in self.alive_aliens:
-            if alien[2] == 1:
+            if alien[2] == 2:
+                Background.screen.blit(self.sprite2, (alien[0], alien[1]))
+            elif alien[2] == 1:
                 Background.screen.blit(self.sprite, (alien[0], alien[1]))
             else:
-                Background.screen.blit(self.sprite2, (alien[0], alien[1]))
+                Background.screen.blit(self.explode[alien[3]//3], (alien[0], alien[1]))
+                alien[3] += 1
+                if alien[3] > 9:
+                    self.alive_aliens.remove(alien)
 
     def detect_collisions(self, Tokens, Main):
         player_hitbox = Tokens[0].get_hitbox()
@@ -280,16 +288,18 @@ class Alien:
         alive_bullets = Tokens[1].get_alive_bullets()
         bullet_size = Tokens[1].get_size()
         for alien in self.alive_aliens:
-            # calculates if a collision has occurred between an alien and the player
-            alien_hitbox = pyg.Rect(alien[0], alien[1], self.ln, self.ht)
-            if alien_hitbox.colliderect(player_hitbox):
-                Tokens[0].on_hit(Tokens, Main)
-                return
-            for bull in alive_bullets:
-                # calculates if a collision has occurred between a bullet and alien
-                if (bull[0]+bullet_size[0] >= alien[0]) and (bull[1] >= alien[1]-bullet_size[1]) and (bull[1] <= alien[1]+self.ht):
-                    self.on_hit(alien, Main)
-                    Tokens[1].on_hit(bull)
+            # only detects collisions for aliens who have >0 hitpoints
+            if alien[2] > 0:
+                # calculates if a collision has occurred between an alien and the player
+                alien_hitbox = pyg.Rect(alien[0], alien[1], self.ln, self.ht)
+                if alien_hitbox.colliderect(player_hitbox):
+                    Tokens[0].on_hit(Tokens, Main)
+                    return
+                for bull in alive_bullets:
+                    # calculates if a collision has occurred between a bullet and alien
+                    if (bull[0]+bullet_size[0] >= alien[0]) and (bull[1] >= alien[1]-bullet_size[1]) and (bull[1] <= alien[1]+self.ht):
+                        self.on_hit(alien, Main)
+                        Tokens[1].on_hit(bull)
 
 
 class AlienSmart(Alien):
@@ -305,22 +315,23 @@ class AlienSmart(Alien):
         player_pos = Player.get_gun_location()
         if (randint(1, self.spawn_rate) == 1) and (self.alive_aliens == []):
             spawn_pos = [self.x, (randint(0,4) * HEIGHT//5) + BORDER]
-            self.alive_aliens += [spawn_pos + [randint(1,2)]]
+            self.alive_aliens += [spawn_pos + [randint(1,2)] + [1]]
         for alien in self.alive_aliens:
-            # moves to a point on the right of the screen
-            if alien[0] > self.width_limit:
-                alien[0] += self.vx
-            # then tracks the player's y position
-            if (alien[1]+self.ht//2) < player_pos[1]:
-                self.vy = self.speed
-            elif (alien[1]+self.ht//2) > player_pos[1]:
-                self.vy = -self.speed
-            else:
-                self.vy = 0
-            alien[1] += self.vy
-            # shoots at the player
-            if randint(1, self.fire_rate) == 1:
-                AlBullet.fire([alien[0], alien[1]+self.ht//2])
+            if alien[2] > 0:
+                # moves to a point on the right of the screen
+                if alien[0] > self.width_limit:
+                    alien[0] += self.vx
+                # then tracks the player's y position
+                if (alien[1]+self.ht//2) < player_pos[1]:
+                    self.vy = self.speed
+                elif (alien[1]+self.ht//2) > player_pos[1]:
+                    self.vy = -self.speed
+                else:
+                    self.vy = 0
+                alien[1] += self.vy
+                # shoots at the player
+                if randint(1, self.fire_rate) == 1:
+                    AlBullet.fire([alien[0], alien[1]+self.ht//2])
 
 
 class AlBullet(Bullet):
@@ -349,24 +360,22 @@ class PowerUp:
         self.powers_dict = {0: [pyg.image.load(os.path.join("images", "hero_life.png")), 93, 25, self.extra_life],
                             1: [pyg.image.load(os.path.join("images", "bomb.png")), 58, 100, self.extra_bomb]}
         self.starttime = time.time()
-        for key in self.powers_dict:
-            print("{} : {}".format(key, self.powers_dict[key]))
-        self.power_up = self.powers_dict[randint(0, 1)]
-        self.spawn_pos = (0, 0)
+
+        self.power_up = []
+        self.spawn_pos = (0,0)
 
     def spawn(self, player):
-        if (time.time() - self.starttime)//1 == 2 and not self.spawned:
+        if (time.time() - self.starttime)//1 == 3 and not self.spawned:
             # generate a random number between 0 and however many
             self.power_up = self.powers_dict[randint(0, 1)]
-            print(self.power_up)
             self.spawn_pos = (randint(BORDER, (WIDTH//2)-self.power_up[1]),
                               randint(BORDER, HEIGHT-BORDER-self.power_up[2]))
             self.hitbox = pyg.Rect(self.spawn_pos[0], self.spawn_pos[1], self.power_up[1], self.power_up[2])
             self.spawned = True
             Background.screen.blit(self.power_up[0],self.spawn_pos)
-        elif (time.time() - self.starttime)//1 == 4:
+        elif (time.time() - self.starttime)//1 == 10:
             self.starttime = time.time()
-            self.spawn_pos = (randint(BORDER, ((WIDTH//2)-self.power_up[1])),
+            self.spawn_pos = (randint(BORDER, (WIDTH//2)-self.power_up[1]),
                               randint(BORDER, HEIGHT-BORDER-self.power_up[2]))
             self.spawned = False
         elif self.spawned:
@@ -384,7 +393,8 @@ class PowerUp:
 
     def collection(self, player):
         # how to tell when player and powerup hitboxes collied
-        if self.hitbox.colliderect(player.get_hitbox()):
+        player_hitbox = player.get_hitbox()
+        if self.hitbox.colliderect(player_hitbox):
             self.pickup.play()
             self.power_up[3]()
             self.spawned = False
