@@ -56,8 +56,8 @@ class Main(eh.HandleEvent):
                 AlBullet.update()
 
                 # detecting collisions between aliens and bullets, and aliens and player
-                Alien1.detect_collisions(Tokens, self)
-                AlienSmart.detect_collisions(Tokens, self)
+                Alien1.detect_collisions(Tokens, Files, self)
+                AlienSmart.detect_collisions(Tokens, Files, self)
                 AlBullet.detect_collisions(Tokens, self)
 
                 # display lives and score at top of screen
