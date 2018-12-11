@@ -141,7 +141,7 @@ class HandleEvent():
 
     def on_key_down(self, event, files, board):
         if event.key == pyg.K_SPACE:
-            files.pewpew.play()
+            files['sounds'].pewpew.play()
             if self.startup:
                 # if on startup, spacebar starts the game
                 self.startup = False
@@ -179,7 +179,7 @@ class HandleEvent():
     # on player death updates life count, creates explosion, and clears screen
     def player_death(self, hit):
         self.lives -= 1
-        self.Files.boom.play()
+        self.sounds.boom.play()
         expl = gamedata.Explosion(hit.rect.center, 'sm')
         self.all_sprites.add(expl)
         self.player.hide()

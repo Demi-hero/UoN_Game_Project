@@ -279,12 +279,12 @@ class PowerUp(pyg.sprite.Sprite):
             self.spawned = False
 
         elif self.spawned:
-            self.image = self.power_up[0][self.animation_loop // 6]
+            self.image = self.power_up[0][self.animation_loop // 3]
             self.animation_loop += 1
-            if self.animation_loop == 18:
-                self.animation_loop -= 11
+            if self.animation_loop >= 9:
+                self.animation_loop -= 5
                 self.rewound = True
-            elif self.animation_loop == 12 and self.rewound:
+            elif self.animation_loop >=7 and self.rewound:
                 self.animation_loop = 0
                 self.rewound = False
 

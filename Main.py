@@ -75,7 +75,7 @@ class Main(eh.HandleEvent):
                 for hit in hits:
 
                     self.score += self.kill_score
-                    self.Files.boom.play()
+                    self.sounds.boom.play()
                     self.expl = gd.Explosion(hit.rect.center, 'lg')
                     self.all_sprites.add(self.expl)
                     self.new_alien(-6)
