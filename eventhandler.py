@@ -3,9 +3,10 @@ import os
 import gamedata
 import time
 import csv
-# push me please
+
 class HandleEvent():
 
+    # startup screen and logic
     def on_startup(self, background, files):
         background.draw()
         background.update()
@@ -25,81 +26,6 @@ class HandleEvent():
                 self.on_event(event, files=files)
             pyg.display.flip()
 
-    # calculating the player movement direction based on arrow keys held down
-    def player_movement(self, Player):
-        keystate = pyg.key.get_pressed()
-        x_dir = keystate[pyg.K_RIGHT] - keystate[pyg.K_LEFT]
-        y_dir = keystate[pyg.K_DOWN] - keystate[pyg.K_UP]
-        Player.move(x_dir, y_dir)
-
-    # this runs for every event and calls the relevant method
-    def on_event(self, event, files="", board = ""):
-        # breaks out of the main game loop if QUIT event occurs (closing window), cleanup occurs after
-        if event.type == pyg.QUIT:
-                self.on_exit()
-        # checks for when keys are pressed
-        elif event.type == pyg.KEYDOWN:
-                self.on_key_down(event, files, board)
-
-    def on_exit(self):
-        self.startup = False
-        self.running = False
-
-    def on_key_down(self, event, files, board):
-        # spacebar triggers firing sequence - takes gun position from player, passes to bullet fire method
-        if event.key == pyg.K_SPACE:
-            files["sounds"].pewpew.play()
-            if self.startup:
-                self.startup = False
-            else:
-                bullet = gamedata.Bullet()
-                bullet.rect.x = self.player.rect.x + self.player.ln//2
-                bullet.rect.y = self.player.rect.y + self.player.ht//2
-                self.all_sprites.add(bullet)
-                self.bullets.add(bullet)
-        # p opens the pause screen, and q quits if on the pause screen
-        elif event.key == pyg.K_p:
-            self.on_pause()
-        elif event.key == pyg.K_q:
-            if self.paused:
-                self.on_exit()
-        elif event.key == pyg.K_b:
-            self.on_bomb(board, files)
-
-    def on_bomb(self, board, files):
-        if self.bombs > 0 and not self.paused:
-            files["sounds"].ult.play()
-            self.update_score(1000)
-            board.screen.fill(self.white)
-            for alien in self.aliens:
-                alien.kill()
-            for bullet in self.alienbullets:
-                bullet.kill()
-            pyg.display.update()
-            self.bombs -= 1
-            self.new_alien(self.wavenum)
-
-
-    # update score and lives
-    def update_score(self, points):
-        self.score += points
-    def update_lives(self, change):
-        self.lives += change
-
-    def player_death(self, hit):
-        self.lives -= 1
-        self.sounds.boom.play()
-        expl = gamedata.Explosion(hit.rect.center, 'sm')
-        self.all_sprites.add(expl)
-        self.player.hide()
-        for alien in self.aliens:
-            alien.kill()
-        for bullet in self.bullets:
-            bullet.kill()
-        for albull in self.alienbullets:
-            albull.kill()
-        self.new_alien(self.wavenum)
-
     # pause screen messages
     def on_pause(self, minimised=0):
         if not self.paused:
@@ -111,6 +37,7 @@ class HandleEvent():
         elif not minimised:
             self.paused = False
 
+    # game over screen and logic
     def gameover(self, board, player, files):
         # display high score messages
         if self.scorboard_check(files):
@@ -153,7 +80,6 @@ class HandleEvent():
         gamedata.Background.screen.blit(textsurf, textrect)
 
     # methods for the high score handling
-
     def highscore_display(self, board, files):
         pos = 0.2
         self.game_over_display(board)
@@ -193,9 +119,89 @@ class HandleEvent():
                 return True
         return False
 
+    # this runs for every event and calls the relevant method - mostly for checking player input
+    def on_event(self, event, files="", board = ""):
+        # breaks out of the main game loop if QUIT event occurs (closing window), cleanup occurs after
+        if event.type == pyg.QUIT:
+                self.on_exit()
+        # checks for when keys are pressed
+        elif event.type == pyg.KEYDOWN:
+                self.on_key_down(event, files, board)
+
+    def on_exit(self):
+        self.startup = False
+        self.running = False
+
+    # calculating the player movement direction based on arrow keys held down
+    def player_movement(self, Player):
+        keystate = pyg.key.get_pressed()
+        x_dir = keystate[pyg.K_RIGHT] - keystate[pyg.K_LEFT]
+        y_dir = keystate[pyg.K_DOWN] - keystate[pyg.K_UP]
+        Player.move(x_dir, y_dir)
+
+    def on_key_down(self, event, files, board):
+        if event.key == pyg.K_SPACE:
+            files.pewpew.play()
+            if self.startup:
+                # if on startup, spacebar starts the game
+                self.startup = False
+            else:
+                # spacebar triggers firing sequence - takes gun position from player, passes to bullet fire method
+                bullet = gamedata.Bullet()
+                bullet.rect.x = self.player.rect.x + self.player.ln//2
+                bullet.rect.y = self.player.rect.y + self.player.ht//2
+                self.all_sprites.add(bullet)
+                self.bullets.add(bullet)
+        # p opens the pause screen, and q quits if on the pause screen
+        elif event.key == pyg.K_p:
+            self.on_pause()
+        elif event.key == pyg.K_q:
+            if self.paused:
+                self.on_exit()
+        # b drops a bomb
+        elif event.key == pyg.K_b:
+            self.on_bomb(board, files)
+
+    # logic for bomb power-up
+    def on_bomb(self, board, files):
+        if self.bombs > 0 and not self.paused:
+            files.ult.play()
+            self.score += 1000
+            board.screen.fill(self.white)
+            for alien in self.aliens:
+                alien.kill()
+            for bullet in self.alienbullets:
+                bullet.kill()
+            pyg.display.update()
+            self.bombs -= 1
+            self.new_alien(self.wavenum)
+
+    # on player death updates life count, creates explosion, and clears screen
+    def player_death(self, hit):
+        self.lives -= 1
+        self.Files.boom.play()
+        expl = gamedata.Explosion(hit.rect.center, 'sm')
+        self.all_sprites.add(expl)
+        self.player.hide()
+        for alien in self.aliens:
+            alien.kill()
+        for bullet in self.bullets:
+            bullet.kill()
+        for albull in self.alienbullets:
+            albull.kill()
+        self.new_alien(self.wavenum)
+
+    # spawns aliens, rate increases as player completes waves
     def new_alien(self, wave):
         for i in range (wave+7):
             alien = gamedata.Alien(self)
             alien.collide(self.aliens)
             self.all_sprites.add(alien)
             self.aliens.add(alien)
+
+    # spawns powerups
+    def new_powerup(self):
+        power_up = gamedata.PowerUp(self)
+        self.power_ups.add(power_up)
+        self.all_sprites.add(power_up)
+
