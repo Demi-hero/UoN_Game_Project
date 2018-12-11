@@ -195,7 +195,6 @@ class Alien(pyg.sprite.Sprite):
         if self.hitpoints <= 0:
             self.kill()
             main.score += main.kill_score
-            main.alien_count -= 1
             main.sounds.boom.play()
             main.expl = Explosion(self.rect.center, 'lg')
             main.all_sprites.add(main.expl)
