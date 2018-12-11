@@ -165,12 +165,11 @@ class HandleEvent():
                 bullet.rect.y = self.player.rect.y + self.player.ht//2
                 self.all_sprites.add(bullet)
                 self.bullets.add(bullet)
-        # p opens the pause screen, and q quits if on the pause screen
+        # p opens the pause screen, and q quits the game no matter where you are
         elif event.key == pyg.K_p:
             self.on_pause()
         elif event.key == pyg.K_q:
-            if self.paused:
-                self.on_exit()
+            self.on_exit()
         # b drops a bomb
         elif event.key == pyg.K_b:
             self.on_bomb(board, files)
