@@ -23,6 +23,7 @@ class Main(eh.HandleEvent):
         self.wavenum = 1
         self.BASE_count = 10
         self.alien_count = self.BASE_count
+        self.new_wave = False
         # basics game needs to run
         self.white = (255, 255, 255)
         self.clock = pyg.time.Clock()
@@ -91,9 +92,8 @@ class Main(eh.HandleEvent):
                 # alien_count gets higher and more aliens are on screen as waves increase
                 if (self.alien_count <= 0) and (len(self.aliens) == 0):
                     self.wavenum += 1
-                    self.message_display("Wave {}".format(self.wavenum), 0.85)
-                    pyg.display.update()
-                    time.sleep(1.5)
+                    self.new_wave = True
+                    new_timer = pyg.time.get_ticks()
                     self.alien_count = self.BASE_count + self.wavenum*5
                     if self.wavenum % 4 == 0:
                         self.lives += 1
@@ -121,6 +121,11 @@ class Main(eh.HandleEvent):
                 self.message_display("Lives: {}".format(self.lives), 0.025, .85, 20)
                 self.message_display("Bombs: {}".format(self.bombs), 0.025, .75, 20)
                 self.message_display("WAVE : {}".format(self.wavenum), 0.025, font_size=20)
+                # displays message on new wave
+                if self.new_wave:
+                    self.message_display("WAVE {}".format(self.wavenum), 0.85)
+                    if pyg.time.get_ticks() - new_timer > 2000:
+                        self.new_wave = False
                 # if out of lives - game over (see eventhandler)
                 if self.lives < 1:
                     self.gameover(self.Board, self.player, self.Files["scores"])
@@ -134,4 +139,3 @@ App = Main()
 App.execute()
 pyg.quit()
 os._exit(0)
-
