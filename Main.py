@@ -17,9 +17,11 @@ class Main(eh.HandleEvent):
         self.lives = 3
         self.bombs = 1
         self.score = 0
-        self.kill_score = 50
+        self.kill_score = 20
         self.penalty_score = -10
+        self.difficulty = 7
         self.wavenum = 1
+        self.kill_count = 0
         # basics game needs to run
         self.white = (255,255,255)
         self.clock = pyg.time.Clock()
@@ -42,7 +44,7 @@ class Main(eh.HandleEvent):
 
     def execute(self):
         # spawning aliens
-        self.new_alien(self.wavenum)
+        self.new_alien((self.wavenum + self.difficulty))
 
         # startup screen
         while self.startup:
@@ -56,7 +58,6 @@ class Main(eh.HandleEvent):
             for event in pyg.event.get():
                 self.on_event(event, self.Files, self.Board)
             self.player_movement(self.player)
-
 
             if not self.paused:
                 # spawning powerups
@@ -75,10 +76,11 @@ class Main(eh.HandleEvent):
                 for hit in hits:
 
                     self.score += self.kill_score
+                    self.kill_count += 1
                     self.sounds.boom.play()
                     self.expl = gd.Explosion(hit.rect.center, 'lg')
                     self.all_sprites.add(self.expl)
-                    self.new_alien(-6)
+                    self.new_alien()
                 # check if a player picked up a powerup
                 hits = pyg.sprite.spritecollide(self.player, self.power_ups, True)
                 for hit in hits:
@@ -92,13 +94,24 @@ class Main(eh.HandleEvent):
                 for hit in hits:
                     self.player_death(hit)
 
+                if self.kill_count >= (self.difficulty + self.wavenum):
+                    self.kill_count -= (self.difficulty + self.wavenum)
+                    self.wavenum += 1
+                    if self.wavenum % 10 == 0:
+                        self.lives += 1
+                        self.bombs += 1
+                    self.purge_aliens()
+                    self.new_alien(self.wavenum + self.difficulty)
+                    # kill the bad guys
+                    # make more bad guys
+
                 # removing the aliens and bullets as they leave the screen
                 for alien in self.aliens:
                     if alien.rect.x < 0 - alien.ln:
                         self.aliens.remove(alien)
                         # penalty for if aliens get past player
                         self.score += self.penalty_score
-                        self.new_alien( -6)
+                        self.new_alien()
                 for bullet in self.bullets:
                     if bullet.rect.x > gd.WIDTH:
                         bullet.kill()
@@ -115,7 +128,6 @@ class Main(eh.HandleEvent):
                 self.message_display("Lives: {}".format(self.lives), 0.03, .85, 20)
                 self.message_display("Bombs: {}".format(self.bombs), 0.03, .75, 20)
                 self.message_display("WAVE : {}".format(self.wavenum), 0.05)
-
                 # if out of lives - game over (see eventhandler)
                 if self.lives < 1:
                     self.gameover(self.Board, self.player, self.Files["scores"])

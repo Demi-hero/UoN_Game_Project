@@ -168,10 +168,7 @@ class HandleEvent():
             files['sounds'].ult.play()
             self.score += 1000
             board.screen.fill(self.white)
-            for alien in self.aliens:
-                alien.kill()
-            for bullet in self.alienbullets:
-                bullet.kill()
+            self.purge_aliens()
             pyg.display.update()
             self.bombs -= 1
             self.new_alien(self.wavenum)
@@ -183,17 +180,15 @@ class HandleEvent():
         expl = gamedata.Explosion(hit.rect.center, 'sm')
         self.all_sprites.add(expl)
         self.player.hide()
-        for alien in self.aliens:
-            alien.kill()
+        self.kill_count = 0
         for bullet in self.bullets:
             bullet.kill()
-        for albull in self.alienbullets:
-            albull.kill()
-        self.new_alien(self.wavenum)
+        self.purge_aliens()
+        self.new_alien(self.wavenum+self.difficulty)
 
     # spawns aliens, rate increases as player completes waves
-    def new_alien(self, wave):
-        for i in range (wave+7):
+    def new_alien(self, amount=1):
+        for i in range (amount):
             alien = gamedata.Alien(self)
             alien.collide(self.aliens)
             self.all_sprites.add(alien)
@@ -205,3 +200,8 @@ class HandleEvent():
         self.power_ups.add(power_up)
         self.all_sprites.add(power_up)
 
+    def purge_aliens(self):
+        for alien in self.aliens:
+            alien.kill()
+        for albull in self.alienbullets:
+            albull.kill()
