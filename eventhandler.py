@@ -180,8 +180,8 @@ class HandleEvent():
         if self.bombs < 5 and not self.paused:
             files['sounds'].ult.play()
             self.score += 500
-            board.screen.fill(self.white)
             self.purge_aliens()
+            self.kill_count += (self.wavenum+self.difficulty)
             pyg.display.update()
             self.bombs -= 1
             self.new_alien(self.wavenum)
