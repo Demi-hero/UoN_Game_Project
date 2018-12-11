@@ -3,6 +3,7 @@ import os
 import gamedata
 import time
 import csv
+from random import randint
 
 class HandleEvent():
 
@@ -69,7 +70,6 @@ class HandleEvent():
                     for sprite in self.all_sprites:
                         sprite.kill()
                     self.__init__()
-                    self.new_alien(self.wavenum)
                     return
 
     def game_over_display(self, board):
@@ -180,11 +180,10 @@ class HandleEvent():
         if self.bombs < 5 and not self.paused:
             files['sounds'].ult.play()
             self.score += 500
+            self.alien_count -= len(self.aliens)
             self.purge_aliens()
-            self.kill_count += (self.wavenum+self.difficulty)
             pyg.display.update()
             self.bombs -= 1
-            self.new_alien(self.wavenum)
 
     # on player death updates life count, creates explosion, and clears screen
     def player_death(self, hit):
@@ -193,27 +192,29 @@ class HandleEvent():
         expl = gamedata.Explosion(hit.rect.center, 'sm')
         self.all_sprites.add(expl)
         self.player.hide()
-        self.kill_count = 0
         for bullet in self.bullets:
             bullet.kill()
+        # adds back to the kill count the aliens that were alive, before clearing screen
+        self.alien_count += len(self.aliens)
         self.purge_aliens(player_death=1)
-        self.new_alien(self.wavenum+self.difficulty)
 
     # spawns aliens, rate increases as player completes waves
     def new_alien(self, amount=1):
-        # spawns a smart alien if one doesn't exist
-        if len(self.smartaliens) == 0:
-            smartalien = gamedata.SmartAlien(self)
-            self.all_sprites.add(smartalien)
-            self.aliens.add(smartalien)
-            self.smartaliens.add(smartalien)
-        for i in range(amount):
-            alien = gamedata.Alien(self)
-            self.spawn_check(alien)
-        # spawns a smaller number of shield aliens
-        for i in range(amount//4):
-            shieldalien = gamedata.ShieldAlien(self)
-            self.spawn_check(shieldalien)
+        if (len(self.aliens) <= amount) and (self.alien_count > 0):
+            # spawns a smart alien if one doesn't exist
+            if len(self.smartaliens) == 0:
+                smartalien = gamedata.SmartAlien(self)
+                self.all_sprites.add(smartalien)
+                self.aliens.add(smartalien)
+                self.smartaliens.add(smartalien)
+            # %25 chance of spawning a shield alien
+            elif randint(1,4) == 1:
+                shieldalien = gamedata.ShieldAlien(self)
+                self.spawn_check(shieldalien)
+            # otherwise spawns a normal alien
+            else:
+                alien = gamedata.Alien(self)
+                self.spawn_check(alien)
 
     def spawn_check(self, alien):
         alien.collide(self.aliens)
