@@ -103,6 +103,7 @@ class Main(eh.HandleEvent):
                 for alien in self.aliens:
                     if alien.rect.x < 0 - alien.ln:
                         alien.kill()
+                        self.alien_count += 1
                         # penalty for if aliens get past player
                         self.score += self.penalty_score
                 for bullet in self.bullets:
