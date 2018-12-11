@@ -20,7 +20,10 @@ class Main(eh.HandleEvent):
         self.wavenum = 1
         # creating the screen and game objects
         self.all_sprites = pyg.sprite.Group()
-        self.Files = av.FileStore()
+        self.sounds = av.AudioFiles()
+        self.images = av.ImageFiles()
+        self.scores = av.ScoreFiles()
+        self.Files = {"sounds": self.sounds, "images": self.images, "scores": self.scores}
         self.Board = gd.Background()
         self.player = gd.Player()
         self.all_sprites.add(self.player)
@@ -64,7 +67,7 @@ class Main(eh.HandleEvent):
                 hits = pyg.sprite.groupcollide(self.aliens, self.bullets, True, True)
                 for hit in hits:
                     self.score += 50
-                    self.Files.boom.play()
+                    self.sounds.boom.play()
                     self.expl = gd.Explosion(hit.rect.center, 'lg')
                     self.all_sprites.add(self.expl)
                     self.new_alien(-6)
@@ -72,7 +75,6 @@ class Main(eh.HandleEvent):
                 hits = pyg.sprite.spritecollide(self.player, self.power_ups, True)
                 for hit in hits:
                     hit.power_up[3]()
-                    print("Power up collected")
 
                 # check to see if a mob hit the player
                 hits = pyg.sprite.spritecollide(self.player, self.aliens, True, pyg.sprite.collide_circle)
@@ -108,7 +110,7 @@ class Main(eh.HandleEvent):
 
                 # if out of lives - game over (see eventhandler)
                 if self.lives < 1:
-                    self.gameover(self.Board, self.player, self.Files)
+                    self.gameover(self.Board, self.player, self.Files["scores"])
 
                 # update the display
                 pyg.display.flip()

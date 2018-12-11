@@ -13,11 +13,11 @@ class HandleEvent():
         # self.message_display(" Lore :", xloc=.65)
         self.message_display("Movement", yloc=.57, xloc=.26)
         self.message_display("Shoot", yloc=.65, xloc=.7)
-        background.screen.blit(files.title, (221, 0))
-        background.screen.blit(files.arrows, (160, 320))
+        background.screen.blit(files["images"].title, (221, 0))
+        background.screen.blit(files["images"].arrows, (160, 320))
         # gamedata.background.screen.blit(Game_Data.startup.h, (425, 228))
         # gamedata.background.screen.blit(Game_Data.startup.l, (675, 228))
-        background.screen.blit(files.space, (591, 375))
+        background.screen.blit(files["images"].space, (591, 375))
         self.message_display("Press Shoot to Start", .9, font_size=35)
         pyg.display.flip()
         while self.startup:
@@ -48,7 +48,7 @@ class HandleEvent():
     def on_key_down(self, event, files, board):
         # spacebar triggers firing sequence - takes gun position from player, passes to bullet fire method
         if event.key == pyg.K_SPACE:
-            files.pewpew.play()
+            files["sounds"].pewpew.play()
             if self.startup:
                 self.startup = False
             else:
@@ -68,7 +68,7 @@ class HandleEvent():
 
     def on_bomb(self, board, files):
         if self.bombs > 0 and not self.paused:
-            files.ult.play()
+            files["sounds"].ult.play()
             self.update_score(1000)
             board.screen.fill(self.white)
             for alien in self.aliens:
@@ -88,7 +88,7 @@ class HandleEvent():
 
     def player_death(self, hit):
         self.lives -= 1
-        self.Files.boom.play()
+        self.sounds.boom.play()
         expl = gamedata.Explosion(hit.rect.center, 'sm')
         self.all_sprites.add(expl)
         self.player.hide()
