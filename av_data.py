@@ -3,25 +3,41 @@ import pygame as pyg
 import os
 import csv
 
-class FileStore(pyg.sprite.Sprite):
-    # class containing all the files that need loading in game that don't relate to an in game sprite.
+
+class FileBank():
+
     def __init__(self):
         self.load_data()
-        pyg.sprite.Sprite.__init__(self)
+
+
+class ImageFiles(FileBank):
+    # class containing all the files that need loading in game that don't relate to an in game sprite.
 
     def load_data(self):
-        self.scores = []
+        self.arrows = pyg.image.load(os.path.join("images", "PixelKeys2.png"))
+        self.h = pyg.image.load(os.path.join("images", "h.png"))
+        self.l = pyg.image.load(os.path.join("images", "L.png"))
+        self.space = pyg.image.load(os.path.join("images", "spacebar.png"))
+        self.title = pyg.image.load(os.path.join("images", "Title.png"))
+        # load in the high scores
+
+
+class AudioFiles(FileBank):
+
+    def load_data(self):
         self.background_music = os.path.join("sounds", "OrbitBeat130.wav")
         self.pewpew = pyg.mixer.Sound(os.path.join("sounds", "pew.wav"))
         self.boom = pyg.mixer.Sound(os.path.join("sounds", "boom.wav"))
         self.pickup = pyg.mixer.Sound(os.path.join("sounds", "Power-Up.wav"))
-        self.arrows = pyg.image.load(os.path.join("images", "PixelKeys2.png"))
-        self.h = pyg.image.load(os.path.join("images", "h.png"))
-        self.l = pyg.image.load(os.path.join("images", "L.png"))
         self.ult = pyg.mixer.Sound(os.path.join("sounds", "ult.wav"))
-        self.space = pyg.image.load(os.path.join("images", "spacebar.png"))
-        self.title = pyg.image.load(os.path.join("images", "Title.png"))
-        # load in the high scores
+        pyg.mixer.init()
+        pyg.mixer.music.load(self.background_music)
+        pyg.mixer.music.play(-1)
+
+class ScoreFiles(FileBank):
+
+    def load_data(self):
+        self.scores = []
         try:
             # have used with to double make sure I closed the file
             with open("highScore.csv", "r", newline='') as f:
@@ -35,9 +51,6 @@ class FileStore(pyg.sprite.Sprite):
             self.create_false_hs()
         except IndexError:
             self.create_false_hs()
-        pyg.mixer.init()
-        pyg.mixer.music.load(self.background_music)
-        pyg.mixer.music.play(-1)
 
     def create_false_hs(self):
         with open("highscore.csv", "w", newline='') as csvfile:

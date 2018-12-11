@@ -27,7 +27,10 @@ class Main(eh.HandleEvent):
         self.framerate = 100
         # creating the screen and game objects
         self.all_sprites = pyg.sprite.Group()
-        self.Files = av.FileStore()
+        self.sounds = av.AudioFiles()
+        self.images = av.ImageFiles()
+        self.scores = av.ScoreFiles()
+        self.Files = {"sounds": self.sounds, "images": self.images, "scores": self.scores}
         self.Board = gd.Background()
         self.player = gd.Player()
         self.all_sprites.add(self.player)
@@ -70,6 +73,7 @@ class Main(eh.HandleEvent):
                 # check to see if a bullet hit an alien
                 hits = pyg.sprite.groupcollide(self.aliens, self.bullets, True, True)
                 for hit in hits:
+
                     self.score += self.kill_score
                     self.Files.boom.play()
                     self.expl = gd.Explosion(hit.rect.center, 'lg')
@@ -114,7 +118,7 @@ class Main(eh.HandleEvent):
 
                 # if out of lives - game over (see eventhandler)
                 if self.lives < 1:
-                    self.gameover(self.Board, self.player, self.Files)
+                    self.gameover(self.Board, self.player, self.Files["scores"])
 
                 # update the display
                 pyg.display.flip()

@@ -14,11 +14,11 @@ class HandleEvent():
         # self.message_display(" Lore :", xloc=.65)
         self.message_display("Movement", yloc=.57, xloc=.26)
         self.message_display("Shoot", yloc=.65, xloc=.7)
-        background.screen.blit(files.title, (221, 0))
-        background.screen.blit(files.arrows, (160, 320))
+        background.screen.blit(files["images"].title, (221, 0))
+        background.screen.blit(files["images"].arrows, (160, 320))
         # gamedata.background.screen.blit(Game_Data.startup.h, (425, 228))
         # gamedata.background.screen.blit(Game_Data.startup.l, (675, 228))
-        background.screen.blit(files.space, (591, 375))
+        background.screen.blit(files["images"].space, (591, 375))
         self.message_display("Press Shoot to Start", .9, font_size=35)
         pyg.display.flip()
         while self.startup:
@@ -204,3 +204,4 @@ class HandleEvent():
         power_up = gamedata.PowerUp(self)
         self.power_ups.add(power_up)
         self.all_sprites.add(power_up)
+
