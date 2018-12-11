@@ -201,6 +201,7 @@ class HandleEvent():
     # spawns aliens, rate increases as player completes waves
     def new_alien(self, amount=1):
         if (len(self.aliens) <= amount) and (self.alien_count > 0):
+            self.alien_count -= 1
             # spawns a smart alien if one doesn't exist
             if len(self.smartaliens) == 0:
                 smartalien = gamedata.SmartAlien(self)
