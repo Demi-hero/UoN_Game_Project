@@ -136,6 +136,9 @@ class Alien(pyg.sprite.Sprite):
     animated_sprite = [pyg.image.load(os.path.join("images", "enemy1.png")).convert_alpha(),
               pyg.image.load(os.path.join("images", "enemy2.png")).convert_alpha(),
               pyg.image.load(os.path.join("images", "enemy3.png")).convert_alpha()]
+    shielded_sprite = [pyg.image.load(os.path.join("images", "shield1.png")).convert_alpha(),
+              pyg.image.load(os.path.join("images", "shield2.png")).convert_alpha(),
+              pyg.image.load(os.path.join("images", "shield3.png")).convert_alpha()]
 
     def __init__(self, main):
         # pass main to alien, so it can access the player position and add alien bullets to the groups
@@ -150,15 +153,12 @@ class Alien(pyg.sprite.Sprite):
         self.rect.y = randint(BORDER, HEIGHT - BORDER - self.ht)
         # alien velocity
         self.vx = -2
-        self.vy = 1
-        # spawn rate/fire rate - the SMALLER the number, the MORE OFTEN they spawn/fire
-        self.spawn_rate = 100
+        # fire rate - the SMALLER the number, the MORE OFTEN they fire
+        self.fire_rate = 400
         self.firing_solution = 1
-        self.fire_rate = 300
         self.animation_loop = 0
-        # this is logic for the smart alien that tracks player movement
-        self.smart = randint(1,10)
-        self.width_limit = WIDTH*0.8
+        # hit points - determines whether shield is up or down (displays different image)
+        self.hitpoints = 1
 
     def collide(self, sprite_group):
         # collision detection only for when spawning new aliens, so they don't overlap
@@ -173,25 +173,62 @@ class Alien(pyg.sprite.Sprite):
             self.main.alienbullets.add(albull)
             self.main.all_sprites.add(albull)
 
-    def update(self):
-        self.image = self.animated_sprite[self.animation_loop // 3]
+    def animate(self):
+        if self.hitpoints == 2:
+            self.image = self.shielded_sprite[self.animation_loop // 3]
+        else:
+            self.image = self.animated_sprite[self.animation_loop // 3]
         self.animation_loop += 1
         # reseting animation loop as only has three images to cycle through
         if self.animation_loop >= 9:
             self.animation_loop = 0
-        # if its a smart alien, tracks player movement and fires
-        if self.smart == 10:
-            if self.rect.x > self.width_limit:
-                self.rect.x += self.vx
-            if self.rect.y < self.main.player.rect.y:
-                self.rect.y += self.vy
-            elif self.rect.y > self.main.player.rect.y:
-                self.rect.y -= self.vy
-            self.shoot(self.fire_rate//3)
-        # if its a dumb alien, just flies left and fires (less often)
-        else:
+
+    def update(self):
+        self.animate()
+        # moves across the screen to the left, and fires
+        self.rect.x += self.vx
+        self.shoot(self.fire_rate)
+
+    def on_hit(self, main):
+        self.hitpoints -= 1
+        if self.hitpoints <= 0:
+            self.kill()
+            main.score += main.kill_score
+            main.kill_count += 1
+            main.sounds.boom.play()
+            main.expl = Explosion(self.rect.center, 'lg')
+            main.all_sprites.add(main.expl)
+            main.new_alien()
+        # can put an else: play 'ping' noise or whatever
+
+
+class ShieldAlien(Alien):
+    def __init__(self, main):
+        Alien.__init__(self, main)
+        self.hitpoints = 2
+
+
+class SmartAlien(ShieldAlien):
+
+    def __init__(self, main):
+        ShieldAlien.__init__(self, main)
+        # limit the distance across the smart alien moves, and sets y velocity
+        self.width_limit = WIDTH*0.8
+        self.vy = 1
+        # smart aliens fire more often than regular aliens
+        self.fire_rate = 75
+
+    def update(self):
+        self.animate()
+        # moves to the position on the right of the screen
+        if self.rect.x > self.width_limit:
             self.rect.x += self.vx
-            self.shoot(self.fire_rate)
+        # tracks player movement and shoots
+        if self.rect.y < self.main.player.rect.y:
+            self.rect.y += self.vy
+        elif self.rect.y > self.main.player.rect.y:
+            self.rect.y -= self.vy
+        self.shoot(self.fire_rate)
 
 
 class AlBullet(Bullet):
