@@ -153,6 +153,7 @@ class Alien(pyg.sprite.Sprite):
         self.vy = 1
         # spawn rate/fire rate - the SMALLER the number, the MORE OFTEN they spawn/fire
         self.spawn_rate = 100
+        self.firing_solution = 1
         self.fire_rate = 300
         self.animation_loop = 0
         # this is logic for the smart alien that tracks player movement
@@ -167,7 +168,7 @@ class Alien(pyg.sprite.Sprite):
 
     def shoot(self, rate):
         # aliens fire based on fire_rate, adds alien bullets to the groups
-        if (randint(1, rate) == 1) and (self.rect.x < WIDTH):
+        if (randint(1, rate) == self.firing_solution) and (self.rect.x < WIDTH):
             albull = AlBullet(self.rect.x, (self.rect.y + self.ht // 2))
             self.main.alienbullets.add(albull)
             self.main.all_sprites.add(albull)

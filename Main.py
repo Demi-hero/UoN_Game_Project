@@ -23,7 +23,7 @@ class Main(eh.HandleEvent):
         self.wavenum = 1
         self.kill_count = 0
         # basics game needs to run
-        self.white = (255,255,255)
+        self.white = (255, 255, 255)
         self.clock = pyg.time.Clock()
         self.starttime = 0
         self.framerate = 100
@@ -54,6 +54,10 @@ class Main(eh.HandleEvent):
         # main game loop
         while self.running:
 
+            # updating the object states
+            self.Board.update()
+            self.all_sprites.update()
+
             # taking the player input, passing to event handler
             for event in pyg.event.get():
                 self.on_event(event, self.Files, self.Board)
@@ -66,9 +70,7 @@ class Main(eh.HandleEvent):
                 elif (time.time() - self.starttime) // 1 > 15:
                     self.starttime = time.time()
 
-                # updating the object states
-                self.Board.update()
-                self.all_sprites.update()
+
 
                 # COLLISIONS
                 # check to see if a bullet hit an alien
@@ -97,7 +99,7 @@ class Main(eh.HandleEvent):
                 if self.kill_count >= (self.difficulty + self.wavenum):
                     self.kill_count -= (self.difficulty + self.wavenum)
                     self.wavenum += 1
-                    if self.wavenum % 10 == 0:
+                    if self.wavenum % 4 == 0:
                         self.lives += 1
                         self.bombs += 1
                     self.purge_aliens()
@@ -124,10 +126,10 @@ class Main(eh.HandleEvent):
                 self.all_sprites.draw(self.Board.screen)
 
                 # display lives and score at top of screen
-                self.message_display("Score:{}".format(self.score), 0.03, 0.1, 20)
-                self.message_display("Lives: {}".format(self.lives), 0.03, .85, 20)
-                self.message_display("Bombs: {}".format(self.bombs), 0.03, .75, 20)
-                self.message_display("WAVE : {}".format(self.wavenum), 0.05)
+                self.message_display("Score:{}".format(self.score), 0.025, 0.1, 20)
+                self.message_display("Lives: {}".format(self.lives), 0.025, .85, 20)
+                self.message_display("Bombs: {}".format(self.bombs), 0.025, .75, 20)
+                self.message_display("WAVE : {}".format(self.wavenum), 0.025, font_size=20)
                 # if out of lives - game over (see eventhandler)
                 if self.lives < 1:
                     self.gameover(self.Board, self.player, self.Files["scores"])
