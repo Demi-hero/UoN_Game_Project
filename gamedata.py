@@ -2,8 +2,8 @@ import pygame as pyg
 import os
 import time
 from random import randint
-# constants for the screen
 
+# constants for the screen
 WIDTH = 960
 HEIGHT = 540
 BORDER = 10
@@ -43,33 +43,25 @@ class Player(pyg.sprite.Sprite):
     animated_sprite = [pyg.image.load(os.path.join("images", "hero_side1.png")).convert_alpha(),
                pyg.image.load(os.path.join("images", "hero_side2.png")).convert_alpha(),
                pyg.image.load(os.path.join("images", "hero_side3.png")).convert_alpha()]
-    # this is the x-coordinate offset of the animated image, to account for it being longer due to the thrusters
-#    animation_offset_x = ln - animated_sprite[0].get_width()
 
     def __init__(self):
+        # sprite stuff, setting image and rectangle
         pyg.sprite.Sprite.__init__(self)
-        self.ln = self.sprite.get_width()
-        self.ht = self.sprite.get_height()
         self.image = self.sprite
         self.rect = self.image.get_rect()
-        # change to a rect?
-        # self.radius = 100
+        # flag to hide the player image when player is killed
         self.hidden = False
         self.hide_timer = pyg.time.get_ticks()
-
         # initialises starting position on the board.
         self.x_new = self.rect.x = BORDER
         self.y_new = self.rect.y = HEIGHT//2 - self.ht
         self.speed = 4
-
         # animation loop - as it increments up, different images of the sprite are drawn, resulting in animation
         self.animation_loop = 0
-
         # x-axis velocity, used to determine whether to animate thrusters
         self.x_vel = 0
         self.altering_name = False
         self.player_name = ''
-
 
     def move(self, x_dir, y_dir):
         # takes the direction of movement from the event handler, multiplies by speed
@@ -82,13 +74,14 @@ class Player(pyg.sprite.Sprite):
         self.x_vel = x_dir
         self.x_new = self.rect.x + (x_dir * velocity)
         self.y_new = self.rect.y + (y_dir * velocity)
-        # checks if the new positions are in the play area, and updates if they are
 
     def update(self):
+        # checks if the new positions are in the play area, and updates if they are
         if (self.x_new > BORDER) and (self.x_new < (WIDTH//2)):
             self.rect.x = self.x_new
         if (self.y_new > BORDER) and (self.y_new < HEIGHT-BORDER-self.ht):
             self.rect.y = self.y_new
+        # if the player gets killed, hidden flag is true - hides player image, and resets position to starting point
         if self.hidden and pyg.time.get_ticks() - self.hide_timer > 1000:
             self.hidden = False
             self.x_new = self.rect.x = BORDER
@@ -103,13 +96,14 @@ class Player(pyg.sprite.Sprite):
             # reseting animation loop as only has three images to cycle through
             if self.animation_loop >= 9:
                 self.animation_loop = 0
-                
+
     def hide(self):
-        # hide the player temporarily
+        # hide the player temporarily when the player is killed
         self.hidden = True
         self.hide_timer = pyg.time.get_ticks()
         self.rect.center = (WIDTH / 2, HEIGHT + 200)
 
+    # logic for getting the user's name for the highscore board
     def update_name(self, new_letter="", delete=0):
         if not delete:
             self.player_name += new_letter
@@ -135,38 +129,44 @@ class Bullet(pyg.sprite.Sprite):
 
 
 class Alien(pyg.sprite.Sprite):
+    # loading the alien sprite and getting it's dimensions
     sprite = pyg.image.load(os.path.join("images", "enemy2.png")).convert_alpha()
     ln = sprite.get_width()
     ht = sprite.get_height()
-    # loading the alien sprite and getting it's dimensions
     animated_sprite = [pyg.image.load(os.path.join("images", "enemy1.png")).convert_alpha(),
               pyg.image.load(os.path.join("images", "enemy2.png")).convert_alpha(),
               pyg.image.load(os.path.join("images", "enemy3.png")).convert_alpha()]
 
     def __init__(self, main):
-        pyg.sprite.Sprite.__init__(self)
+        # pass main to alien, so it can access the player position and add alien bullets to the groups
         self.main = main
+        # the sprite stuff, to get its image, rectangle and radius (for collision detection)
+        pyg.sprite.Sprite.__init__(self)
         self.image = self.sprite
         self.rect = self.image.get_rect()
+        self.radius = 20
+        # sets the alien's position on the right of the screen, at a random y coordinate
         self.rect.x = WIDTH + self.ln + randint(1, 100)
         self.rect.y = randint(BORDER, HEIGHT - BORDER - self.ht)
-        self.radius = 20
         # alien velocity
         self.vx = -2
         self.vy = 1
-        # spawn rate - the SMALLER the number, the MORE OFTEN they spawn
+        # spawn rate/fire rate - the SMALLER the number, the MORE OFTEN they spawn/fire
         self.spawn_rate = 100
         self.fire_rate = 300
         self.animation_loop = 0
+        # this is logic for the smart alien that tracks player movement
         self.smart = randint(1,10)
         self.width_limit = WIDTH*0.8
 
     def collide(self, sprite_group):
+        # collision detection only for when spawning new aliens, so they don't overlap
         if pyg.sprite.spritecollide(self, sprite_group, False):
             self.rect.x += self.ln * randint(2, 5)
             self.collide(sprite_group)
 
     def shoot(self, rate):
+        # aliens fire based on fire_rate, adds alien bullets to the groups
         if (randint(1, rate) == 1) and (self.rect.x < WIDTH):
             albull = AlBullet(self.rect.x, (self.rect.y + self.ht // 2))
             self.main.alienbullets.add(albull)
@@ -178,6 +178,7 @@ class Alien(pyg.sprite.Sprite):
         # reseting animation loop as only has three images to cycle through
         if self.animation_loop >= 9:
             self.animation_loop = 0
+        # if its a smart alien, tracks player movement and fires
         if self.smart == 10:
             if self.rect.x > self.width_limit:
                 self.rect.x += self.vx
@@ -186,27 +187,28 @@ class Alien(pyg.sprite.Sprite):
             elif self.rect.y > self.main.player.rect.y:
                 self.rect.y -= self.vy
             self.shoot(self.fire_rate//3)
+        # if its a dumb alien, just flies left and fires (less often)
         else:
             self.rect.x += self.vx
             self.shoot(self.fire_rate)
 
 
 class AlBullet(Bullet):
-
+    # inherits most stuff from bullet, but moves right to left, and is slower
     def __init__(self, x, y):
         Bullet.__init__(self)
         self.rect.x = x
         self.rect.y = y
         self.vx = -10
 
-        
+
 class Explosion(pyg.sprite.Sprite):
     def __init__(self, center, size):
         pyg.sprite.Sprite.__init__(self)
-        self.size = size        
+        self.size = size
         self.frame = 0
         self.last_update = pyg.time.get_ticks()
-        self.frame_rate = 50        
+        self.frame_rate = 50
         self.explosion_anim = {}
         self.explosion_anim['lg'] = []
         self.explosion_anim['sm'] = []
@@ -275,6 +277,7 @@ class PowerUp(pyg.sprite.Sprite):
             self.rect.x = 0
             self.rect.y = 0
             self.spawned = False
+
         elif self.spawned:
             self.image = self.power_up[0][self.animation_loop // 6]
             self.animation_loop += 1
@@ -290,4 +293,3 @@ class PowerUp(pyg.sprite.Sprite):
 
     def extra_bomb(self):
         self.main.bombs += 1
-
