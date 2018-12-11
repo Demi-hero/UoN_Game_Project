@@ -247,15 +247,16 @@ class PowerUp(pyg.sprite.Sprite):
                         pyg.image.load(os.path.join("images", "bomb2.png")).convert_alpha(),
                         pyg.image.load(os.path.join("images", "bomb3.png")).convert_alpha()]
 
-    def __init__(self,main):
+    def __init__(self, main):
         self.main = main
         pyg.sprite.Sprite.__init__(self)
         self.spawned = False
+        self.rewound = False
         self.powers_dict = {0: pyg.image.load(os.path.join("images", "1pixelimage.png")).convert_alpha(),
                             1: [self.animated_life, 93, 25, self.extra_life],
                             2: [self.animated_bombs, 58, 100, self.extra_bomb]}
         self.starttime = time.time()
-
+        self.animation_loop = 0
         self.power_up = []
         self.spawn_pos = (0, 0)
         self.image = self.powers_dict[0]
@@ -276,9 +277,16 @@ class PowerUp(pyg.sprite.Sprite):
             self.rect.x = 0
             self.rect.y = 0
             self.spawned = False
-        else:
-            pass
-            # incriment the animation timer then
+
+        elif self.spawned:
+            self.image = self.power_up[0][self.animation_loop // 6]
+            self.animation_loop += 1
+            if self.animation_loop == 18:
+                self.animation_loop -= 11
+                self.rewound = True
+            elif self.animation_loop == 12 and self.rewound:
+                self.animation_loop = 0
+                self.rewound = False
 
     def extra_life(self):
         self.main.lives += 1
