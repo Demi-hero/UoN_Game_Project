@@ -52,7 +52,6 @@ class Main(eh.HandleEvent):
 
             # updating the object states, and drawing to screen (see gamedata)
             if not self.paused:
-
                 if (time.time() - self.starttime) // 1 == 3 and len(self.power_ups) == 0:
                     self.new_powerup()
                 elif (time.time() - self.starttime) // 1 > 15:

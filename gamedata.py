@@ -198,7 +198,6 @@ class Bullet(pyg.sprite.Sprite):
 
 
 
-
 class Alien(pyg.sprite.Sprite):
     sprite = pyg.image.load(os.path.join("images", "enemy2.png")).convert_alpha()
     ln = sprite.get_width()
@@ -314,6 +313,7 @@ class PowerUp(pyg.sprite.Sprite):
                             1: [pyg.image.load(os.path.join("images", "hero_life.png")).convert_alpha(), 93, 25, self.extra_life],
                             2: [pyg.image.load(os.path.join("images", "bomb1.png")).convert_alpha(), 58, 100, self.extra_bomb]}
         self.starttime = time.time()
+
         self.power_up = []
         self.spawn_pos = (0, 0)
         self.image = self.powers_dict[0]
@@ -335,15 +335,12 @@ class PowerUp(pyg.sprite.Sprite):
             self.image = self.powers_dict[0]
             self.rect.x = 0
             self.rect.y = 0
-
             self.spawned = False
-#        elif self.spawned:
-#            self.collection(player)
+
 
     def extra_life(self):
         self.main.lives += 1
 
     def extra_bomb(self):
         self.main.bombs += 1
-
 
