@@ -140,7 +140,7 @@ class HandleEvent():
         Player.move(x_dir, y_dir)
 
     def on_key_down(self, event, files, board):
-        if event.key == pyg.K_SPACE:
+        if (event.key == pyg.K_SPACE) and not self.paused:
             files['sounds'].pewpew.play()
             if self.startup:
                 # if on startup, spacebar starts the game
@@ -153,7 +153,7 @@ class HandleEvent():
                 self.all_sprites.add(bullet)
                 self.bullets.add(bullet)
         # p opens the pause screen, and q quits if on the pause screen
-        elif event.key == pyg.K_p:
+        elif (event.key == pyg.K_p) and not self.startup:
             self.on_pause()
         elif event.key == pyg.K_q:
             if self.paused:
