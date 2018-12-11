@@ -165,7 +165,7 @@ class HandleEvent():
     # logic for bomb power-up
     def on_bomb(self, board, files):
         if self.bombs > 0 and not self.paused:
-            files.ult.play()
+            files['sounds'].ult.play()
             self.score += 1000
             board.screen.fill(self.white)
             for alien in self.aliens:
