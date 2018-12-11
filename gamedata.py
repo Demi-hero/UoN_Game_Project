@@ -2,7 +2,6 @@ import pygame as pyg
 import os
 import time
 from random import randint
-from random import randrange
 # constants for the screen
 
 WIDTH = 960
@@ -62,7 +61,6 @@ class Player(pyg.sprite.Sprite):
         self.x_new = self.rect.x = BORDER
         self.y_new = self.rect.y = HEIGHT//2 - self.ht
         self.speed = 4
-        # self.hitbox = pyg.Rect(self.x, self.y, self.ln, self.ht)
 
         # animation loop - as it increments up, different images of the sprite are drawn, resulting in animation
         self.animation_loop = 0
@@ -136,7 +134,6 @@ class Bullet(pyg.sprite.Sprite):
         self.rect.x += self.vx
 
 
-
 class Alien(pyg.sprite.Sprite):
     sprite = pyg.image.load(os.path.join("images", "enemy2.png")).convert_alpha()
     ln = sprite.get_width()
@@ -194,7 +191,6 @@ class Alien(pyg.sprite.Sprite):
             self.shoot(self.fire_rate)
 
 
-
 class AlBullet(Bullet):
 
     def __init__(self, x, y):
@@ -239,16 +235,23 @@ class Explosion(pyg.sprite.Sprite):
                 self.rect.center = center
 
 
-
 class PowerUp(pyg.sprite.Sprite):
+
+    animated_life = [pyg.image.load(os.path.join("images", "hero_life.png")).convert_alpha(),
+                     pyg.image.load(os.path.join("images", "hero_life.png")).convert_alpha(),
+                      pyg.image.load(os.path.join("images", "hero_life.png")).convert_alpha()]
+
+    animated_bombs = [pyg.image.load(os.path.join("images", "bomb1.png")).convert_alpha(),
+                        pyg.image.load(os.path.join("images", "bomb2.png")).convert_alpha(),
+                        pyg.image.load(os.path.join("images", "bomb3.png")).convert_alpha()]
 
     def __init__(self,main):
         self.main = main
         pyg.sprite.Sprite.__init__(self)
         self.spawned = False
         self.powers_dict = {0: pyg.image.load(os.path.join("images", "1pixelimage.png")).convert_alpha(),
-                            1: [pyg.image.load(os.path.join("images", "hero_life.png")).convert_alpha(), 93, 25, self.extra_life],
-                            2: [pyg.image.load(os.path.join("images", "bomb1.png")).convert_alpha(), 58, 100, self.extra_bomb]}
+                            1: [self.animated_life, 93, 25, self.extra_life],
+                            2: [self.animated_bombs, 58, 100, self.extra_bomb]}
         self.starttime = time.time()
 
         self.power_up = []
@@ -261,7 +264,7 @@ class PowerUp(pyg.sprite.Sprite):
             print("I should spawn a power up")
             # generate a random number between 1 and however many
             self.power_up = self.powers_dict[randint(1, 2)]
-            self.image = self.power_up[0]
+            self.image = self.power_up[0][0]
             self.rect = self.image.get_rect()
             self.rect.x = randint(BORDER, (WIDTH//2)-self.power_up[1])
             self.rect.y = randint(BORDER, HEIGHT-BORDER-self.power_up[2])
@@ -273,6 +276,9 @@ class PowerUp(pyg.sprite.Sprite):
             self.rect.x = 0
             self.rect.y = 0
             self.spawned = False
+        else:
+            pass
+            # incriment the animation timer then
 
 
     def extra_life(self):
