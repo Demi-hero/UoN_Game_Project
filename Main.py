@@ -37,6 +37,7 @@ class Main(eh.HandleEvent):
         self.bullets = pyg.sprite.Group()
         self.power_ups = pyg.sprite.Group()
         self.aliens = pyg.sprite.Group()
+        self.smartaliens = pyg.sprite.Group()
         self.alienbullets = pyg.sprite.Group()
 
 
@@ -71,14 +72,9 @@ class Main(eh.HandleEvent):
 
                 # COLLISIONS
                 # check to see if a bullet hit an alien
-                hits = pyg.sprite.groupcollide(self.aliens, self.bullets, True, True)
-                for hit in hits:
-
-                    self.score += self.kill_score
-                    self.sounds.boom.play()
-                    self.expl = gd.Explosion(hit.rect.center, 'lg')
-                    self.all_sprites.add(self.expl)
-                    self.new_alien(-6)
+                hits = pyg.sprite.groupcollide(self.aliens, self.bullets, False, True)
+                for alien in hits:
+                    alien.on_hit(self)
                 # check if a player picked up a powerup
                 hits = pyg.sprite.spritecollide(self.player, self.power_ups, True)
                 for hit in hits:
