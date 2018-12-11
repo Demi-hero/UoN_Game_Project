@@ -93,6 +93,7 @@ class Main(eh.HandleEvent):
                     self.wavenum += 1
                     self.message_display("Wave {}".format(self.wavenum), 0.85)
                     pyg.display.update()
+                    self.player.hide()
                     time.sleep(1.5)
                     self.alien_count = self.BASE_count + self.wavenum*5
                     if self.wavenum % 4 == 0:
@@ -118,9 +119,13 @@ class Main(eh.HandleEvent):
 
                 # display lives and score at top of screen
                 self.message_display("Score:{}".format(self.score), 0.025, 0.1, 20)
-                self.message_display("Lives: {}".format(self.lives), 0.025, .85, 20)
-                self.message_display("Bombs: {}".format(self.bombs), 0.025, .75, 20)
-                self.message_display("WAVE : {}".format(self.wavenum), 0.025, font_size=20)
+                self.message_display("Lives: {}".format(self.lives), 0.025, .9, 20)
+                self.message_display("Bombs: {}".format(self.bombs), 0.025, .8, 20)
+                self.message_display("WAVE : {}".format(self.wavenum), 0.029, .55, font_size=30)
+                if self.alien_count > 0:
+                    self.message_display("Enemies Reinforcements : {}".format(self.alien_count), 0.95, .17, 20)
+                else:
+                    self.message_display("Enemies Reinforcements : 0".format(self.alien_count), 0.98, .17, 20)
                 # if out of lives - game over (see eventhandler)
                 if self.lives < 1:
                     self.gameover(self.Board, self.player, self.Files["scores"])
