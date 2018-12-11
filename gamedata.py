@@ -45,10 +45,11 @@ class Player(pyg.sprite.Sprite):
                pyg.image.load(os.path.join("images", "hero_side3.png")).convert_alpha()]
 
     def __init__(self):
-        # sprite stuff, setting image and rectangle
+        # sprite stuff, setting image, rectangle and mask (for collision detection)
         pyg.sprite.Sprite.__init__(self)
         self.image = self.sprite
         self.rect = self.image.get_rect()
+        self.col_mask = pyg.mask.from_surface(self.image)
         # flag to hide the player image when player is killed
         self.hidden = False
         self.hide_timer = pyg.time.get_ticks()
@@ -143,11 +144,11 @@ class Alien(pyg.sprite.Sprite):
     def __init__(self, main):
         # pass main to alien, so it can access the player position and add alien bullets to the groups
         self.main = main
-        # the sprite stuff, to get its image, rectangle and radius (for collision detection)
+        # the sprite stuff, to get its image, rectangle and mask (for collision detection)
         pyg.sprite.Sprite.__init__(self)
         self.image = self.sprite
         self.rect = self.image.get_rect()
-        self.radius = 20
+        self.col_mask = pyg.mask.from_surface(self.image)
         # sets the alien's position on the right of the screen, at a random y coordinate
         self.rect.x = WIDTH + self.ln + randint(1, 100)
         self.rect.y = randint(BORDER, HEIGHT - BORDER - self.ht)
@@ -194,11 +195,10 @@ class Alien(pyg.sprite.Sprite):
         if self.hitpoints <= 0:
             self.kill()
             main.score += main.kill_score
-            main.kill_count += 1
+            main.alien_count -= 1
             main.sounds.boom.play()
             main.expl = Explosion(self.rect.center, 'lg')
             main.all_sprites.add(main.expl)
-            main.new_alien()
         # can put an else: play 'ping' noise or whatever
 
 
