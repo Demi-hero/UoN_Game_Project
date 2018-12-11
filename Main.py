@@ -122,7 +122,7 @@ class Main(eh.HandleEvent):
                 self.message_display("Bombs: {}".format(self.bombs), 0.025, .8, 20)
                 self.message_display("WAVE : {}".format(self.wavenum), 0.029, .55, font_size=30)
                 if self.alien_count > 0:
-                    self.message_display("Enemies Reinforcements : {}".format(self.alien_count), 0.95, .17, 20)
+                    self.message_display("Enemies Reinforcements : {}".format(self.alien_count), 0.98, .17, 20)
                 else:
                     self.message_display("Enemies Reinforcements : 0".format(self.alien_count), 0.98, .17, 20)
                 # displays message on new wave
