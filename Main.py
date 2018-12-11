@@ -19,9 +19,10 @@ class Main(eh.HandleEvent):
         self.score = 0
         self.kill_score = 20
         self.penalty_score = -10
-        self.difficulty = 7
+        self.difficulty = 5
         self.wavenum = 1
-        self.kill_count = 0
+        self.BASE_count = 10
+        self.alien_count = self.BASE_count
         # basics game needs to run
         self.white = (255, 255, 255)
         self.clock = pyg.time.Clock()
@@ -43,9 +44,6 @@ class Main(eh.HandleEvent):
         self.alienbullets = pyg.sprite.Group()
 
     def execute(self):
-        # spawning aliens
-        self.new_alien((self.wavenum + self.difficulty))
-
         # startup screen
         while self.startup:
             self.on_startup(self.Board, self.Files)
@@ -63,6 +61,8 @@ class Main(eh.HandleEvent):
                 self.Board.update()
                 self.all_sprites.update()
 
+                # spawning aliens
+                self.new_alien((self.wavenum + self.difficulty))
                 # spawning powerups
                 if (time.time() - self.starttime) // 1 == 3 and len(self.power_ups) == 0:
                     self.new_powerup()
@@ -79,7 +79,7 @@ class Main(eh.HandleEvent):
                 for hit in hits:
                     hit.power_up[3]()
                 # check to see if an alien hit the player
-                hits = pyg.sprite.spritecollide(self.player, self.aliens, True, pyg.sprite.collide_circle)
+                hits = pyg.sprite.spritecollide(self.player, self.aliens, True, pyg.sprite.collide_mask)
                 for hit in hits:
                     self.player_death(hit)
                 # check to see if an alien bullet hit the player
@@ -87,24 +87,24 @@ class Main(eh.HandleEvent):
                 for hit in hits:
                     self.player_death(hit)
 
-                if self.kill_count >= (self.difficulty + self.wavenum):
-                    self.kill_count -= (self.difficulty + self.wavenum)
+                # once the alien_count drops below zero, new wave starts
+                # alien_count gets higher and more aliens are on screen as waves increase
+                if (self.alien_count <= 0) and (len(self.aliens) == 0):
                     self.wavenum += 1
+                    self.message_display("Wave {}".format(self.wavenum), 0.85)
+                    pyg.display.update()
+                    time.sleep(1.5)
+                    self.alien_count = self.BASE_count + self.wavenum*5
                     if self.wavenum % 4 == 0:
                         self.lives += 1
                         self.bombs += 1
-                    self.purge_aliens()
-                    self.new_alien(self.wavenum + self.difficulty)
-                    # kill the bad guys
-                    # make more bad guys
 
                 # removing the aliens and bullets as they leave the screen
                 for alien in self.aliens:
                     if alien.rect.x < 0 - alien.ln:
-                        self.aliens.remove(alien)
+                        alien.kill()
                         # penalty for if aliens get past player
                         self.score += self.penalty_score
-                        self.new_alien()
                 for bullet in self.bullets:
                     if bullet.rect.x > gd.WIDTH:
                         bullet.kill()
@@ -134,3 +134,4 @@ App = Main()
 App.execute()
 pyg.quit()
 os._exit(0)
+
