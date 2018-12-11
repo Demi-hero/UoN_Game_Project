@@ -1,5 +1,6 @@
 import pygame as pyg
 import os
+import av_data as av
 import gamedata as gd
 import eventhandler as eh
 import time
@@ -19,7 +20,7 @@ class Main(eh.HandleEvent):
         self.wavenum = 1
         # creating the screen and game objects
         self.all_sprites = pyg.sprite.Group()
-        self.Files = gd.FileStore()
+        self.Files = av.FileStore()
         self.Board = gd.Background()
         self.player = gd.Player()
         self.all_sprites.add(self.player)
@@ -36,12 +37,12 @@ class Main(eh.HandleEvent):
 
     def execute(self):
 
-
         self.new_alien(self.wavenum)
 
         while self.startup:
             self.on_startup(self.Board, self.Files)
         self.starttime = time.time()
+
         # main game loop
         while self.running:
             # taking the player input, passing to event handler

@@ -67,7 +67,7 @@ class HandleEvent():
             self.on_bomb(board, files)
 
     def on_bomb(self, board, files):
-        if self.bombs > 0:
+        if self.bombs > 0 and not self.paused:
             files.ult.play()
             self.update_score(1000)
             board.screen.fill(self.white)
