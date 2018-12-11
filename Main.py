@@ -54,9 +54,7 @@ class Main(eh.HandleEvent):
         # main game loop
         while self.running:
 
-            # updating the object states
-            self.Board.update()
-            self.all_sprites.update()
+
 
             # taking the player input, passing to event handler
             for event in pyg.event.get():
@@ -64,12 +62,15 @@ class Main(eh.HandleEvent):
             self.player_movement(self.player)
 
             if not self.paused:
+                # updating the object states
+                self.Board.update()
+                self.all_sprites.update()
+
                 # spawning powerups
                 if (time.time() - self.starttime) // 1 == 3 and len(self.power_ups) == 0:
                     self.new_powerup()
                 elif (time.time() - self.starttime) // 1 > 15:
                     self.starttime = time.time()
-
 
 
                 # COLLISIONS
