@@ -155,6 +155,7 @@ class Alien(pyg.sprite.Sprite):
         self.vx = -2
         # fire rate - the SMALLER the number, the MORE OFTEN they fire
         self.fire_rate = 400
+        self.firing_solution = 1
         self.animation_loop = 0
         # hit points - determines whether shield is up or down (displays different image)
         self.hitpoints = 1
@@ -167,8 +168,8 @@ class Alien(pyg.sprite.Sprite):
 
     def shoot(self, rate):
         # aliens fire based on fire_rate, adds alien bullets to the groups
-        if (randint(1, rate) == 1) and (self.rect.x < WIDTH):
-            albull = AlBullet(self.rect.x, (self.rect.y + self.ht * 0.4))
+        if (randint(1, rate) == self.firing_solution) and (self.rect.x < WIDTH):
+            albull = AlBullet(self.rect.x, (self.rect.y + self.ht // 2))
             self.main.alienbullets.add(albull)
             self.main.all_sprites.add(albull)
 
@@ -196,7 +197,7 @@ class Alien(pyg.sprite.Sprite):
             main.sounds.boom.play()
             main.expl = Explosion(self.rect.center, 'lg')
             main.all_sprites.add(main.expl)
-            main.new_alien(-6)
+            main.new_alien()
         # can put an else: play 'ping' noise or whatever
 
 

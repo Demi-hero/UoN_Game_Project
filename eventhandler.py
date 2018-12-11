@@ -30,11 +30,21 @@ class HandleEvent():
     def on_pause(self, minimised=0):
         if not self.paused:
             self.paused = True
+            for alien in self.aliens:
+                alien.vx = 0
+                alien.firing_solution = 0
+            for bullet in self.alienbullets:
+                bullet.vx = 0
             self.message_display("GAME PAUSED", .30)
             self.message_display("Press p to unpause")
             self.message_display("Press q to quit", .65)
             pyg.display.update()
         elif not minimised:
+            for alien in self.aliens:
+                alien.vx = -2
+                alien.firing_solution = 1
+            for bullet in self.alienbullets:
+                bullet.vx = -10
             self.paused = False
 
     # game over screen and logic
@@ -127,6 +137,9 @@ class HandleEvent():
         # checks for when keys are pressed
         elif event.type == pyg.KEYDOWN:
                 self.on_key_down(event, files, board)
+        elif event.type == pyg.ACTIVEEVENT:
+            if event.state == 6:
+                self.on_pause()
 
     def on_exit(self):
         self.startup = False
@@ -152,26 +165,23 @@ class HandleEvent():
                 bullet.rect.y = self.player.rect.y + self.player.ht//2
                 self.all_sprites.add(bullet)
                 self.bullets.add(bullet)
+
         # p opens the pause screen, and q quits if on the pause screen
         elif (event.key == pyg.K_p) and not self.startup:
             self.on_pause()
         elif event.key == pyg.K_q:
-            if self.paused:
-                self.on_exit()
+            self.on_exit()
         # b drops a bomb
         elif event.key == pyg.K_b:
             self.on_bomb(board, files)
 
     # logic for bomb power-up
     def on_bomb(self, board, files):
-        if self.bombs > 0 and not self.paused:
+        if self.bombs < 5 and not self.paused:
             files['sounds'].ult.play()
-            self.score += 1000
+            self.score += 500
             board.screen.fill(self.white)
-            for alien in self.aliens:
-                alien.kill()
-            for bullet in self.alienbullets:
-                bullet.kill()
+            self.purge_aliens()
             pyg.display.update()
             self.bombs -= 1
             self.new_alien(self.wavenum)
@@ -183,27 +193,25 @@ class HandleEvent():
         expl = gamedata.Explosion(hit.rect.center, 'sm')
         self.all_sprites.add(expl)
         self.player.hide()
-        for alien in self.aliens:
-            alien.kill()
+        self.kill_count = 0
         for bullet in self.bullets:
             bullet.kill()
-        for albull in self.alienbullets:
-            albull.kill()
-        self.new_alien(self.wavenum)
+        self.purge_aliens(player_death=1)
+        self.new_alien(self.wavenum+self.difficulty)
 
-    def new_alien(self, wave):
+    # spawns aliens, rate increases as player completes waves
+    def new_alien(self, amount=1):
         # spawns a smart alien if one doesn't exist
         if len(self.smartaliens) == 0:
             smartalien = gamedata.SmartAlien(self)
             self.all_sprites.add(smartalien)
             self.aliens.add(smartalien)
             self.smartaliens.add(smartalien)
-        # spawns aliens, rate increases as player completes waves
-        for i in range (wave+7):
+        for i in range(amount):
             alien = gamedata.Alien(self)
             self.spawn_check(alien)
         # spawns a smaller number of shield aliens
-        for i in range(wave):
+        for i in range(amount//4):
             shieldalien = gamedata.ShieldAlien(self)
             self.spawn_check(shieldalien)
 
@@ -217,3 +225,12 @@ class HandleEvent():
         power_up = gamedata.PowerUp(self)
         self.power_ups.add(power_up)
         self.all_sprites.add(power_up)
+
+    def purge_aliens(self,player_death=0):
+        for alien in self.aliens:
+            if not player_death:
+                self.expl = gamedata.Explosion(alien.rect.center, 'lg')
+                self.all_sprites.add(self.expl)
+            alien.kill()
+        for albull in self.alienbullets:
+            albull.kill()
