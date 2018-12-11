@@ -3,7 +3,7 @@ import os
 import gamedata
 import time
 import csv
-
+# push me please
 class HandleEvent():
 
     def on_startup(self, background, files):
@@ -33,27 +33,30 @@ class HandleEvent():
         Player.move(x_dir, y_dir)
 
     # this runs for every event and calls the relevant method
-    def on_event(self, event, board='', Tokens='', files=""):
+    def on_event(self, event, files="", board = ""):
         # breaks out of the main game loop if QUIT event occurs (closing window), cleanup occurs after
         if event.type == pyg.QUIT:
                 self.on_exit()
         # checks for when keys are pressed
         elif event.type == pyg.KEYDOWN:
-                self.on_key_down(event, board, Tokens, files,)
+                self.on_key_down(event, files, board)
 
     def on_exit(self):
         self.startup = False
         self.running = False
 
-    def on_key_down(self, event, board, Tokens, files):
+    def on_key_down(self, event, files, board):
         # spacebar triggers firing sequence - takes gun position from player, passes to bullet fire method
         if event.key == pyg.K_SPACE:
             files.pewpew.play()
             if self.startup:
                 self.startup = False
             else:
-                gun_pos = Tokens[0].get_gun_location()
-                Tokens[1].fire(gun_pos)
+                bullet = gamedata.Bullet()
+                bullet.rect.x = self.player.rect.x + self.player.ln//2
+                bullet.rect.y = self.player.rect.y + self.player.ht//2
+                self.all_sprites.add(bullet)
+                self.bullets.add(bullet)
         # p opens the pause screen, and q quits if on the pause screen
         elif event.key == pyg.K_p:
             self.on_pause()
@@ -61,24 +64,41 @@ class HandleEvent():
             if self.paused:
                 self.on_exit()
         elif event.key == pyg.K_b:
-            if not self.paused:
-                self.on_bomb(board, Tokens, files)
+            self.on_bomb(board, files)
 
-    def on_bomb(self, board, Tokens, files):
+    def on_bomb(self, board, files):
         if self.bombs > 0:
             files.ult.play()
-            self.update_score(((len(Tokens[2].alive_aliens)+len(Tokens[3].alive_aliens)) * 40))
+            self.update_score(1000)
             board.screen.fill(self.white)
+            for alien in self.aliens:
+                alien.kill()
+            for bullet in self.alienbullets:
+                bullet.kill()
             pyg.display.update()
-            for value in range(2, 5):
-                Tokens[value].__init__()
             self.bombs -= 1
+            self.new_alien(self.wavenum)
+
 
     # update score and lives
     def update_score(self, points):
         self.score += points
     def update_lives(self, change):
         self.lives += change
+
+    def player_death(self, hit):
+        self.lives -= 1
+        self.Files.boom.play()
+        expl = gamedata.Explosion(hit.rect.center, 'sm')
+        self.all_sprites.add(expl)
+        self.player.hide()
+        for alien in self.aliens:
+            alien.kill()
+        for bullet in self.bullets:
+            bullet.kill()
+        for albull in self.alienbullets:
+            albull.kill()
+        self.new_alien(self.wavenum)
 
     # pause screen messages
     def on_pause(self, minimised=0):
@@ -91,13 +111,13 @@ class HandleEvent():
         elif not minimised:
             self.paused = False
 
-    def gameover(self, Board, Tokens, Files):
+    def gameover(self, board, player, files):
         # display high score messages
-        if self.scorboard_check(Files):
-            self.on_new_highscore(Board, Tokens[0], Files)
+        if self.scorboard_check(files):
+            self.on_new_highscore(board, player, files)
         else:
             self.message_display("Your Score: {}".format(self.score), .75)
-        self.highscore_display(Board, Files)
+        self.highscore_display(board, files)
         self.message_display("Press any key to try again", .85)
         pyg.display.update()
         time.sleep(1.5)
@@ -109,9 +129,10 @@ class HandleEvent():
                     os._exit(0)
                 elif event.type == pyg.KEYDOWN:
                     # if key pressed, re-initialises everything and breaks from loop
-                    for token in Tokens:
-                        token.__init__()
+                    for sprite in self.all_sprites:
+                        sprite.kill()
                     self.__init__()
+                    self.new_alien(self.wavenum)
                     return
 
     def game_over_display(self, board):
@@ -171,3 +192,10 @@ class HandleEvent():
             if self.score > int(lists[1]):
                 return True
         return False
+
+    def new_alien(self, wave):
+        for i in range (wave+7):
+            alien = gamedata.Alien(self)
+            alien.collide(self.aliens)
+            self.all_sprites.add(alien)
+            self.aliens.add(alien)
