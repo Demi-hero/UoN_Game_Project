@@ -239,11 +239,13 @@ class PowerUp(pyg.sprite.Sprite):
 
     animated_life = [pyg.image.load(os.path.join("images", "hero_life.png")).convert_alpha(),
                      pyg.image.load(os.path.join("images", "hero_life.png")).convert_alpha(),
+                      pyg.image.load(os.path.join("images", "hero_life.png")).convert_alpha(),
                       pyg.image.load(os.path.join("images", "hero_life.png")).convert_alpha()]
 
     animated_bombs = [pyg.image.load(os.path.join("images", "bomb1.png")).convert_alpha(),
                         pyg.image.load(os.path.join("images", "bomb2.png")).convert_alpha(),
-                        pyg.image.load(os.path.join("images", "bomb3.png")).convert_alpha()]
+                        pyg.image.load(os.path.join("images", "bomb3.png")).convert_alpha(),
+                        pyg.image.load(os.path.join("images", "bomb2.png")).convert_alpha()]
 
     def __init__(self,main):
         self.main = main
@@ -253,7 +255,7 @@ class PowerUp(pyg.sprite.Sprite):
                             1: [self.animated_life, 93, 25, self.extra_life],
                             2: [self.animated_bombs, 58, 100, self.extra_bomb]}
         self.starttime = time.time()
-
+        self.animation_loop = 0
         self.power_up = []
         self.spawn_pos = (0, 0)
         self.image = self.powers_dict[0]
@@ -261,7 +263,6 @@ class PowerUp(pyg.sprite.Sprite):
 
     def update(self):
         if (time.time() - self.starttime)//1 == 3 and not self.spawned:
-            print("I should spawn a power up")
             # generate a random number between 1 and however many
             self.power_up = self.powers_dict[randint(1, 2)]
             self.image = self.power_up[0][0]
@@ -270,14 +271,16 @@ class PowerUp(pyg.sprite.Sprite):
             self.rect.y = randint(BORDER, HEIGHT-BORDER-self.power_up[2])
             self.spawned = True
         elif (time.time() - self.starttime)//1 == 10:
-            print("I despawn a power up")
             self.starttime = time.time()
             self.image = self.powers_dict[0]
             self.rect.x = 0
             self.rect.y = 0
             self.spawned = False
-        else:
-            pass
+        elif self.spawned:
+            self.image = self.power_up[0][self.animation_loop // 6]
+            self.animation_loop += 1
+            if self.animation_loop == 24:
+                self.animation_loop = 0
             # incriment the animation timer then
 
 
