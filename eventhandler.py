@@ -83,9 +83,9 @@ class HandleEvent():
         textsurface = font.render(text, True, pyg.Color("white"))
         return textsurface, textsurface.get_rect()
 
-    def message_display(self, text, yloc=.45, xloc=.5, font_size=50):
-        largetext = pyg.font.Font('freesansbold.ttf', font_size)
-        textsurf, textrect = self.text_objects(text, largetext)
+    def message_display(self, words, yloc=.45, xloc=.5, font_size=50):
+        text = pyg.font.Font('freesansbold.ttf', font_size)
+        textsurf, textrect = self.text_objects(words, text)
         textrect.center = (gamedata.WIDTH * xloc), (gamedata.HEIGHT * yloc)
         gamedata.Background.screen.blit(textsurf, textrect)
 
