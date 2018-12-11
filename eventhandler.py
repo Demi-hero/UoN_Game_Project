@@ -191,17 +191,29 @@ class HandleEvent():
             albull.kill()
         self.new_alien(self.wavenum)
 
-    # spawns aliens, rate increases as player completes waves
     def new_alien(self, wave):
+        # spawns a smart alien if one doesn't exist
+        if len(self.smartaliens) == 0:
+            smartalien = gamedata.SmartAlien(self)
+            self.all_sprites.add(smartalien)
+            self.aliens.add(smartalien)
+            self.smartaliens.add(smartalien)
+        # spawns aliens, rate increases as player completes waves
         for i in range (wave+7):
             alien = gamedata.Alien(self)
-            alien.collide(self.aliens)
-            self.all_sprites.add(alien)
-            self.aliens.add(alien)
+            self.spawn_check(alien)
+        # spawns a smaller number of shield aliens
+        for i in range(wave):
+            shieldalien = gamedata.ShieldAlien(self)
+            self.spawn_check(shieldalien)
+
+    def spawn_check(self, alien):
+        alien.collide(self.aliens)
+        self.all_sprites.add(alien)
+        self.aliens.add(alien)
 
     # spawns powerups
     def new_powerup(self):
         power_up = gamedata.PowerUp(self)
         self.power_ups.add(power_up)
         self.all_sprites.add(power_up)
-
