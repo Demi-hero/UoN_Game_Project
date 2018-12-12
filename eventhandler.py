@@ -10,12 +10,14 @@ class HandleEvent():
     def on_startup(self, background, files):
         background.draw()
         background.update()
-        self.message_display("Movement", yloc=.93, xloc=.13, font_size=25)
-        self.message_display("Shoot", yloc=.93, xloc=.87, font_size=25)
-        self.message_display("Bomb", yloc=.7, xloc= .87, font_size=25 )
+
+        self.message_display("Movement", yloc=.89, xloc=.13, font_size=25)
+        self.message_display("Bomb", yloc=.73, xloc=.87, font_size=25)
+        self.message_display("Shoot", yloc=.89, xloc=.87, font_size=25)
         background.screen.blit(files["images"].title, (221, 0))
-        background.screen.blit(files["images"].arrows, (50, 375))
-        background.screen.blit(files["images"].space, (760, 426))
+        background.screen.blit(files["images"].arrows, (50, 355))
+        background.screen.blit(files["images"].b_button, (810, 326))
+        background.screen.blit(files["images"].space, (760, 406))
         self.message_display("-Press Shoot to Start-", .8, font_size=35)
         pyg.display.flip()
         while self.startup:
