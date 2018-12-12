@@ -17,7 +17,6 @@ class Main(eh.HandleEvent):
         self.lives = 3
         self.bombs = 1
         self.score = 0
-        self.kill_score = 20
         self.penalty_score = -10
         self.difficulty = 5
         self.wavenum = 1
@@ -58,8 +57,9 @@ class Main(eh.HandleEvent):
             self.player_movement(self.player)
 
             if not self.paused:
-                # updating the object states
+                # updating the object states, drawing the background
                 self.Board.update()
+                self.Board.draw()
                 self.all_sprites.update()
 
                 # spawning aliens
@@ -74,14 +74,15 @@ class Main(eh.HandleEvent):
                 # check to see if a bullet hit an alien
                 hits = pyg.sprite.groupcollide(self.aliens, self.bullets, False, True)
                 for alien in hits:
-                    alien.on_hit(self)
+                    alien.on_hit(self, 1)
                 # check if a player picked up a powerup
                 hits = pyg.sprite.spritecollide(self.player, self.power_ups, True)
                 for hit in hits:
                     hit.power_up[3]()
                 # check to see if an alien hit the player
-                hits = pyg.sprite.spritecollide(self.player, self.aliens, True, pyg.sprite.collide_mask)
+                hits = pyg.sprite.spritecollide(self.player, self.aliens, False, pyg.sprite.collide_mask)
                 for hit in hits:
+                    hit.on_hit(self, 2)
                     self.player_death(hit)
                 # check to see if an alien bullet hit the player
                 hits = pyg.sprite.spritecollide(self.player, self.alienbullets, True)
@@ -94,7 +95,12 @@ class Main(eh.HandleEvent):
                     self.wavenum += 1
                     self.new_wave = True
                     new_timer = pyg.time.get_ticks()
-                    self.alien_count = self.BASE_count + self.wavenum*5
+                    # every four waves, a boss wave occurs
+                    if self.wavenum % 4 == 0:
+                        self.alien_count = 1
+                    else:
+                        self.alien_count = self.BASE_count + self.wavenum*5
+                    # player gets an extra life and bomb after the boss wave
                     if self.wavenum % 4 == 1 and self.wavenum != 1:
                         self.lives += 1
                         self.bombs += 1
@@ -112,22 +118,25 @@ class Main(eh.HandleEvent):
                     if bullet.rect.x < (0 - bullet.ln):
                         bullet.kill()
 
-                # drawing the scene
-                self.Board.draw()
+                # drawing the objects
                 self.all_sprites.draw(self.Board.screen)
 
                 # display lives and score at top of screen
                 self.message_display("Score:{}".format(self.score), 0.025, 0.1, 20)
                 self.message_display("Lives: {}".format(self.lives), 0.025, .9, 20)
                 self.message_display("Bombs: {}".format(self.bombs), 0.025, .8, 20)
-                self.message_display("WAVE : {}".format(self.wavenum), 0.029, .5, font_size=30)
-                if self.alien_count > 0:
+                self.message_display("WAVE : {}".format(self.wavenum), 0.029, .55, font_size=30)
+                # if not a boss wave, displays number of aliens left in wave
+                if (self.alien_count > 0) and (self.wavenum % 4 != 0):
                     self.message_display("Enemies Reinforcements : {}".format(self.alien_count), 0.98, .17, 20)
-                else:
+                elif self.wavenum % 4 != 0:
                     self.message_display("Enemies Reinforcements : 0".format(self.alien_count), 0.98, .17, 20)
                 # displays message on new wave
                 if self.new_wave:
-                    self.message_display("WAVE {}".format(self.wavenum), 0.85)
+                    if self.wavenum % 4 == 0:
+                        self.message_display("BOSS WAVE", 0.85)
+                    else:
+                        self.message_display("WAVE {}".format(self.wavenum), 0.85)
                     if pyg.time.get_ticks() - new_timer > 2000:
                         self.new_wave = False
 
