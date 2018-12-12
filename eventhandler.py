@@ -11,15 +11,13 @@ class HandleEvent():
     def on_startup(self, background, files):
         background.draw()
         background.update()
-        # self.message_display("Highscores :",xloc=.35)
-        # self.message_display(" Lore :", xloc=.65)
-        self.message_display("Movement", yloc=.93, xloc=.13, font_size=25)
-        self.message_display("Shoot", yloc=.93, xloc=.87, font_size=25)
+        self.message_display("Movement", yloc=.89, xloc=.13, font_size=25)
+        self.message_display("Bomb", yloc=.73, xloc=.87, font_size=25)
+        self.message_display("Shoot", yloc=.89, xloc=.87, font_size=25)
         background.screen.blit(files["images"].title, (221, 0))
-        background.screen.blit(files["images"].arrows, (50, 375))
-        # gamedata.background.screen.blit(Game_Data.startup.h, (425, 228))
-        # gamedata.background.screen.blit(Game_Data.startup.l, (675, 228))
-        background.screen.blit(files["images"].space, (760, 426))
+        background.screen.blit(files["images"].arrows, (50, 355))
+        background.screen.blit(files["images"].b_button, (810, 326))
+        background.screen.blit(files["images"].space, (760, 406))
         self.message_display("-Press Shoot to Start-", .8, font_size=35)
         pyg.display.flip()
         while self.startup:
@@ -177,7 +175,7 @@ class HandleEvent():
 
     # logic for bomb power-up
     def on_bomb(self, board, files):
-        if self.bombs > 0 and not self.paused:
+        if self.bombs < 5 and not self.paused:
             files['sounds'].ult.play()
             self.score += 500
             self.alien_count -= len(self.aliens)
