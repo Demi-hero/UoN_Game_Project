@@ -70,6 +70,7 @@ class HandleEvent():
                     for sprite in self.all_sprites:
                         sprite.kill()
                     self.__init__()
+                    self.startup = False
                     return
 
     def game_over_display(self, board):
