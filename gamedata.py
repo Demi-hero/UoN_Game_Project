@@ -9,6 +9,7 @@ HEIGHT = 540
 BORDER = 20
 
 # Background object contains the display, and draws and updates the animated background
+# Animation derived from instructions from the Nutt.net pygame tutoral
 class Background(pyg.sprite.Sprite):
     screen = pyg.display.set_mode((WIDTH, HEIGHT), pyg.HWSURFACE)
 
@@ -279,7 +280,7 @@ class AlBullet(Bullet):
         self.rect.y = y
         self.vx = -10
 
-
+# This class was built from instructions given in the pygame tutorial by KidsCanCode.org
 class Explosion(pyg.sprite.Sprite):
     def __init__(self, center, size):
         pyg.sprite.Sprite.__init__(self)
@@ -362,7 +363,7 @@ class PowerUp(pyg.sprite.Sprite):
             if self.animation_loop >= 9:
                 self.animation_loop -= 5
                 self.rewound = True
-            elif self.animation_loop >=7 and self.rewound:
+            elif self.animation_loop >= 7 and self.rewound:
                 self.animation_loop = 0
                 self.rewound = False
 

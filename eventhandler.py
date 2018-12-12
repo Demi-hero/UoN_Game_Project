@@ -4,7 +4,8 @@ import gamedata
 import time
 from random import randint
 
-class HandleEvent():
+
+class HandleEvent:
 
     # startup screen and logic
     def on_startup(self, background, files):
@@ -77,7 +78,8 @@ class HandleEvent():
         board.update()
         self.message_display("Game Over", yloc=0.1, font_size=35)
 
-    # code for creating messages
+    # code for creating and displaying text to the screen, both functions are variations upon a text display
+    # function demonstrated by the YouTuber SentDex in their pygame tutorial.
     def text_objects(self, text, font):
         textsurface = font.render(text, True, pyg.Color("white"))
         return textsurface, textsurface.get_rect()
@@ -172,10 +174,10 @@ class HandleEvent():
             self.on_exit()
         # b drops a bomb
         elif event.key == pyg.K_b:
-            self.on_bomb(board, files)
+            self.on_bomb(files)
 
     # logic for bomb power-up
-    def on_bomb(self, board, files):
+    def on_bomb(self,  files):
         if self.bombs > 0 and not self.paused and not self.startup:
             files['sounds'].ult.play()
             self.purge_aliens()

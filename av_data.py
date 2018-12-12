@@ -4,7 +4,7 @@ import os
 import csv
 
 
-class FileBank():
+class FileBank:
 
     def __init__(self):
         self.load_data()
@@ -17,6 +17,7 @@ class ImageFiles(FileBank):
         self.arrows = pyg.image.load(os.path.join("images", "keys.png"))
         self.space = pyg.image.load(os.path.join("images", "space.png"))
         self.title = pyg.image.load(os.path.join("images", "Title.png"))
+        self.b_button = pyg.image.load(os.path.join("images", "b_button.png"))
         # load in the high scores
 
 
@@ -32,6 +33,7 @@ class AudioFiles(FileBank):
         pyg.mixer.init()
         pyg.mixer.music.load(self.background_music)
         pyg.mixer.music.play(-1)
+
 
 class ScoreFiles(FileBank):
 
