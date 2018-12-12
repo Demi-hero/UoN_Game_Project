@@ -30,6 +30,7 @@ class AudioFiles(FileBank):
         self.boom = pyg.mixer.Sound(os.path.join("sounds", "boom.wav"))
         self.pickup = pyg.mixer.Sound(os.path.join("sounds", "Power-Up.wav"))
         self.ult = pyg.mixer.Sound(os.path.join("sounds", "ult.wav"))
+        self.ping = pyg.mixer.Sound(os.path.join("sounds", "ping.wav"))
         pyg.mixer.init()
         pyg.mixer.music.load(self.background_music)
         pyg.mixer.music.play(-1)
