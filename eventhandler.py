@@ -136,7 +136,7 @@ class HandleEvent():
         elif event.type == pyg.KEYDOWN:
                 self.on_key_down(event, files, board)
         elif event.type == pyg.ACTIVEEVENT:
-            if event.state == 6:
+            if (event.state == 6) and not self.startup:
                 self.on_pause()
 
     def on_exit(self):
@@ -175,10 +175,8 @@ class HandleEvent():
 
     # logic for bomb power-up
     def on_bomb(self, board, files):
-        if self.bombs > 0 and not self.paused and (self.wavenum % 4 != 0):
+        if self.bombs > 0 and not self.paused and not self.startup:
             files['sounds'].ult.play()
-            self.score += 500
-            self.alien_count -= len(self.aliens)
             self.purge_aliens()
             pyg.display.update()
             self.bombs -= 1
@@ -231,9 +229,9 @@ class HandleEvent():
 
     def purge_aliens(self,player_death=0):
         for alien in self.aliens:
-            if not player_death:
-                self.expl = gamedata.Explosion(alien.rect.center, 'sm')
-                self.all_sprites.add(self.expl)
-            alien.kill()
+            if player_death:
+                alien.kill()
+            else:
+                alien.on_hit(self, 10)
         for albull in self.alienbullets:
             albull.kill()

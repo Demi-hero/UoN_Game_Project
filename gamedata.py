@@ -6,7 +6,7 @@ from random import randint
 # constants for the screen
 WIDTH = 960
 HEIGHT = 540
-BORDER = 10
+BORDER = 20
 
 # Background object contains the display, and draws and updates the animated background
 class Background(pyg.sprite.Sprite):
@@ -171,7 +171,7 @@ class Alien(pyg.sprite.Sprite):
     def shoot(self, rate):
         # aliens fire based on fire_rate, adds alien bullets to the groups
         if (randint(1, rate) == self.firing_solution) and (self.rect.x < WIDTH):
-            albull = AlBullet(self.rect.x, (self.rect.y + self.ht // 2))
+            albull = AlBullet(self.rect.x, (self.rect.y + self.ht//2))
             self.main.alienbullets.add(albull)
             self.main.all_sprites.add(albull)
 
@@ -191,8 +191,8 @@ class Alien(pyg.sprite.Sprite):
         self.rect.x += self.vx
         self.shoot(self.fire_rate)
 
-    def on_hit(self, main):
-        self.hitpoints -= 1
+    def on_hit(self, main, damage):
+        self.hitpoints -= damage
         if self.hitpoints <= 0:
             self.kill()
             main.score += self.kill_score
@@ -225,9 +225,9 @@ class SmartAlien(ShieldAlien):
         if self.rect.x > self.width_limit:
             self.rect.x += self.vx
         # tracks player movement and shoots
-        if self.rect.y < self.main.player.rect.y:
+        if self.rect.y + self.ht//2 < self.main.player.rect.y + self.main.player.ht//2:
             self.rect.y += self.vy
-        elif self.rect.y > self.main.player.rect.y:
+        elif self.rect.y + self.ht//2 > self.main.player.rect.y + self.main.player.ht//2:
             self.rect.y -= self.vy
         self.shoot(self.fire_rate)
 
@@ -241,12 +241,27 @@ class Boss(SmartAlien):
         self.hitpoints = 50
         self.fire_rate = 40
         self.kill_score = 1000
+        self.width_limit = WIDTH - self.ln
 
     def animate(self):
         bar = pyg.Rect((WIDTH//2 - 100), (HEIGHT - 20), 200, 18)
         healthbar = pyg.Rect((WIDTH//2 - 100), (HEIGHT - 19), self.hitpoints*4, 16)
         pyg.draw.rect(Background.screen, pyg.Color("black"), bar)
         pyg.draw.rect(Background.screen, pyg.Color("red"), healthbar)
+
+    def update(self):
+        if self.hitpoints > 15:
+            SmartAlien.update(self)
+        else:
+            self.animate()
+            new_x = self.rect.x + self.vx
+            new_y = self.rect.y + self.vy
+            if (new_x < 0) or (new_x > WIDTH-self.ln):
+                self.vx = -self.vx
+            if (new_y + self.ht//2 < BORDER) or (new_y + self.ht//2 > HEIGHT-BORDER):
+                self.vy = -self.vy
+            self.rect.x = new_x
+            self.rect.y = new_y
 
 
 class AlBullet(Bullet):
