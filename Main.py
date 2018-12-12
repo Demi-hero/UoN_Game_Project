@@ -98,7 +98,7 @@ class Main(eh.HandleEvent):
                         self.alien_count = 1
                     else:
                         self.alien_count = self.BASE_count + self.wavenum*5
-                    if self.wavenum % 5 == 0:
+                    if self.wavenum % 4 == 1 and self.wavenum != 1:
                         self.lives += 1
                         self.bombs += 1
 
@@ -124,6 +124,7 @@ class Main(eh.HandleEvent):
                 self.message_display("Bombs: {}".format(self.bombs), 0.025, .8, 20)
                 self.message_display("WAVE : {}".format(self.wavenum), 0.029, .55, font_size=30)
                 if (self.alien_count > 0) and (self.wavenum % 4 != 0):
+
                     self.message_display("Enemies Reinforcements : {}".format(self.alien_count), 0.98, .17, 20)
                 elif self.wavenum % 4 != 0:
                     self.message_display("Enemies Reinforcements : 0".format(self.alien_count), 0.98, .17, 20)

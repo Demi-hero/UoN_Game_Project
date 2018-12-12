@@ -14,10 +14,8 @@ class ImageFiles(FileBank):
     # class containing all the files that need loading in game that don't relate to an in game sprite.
 
     def load_data(self):
-        self.arrows = pyg.image.load(os.path.join("images", "PixelKeys2.png"))
-        self.h = pyg.image.load(os.path.join("images", "h.png"))
-        self.l = pyg.image.load(os.path.join("images", "L.png"))
-        self.space = pyg.image.load(os.path.join("images", "spacebar.png"))
+        self.arrows = pyg.image.load(os.path.join("images", "keys.png"))
+        self.space = pyg.image.load(os.path.join("images", "space.png"))
         self.title = pyg.image.load(os.path.join("images", "Title.png"))
         # load in the high scores
 
@@ -30,6 +28,7 @@ class AudioFiles(FileBank):
         self.boom = pyg.mixer.Sound(os.path.join("sounds", "boom.wav"))
         self.pickup = pyg.mixer.Sound(os.path.join("sounds", "Power-Up.wav"))
         self.ult = pyg.mixer.Sound(os.path.join("sounds", "ult.wav"))
+        self.ping = pyg.mixer.Sound(os.path.join("sounds", "ping.wav"))
         pyg.mixer.init()
         pyg.mixer.music.load(self.background_music)
         pyg.mixer.music.play(-1)

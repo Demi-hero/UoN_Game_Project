@@ -41,8 +41,8 @@ class Player(pyg.sprite.Sprite):
     ht = sprite.get_height()
     # loading the images for the sprite with animated thrusters
     animated_sprite = [pyg.image.load(os.path.join("images", "hero_side1.png")).convert_alpha(),
-               pyg.image.load(os.path.join("images", "hero_side2.png")).convert_alpha(),
-               pyg.image.load(os.path.join("images", "hero_side3.png")).convert_alpha()]
+                       pyg.image.load(os.path.join("images", "hero_side2.png")).convert_alpha(),
+                       pyg.image.load(os.path.join("images", "hero_side3.png")).convert_alpha()]
 
     def __init__(self):
         # sprite stuff, setting image, rectangle and mask (for collision detection)
@@ -135,11 +135,11 @@ class Alien(pyg.sprite.Sprite):
     ln = sprite.get_width()
     ht = sprite.get_height()
     animated_sprite = [pyg.image.load(os.path.join("images", "enemy1.png")).convert_alpha(),
-              pyg.image.load(os.path.join("images", "enemy2.png")).convert_alpha(),
-              pyg.image.load(os.path.join("images", "enemy3.png")).convert_alpha()]
+                       pyg.image.load(os.path.join("images", "enemy2.png")).convert_alpha(),
+                       pyg.image.load(os.path.join("images", "enemy3.png")).convert_alpha()]
     shielded_sprite = [pyg.image.load(os.path.join("images", "shield1.png")).convert_alpha(),
-              pyg.image.load(os.path.join("images", "shield2.png")).convert_alpha(),
-              pyg.image.load(os.path.join("images", "shield3.png")).convert_alpha()]
+                       pyg.image.load(os.path.join("images", "shield2.png")).convert_alpha(),
+                       pyg.image.load(os.path.join("images", "shield3.png")).convert_alpha()]
 
     def __init__(self, main):
         # pass main to alien, so it can access the player position and add alien bullets to the groups
@@ -199,7 +199,8 @@ class Alien(pyg.sprite.Sprite):
             main.sounds.boom.play()
             main.expl = Explosion(self.rect.center, 'lg')
             main.all_sprites.add(main.expl)
-        # can put an else: play 'ping' noise or whatever
+        else:
+            main.sounds.ping.play()
 
 
 class ShieldAlien(Alien):
@@ -295,12 +296,12 @@ class Explosion(pyg.sprite.Sprite):
 class PowerUp(pyg.sprite.Sprite):
 
     animated_life = [pyg.image.load(os.path.join("images", "hero_life.png")).convert_alpha(),
-                     pyg.image.load(os.path.join("images", "hero_life.png")).convert_alpha(),
-                      pyg.image.load(os.path.join("images", "hero_life.png")).convert_alpha()]
+                     pyg.image.load(os.path.join("images", "hero_life1.png")).convert_alpha(),
+                     pyg.image.load(os.path.join("images", "hero_life2.png")).convert_alpha()]
 
     animated_bombs = [pyg.image.load(os.path.join("images", "bomb1.png")).convert_alpha(),
-                        pyg.image.load(os.path.join("images", "bomb2.png")).convert_alpha(),
-                        pyg.image.load(os.path.join("images", "bomb3.png")).convert_alpha()]
+                      pyg.image.load(os.path.join("images", "bomb2.png")).convert_alpha(),
+                      pyg.image.load(os.path.join("images", "bomb3.png")).convert_alpha()]
 
     def __init__(self, main):
         self.main = main

@@ -11,16 +11,13 @@ class HandleEvent():
     def on_startup(self, background, files):
         background.draw()
         background.update()
-        # self.message_display("Highscores :",xloc=.35)
-        # self.message_display(" Lore :", xloc=.65)
-        self.message_display("Movement", yloc=.57, xloc=.26)
-        self.message_display("Shoot", yloc=.65, xloc=.7)
+        self.message_display("Movement", yloc=.93, xloc=.13, font_size=25)
+        self.message_display("Shoot", yloc=.93, xloc=.87, font_size=25)
+        self.message_display("Bomb", yloc=.7, xloc= .87, font_size=25 )
         background.screen.blit(files["images"].title, (221, 0))
-        background.screen.blit(files["images"].arrows, (160, 320))
-        # gamedata.background.screen.blit(Game_Data.startup.h, (425, 228))
-        # gamedata.background.screen.blit(Game_Data.startup.l, (675, 228))
-        background.screen.blit(files["images"].space, (591, 375))
-        self.message_display("Press Shoot to Start", .9, font_size=35)
+        background.screen.blit(files["images"].arrows, (50, 375))
+        background.screen.blit(files["images"].space, (760, 426))
+        self.message_display("-Press Shoot to Start-", .8, font_size=35)
         pyg.display.flip()
         while self.startup:
             for event in pyg.event.get():
@@ -190,7 +187,7 @@ class HandleEvent():
     def player_death(self, hit):
         self.lives -= 1
         self.sounds.boom.play()
-        expl = gamedata.Explosion(hit.rect.center, 'sm')
+        expl = gamedata.Explosion(hit.rect.center, 'lg')
         self.all_sprites.add(expl)
         self.player.hide()
         for bullet in self.bullets:
@@ -235,7 +232,7 @@ class HandleEvent():
     def purge_aliens(self,player_death=0):
         for alien in self.aliens:
             if not player_death:
-                self.expl = gamedata.Explosion(alien.rect.center, 'lg')
+                self.expl = gamedata.Explosion(alien.rect.center, 'sm')
                 self.all_sprites.add(self.expl)
             alien.kill()
         for albull in self.alienbullets:
