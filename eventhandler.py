@@ -178,7 +178,7 @@ class HandleEvent():
 
     # logic for bomb power-up
     def on_bomb(self, board, files):
-        if self.bombs > 0 and not self.paused:
+        if self.bombs > 0 and not self.paused and (self.wavenum % 4 != 0):
             files['sounds'].ult.play()
             self.score += 500
             self.alien_count -= len(self.aliens)
@@ -203,8 +203,11 @@ class HandleEvent():
     def new_alien(self, amount=1):
         if (len(self.aliens) <= amount) and (self.alien_count > 0):
             self.alien_count -= 1
+            if self.wavenum % 4 == 0:
+                boss = gamedata.Boss(self)
+                self.spawn_check(boss)
             # spawns a smart alien if one doesn't exist
-            if len(self.smartaliens) == 0:
+            elif len(self.smartaliens) == 0:
                 smartalien = gamedata.SmartAlien(self)
                 self.all_sprites.add(smartalien)
                 self.aliens.add(smartalien)
