@@ -158,6 +158,7 @@ class Alien(pyg.sprite.Sprite):
         self.fire_rate = 400
         self.firing_solution = 1
         self.animation_loop = 0
+        self.kill_score = 20
         # hit points - determines whether shield is up or down (displays different image)
         self.hitpoints = 1
 
@@ -194,7 +195,7 @@ class Alien(pyg.sprite.Sprite):
         self.hitpoints -= 1
         if self.hitpoints <= 0:
             self.kill()
-            main.score += main.kill_score
+            main.score += self.kill_score
             main.sounds.boom.play()
             main.expl = Explosion(self.rect.center, 'lg')
             main.all_sprites.add(main.expl)
@@ -228,6 +229,23 @@ class SmartAlien(ShieldAlien):
         elif self.rect.y > self.main.player.rect.y:
             self.rect.y -= self.vy
         self.shoot(self.fire_rate)
+
+
+class Boss(SmartAlien):
+    sprite = pyg.image.load(os.path.join("images", "enemy.png")).convert_alpha()
+    ln = sprite.get_width()
+    ht = sprite.get_height()
+    def __init__(self, main):
+        SmartAlien.__init__(self, main)
+        self.hitpoints = 50
+        self.fire_rate = 40
+        self.kill_score = 1000
+
+    def animate(self):
+        bar = pyg.Rect((WIDTH//2 - 100), (HEIGHT - 20), 200, 18)
+        healthbar = pyg.Rect((WIDTH//2 - 100), (HEIGHT - 19), self.hitpoints*4, 16)
+        pyg.draw.rect(Background.screen, pyg.Color("black"), bar)
+        pyg.draw.rect(Background.screen, pyg.Color("red"), healthbar)
 
 
 class AlBullet(Bullet):
