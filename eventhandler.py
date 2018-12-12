@@ -2,7 +2,6 @@ import pygame as pyg
 import os
 import gamedata
 import time
-import csv
 from random import randint
 
 class HandleEvent():

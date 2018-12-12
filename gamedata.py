@@ -233,7 +233,12 @@ class SmartAlien(ShieldAlien):
 
 
 class Boss(SmartAlien):
-    sprite = pyg.image.load(os.path.join("images", "enemy.png")).convert_alpha()
+    sprite = pyg.image.load(os.path.join("images", "boss1.png")).convert_alpha()
+    damaged = [pyg.image.load(os.path.join("images", "boss5.png")).convert_alpha(),
+               pyg.image.load(os.path.join("images", "boss4.png")).convert_alpha(),
+               pyg.image.load(os.path.join("images", "boss3.png")).convert_alpha(),
+               pyg.image.load(os.path.join("images", "boss2.png")).convert_alpha(),
+               pyg.image.load(os.path.join("images", "boss1.png")).convert_alpha()]
     ln = sprite.get_width()
     ht = sprite.get_height()
     def __init__(self, main):
@@ -244,6 +249,8 @@ class Boss(SmartAlien):
         self.width_limit = WIDTH - self.ln
 
     def animate(self):
+        if self.hitpoints < 50:
+            self.image = self.damaged[self.hitpoints//10]
         bar = pyg.Rect((WIDTH//2 - 100), (HEIGHT - 20), 200, 18)
         healthbar = pyg.Rect((WIDTH//2 - 100), (HEIGHT - 19), self.hitpoints*4, 16)
         pyg.draw.rect(Background.screen, pyg.Color("black"), bar)
