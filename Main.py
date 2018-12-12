@@ -95,7 +95,7 @@ class Main(eh.HandleEvent):
                     self.new_wave = True
                     new_timer = pyg.time.get_ticks()
                     self.alien_count = self.BASE_count + self.wavenum*5
-                    if self.wavenum % 4 == 0:
+                    if self.wavenum % 4 == 1 and self.wavenum != 1:
                         self.lives += 1
                         self.bombs += 1
 
@@ -120,7 +120,7 @@ class Main(eh.HandleEvent):
                 self.message_display("Score:{}".format(self.score), 0.025, 0.1, 20)
                 self.message_display("Lives: {}".format(self.lives), 0.025, .9, 20)
                 self.message_display("Bombs: {}".format(self.bombs), 0.025, .8, 20)
-                self.message_display("WAVE : {}".format(self.wavenum), 0.029, .55, font_size=30)
+                self.message_display("WAVE : {}".format(self.wavenum), 0.029, .5, font_size=30)
                 if self.alien_count > 0:
                     self.message_display("Enemies Reinforcements : {}".format(self.alien_count), 0.98, .17, 20)
                 else:
